@@ -1,6 +1,8 @@
 import sqlite3
 import numpy as np
 
+from bss.conf import attrs
+
 
 def get_closest_bike(customer):
 	location = customer.get_location().copy()
