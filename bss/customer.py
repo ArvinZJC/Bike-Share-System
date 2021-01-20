@@ -74,27 +74,35 @@ class Customer:
 
         if direction == 'up':
             map.set_state(location, og_val - 100)
-            location[0] -= 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 100)
+            temp = location[0]
+            if temp >= 1:
+                location[0] -= 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 1)
 
         elif direction == 'down':
             map.set_state(location, og_val - 100)
-            location[0] += 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 100)
+            temp = location[0]
+            if temp <= 18:
+                location[0] += 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 100)
 
         elif direction == 'left':
             map.set_state(location, og_val - 100)
-            location[1] -= 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 100)
+            temp = location[1]
+            if temp >= 1:
+                location[1] -= 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 100)
 
         else:
             map.set_state(location, og_val - 100)
-            location[1] += 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 100)
+            temp = location[1]
+            if temp <= 18:
+                location[1] += 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 100)
 
     def move_with_bike(self, direction, map, bike):
         if direction == 'unmount':
