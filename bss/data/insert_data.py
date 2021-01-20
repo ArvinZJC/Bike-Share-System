@@ -1,5 +1,6 @@
 import sqlite3
 
+
 db_name = 'TEAM_PJT.db'
 
 try:
