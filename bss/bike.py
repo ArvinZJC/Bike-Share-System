@@ -1,14 +1,11 @@
 import sqlite3
 
-
 class Bike:
 
     def __init__(self, defective, Id, location):
         self.Id = Id
         self.location = location
         self.defective = defective
-
-    # map.set_state(location,1)
 
     def is_defective(self):
         return self.defective
@@ -36,25 +33,29 @@ class Bike:
         location = self.get_location()
         og_val = map.get_square_val(location)
         if direction == 'up':
-            map.set_state(location, og_val - 1)
-            location[0] -= 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 1)
+            if location[0]>=0:
+                map.set_state(location, og_val - 1)
+                location[0] -= 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 1)
 
         elif direction == 'down':
-            map.set_state(location, og_val - 1)
-            location[0] += 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 1)
+            if location[0]<=19:
+                map.set_state(location, og_val - 1)
+                location[0] += 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 1)
 
         elif direction == 'left':
-            map.set_state(location, og_val - 1)
-            location[1] -= 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 1)
+            if location[1]>=0:
+                map.set_state(location, og_val - 1)
+                location[1] -= 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 1)
 
         else:
-            map.set_state(location, og_val - 1)
-            location[1] += 1
-            self.set_location(location)
-            map.set_state(location, map.get_square_val(location) + 1)
+            if location[1]<=19:
+                map.set_state(location, og_val - 1)
+                location[1] += 1
+                self.set_location(location)
+                map.set_state(location, map.get_square_val(location) + 1)
