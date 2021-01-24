@@ -24,9 +24,18 @@ class Customer:
             print("Balance not enough to pay! Invalid transaction.")
             return
         self.balance -= amount
+        c = conn.cursor()
+        c.execute("Update customer set wallet =:new_amount",{'new_amount':self.balance})
+        conn.commit()
+        conn.close()
 
     def update_balance(self, amount):
         self.balance += amount
+        conn = sqlite3.connect('data/TEAM_PJT.db')
+        c = conn.cursor()
+        c.execute("Update customer set wallet =:new_amount",{'new_amount':self.balance})
+        conn.commit()
+        conn.close()
 
     def get_location(self):
         return self.location
@@ -35,8 +44,9 @@ class Customer:
         self.location = location
         conn = sqlite3.connect('data/TEAM_PJT.db')
         c = conn.cursor()
-        c.execute("UPDATE customer set location_row =:location_row, location_col=:location_col where name=:name",
-                  {'location_row': location[0], 'location_col': location[1], 'name': self.name})
+        c.execute("UPDATE customer set location_row =:location_row, location_col=:location_col where id=:Id",
+                  {'location_row': location[0], 'location_col': location[1], 'Id': self.Id})
+        
         conn.commit()
         conn.close()
 
@@ -73,33 +83,29 @@ class Customer:
         og_val = map.get_square_val(location)
 
         if direction == 'up':
-            map.set_state(location, og_val - 100)
-            temp = location[0]
-            if temp >= 1:
+            if location[0] >= 0:
+                map.set_state(location, og_val - 100)
                 location[0] -= 1
                 self.set_location(location)
-                map.set_state(location, map.get_square_val(location) + 1)
+                map.set_state(location, map.get_square_val(location) + 100)
 
         elif direction == 'down':
-            map.set_state(location, og_val - 100)
-            temp = location[0]
-            if temp <= 18:
+            if location[0] <= 19:
+                map.set_state(location, og_val - 100)
                 location[0] += 1
                 self.set_location(location)
                 map.set_state(location, map.get_square_val(location) + 100)
 
         elif direction == 'left':
-            map.set_state(location, og_val - 100)
-            temp = location[1]
-            if temp >= 1:
+            if location[1] >= 0:
+                map.set_state(location, og_val - 100)
                 location[1] -= 1
                 self.set_location(location)
                 map.set_state(location, map.get_square_val(location) + 100)
 
         else:
-            map.set_state(location, og_val - 100)
-            temp = location[1]
-            if temp <= 18:
+            if location[1] <= 19:
+                map.set_state(location, og_val - 100)
                 location[1] += 1
                 self.set_location(location)
                 map.set_state(location, map.get_square_val(location) + 100)
