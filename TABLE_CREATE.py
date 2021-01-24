@@ -32,8 +32,8 @@ def main():
                                 user_name TEXT NOT NULL UNIQUE,
                                 password TEXT NOT NULL,
                                 wallet REAL NOT NULL,
-                                longitude INTEGER NOT NULL,
-                                latitude INTEGER NOT NULL
+                                location_row INTEGER NOT NULL,
+                                location_col INTEGER NOT NULL
                                 );"""
                                 
     bike_status_table = """CREATE TABLE IF NOT EXISTS bike_status(
