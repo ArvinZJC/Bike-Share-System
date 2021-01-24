@@ -10,10 +10,17 @@ c = conn.cursor()
 
 
 
-c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(1,"Tony","1234",132.5,10,11))
-c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(2,"Jichen","12345",232.5,0,1))
-c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(3,"Shihao","123456",172.5,8,3))
-c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(4,"Yuan","1234567",188.6,4,12))
+c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(1,"tony","1234",132.5,10,11))
+c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(2,"jichen","12345",232.5,0,1))
+c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(3,"shihao","123456",172.5,8,3))
+c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(4,"yuan","1234567",188.6,4,12))
+
+
+c.execute("INSERT INTO operator (id,name,password) VALUES({},'{}','{}')".format(1,"jiamin","1234"))
+c.execute("INSERT INTO operator (id,name,password) VALUES({},'{}','{}')".format(2,"nan","12345"))
+
+c.execute("INSERT INTO manager (id,name,password) VALUES({},'{}','{}')".format(1,"xiaoran","1234"))
+
 
 
 c.execute("INSERT INTO bike (id,defective,location_row,location_col) VALUES({},{},{},{})".format(1,0,11,15))

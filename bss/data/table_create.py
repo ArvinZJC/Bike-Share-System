@@ -26,7 +26,7 @@ def main():
 
 	bike_table = """CREATE TABLE IF NOT EXISTS bike(
 								id INTEGER PRIMARY KEY,
-                                defective INTEGER DEFAULT 0,
+                                defective REAL DEFAULT 0,
                                 location_row INTEGER NOT NULL,
                                 location_col INTEGER NOT NULL
                                 );"""
@@ -42,8 +42,8 @@ def main():
                                 
 	bike_status_table = """CREATE TABLE IF NOT EXISTS bike_status(
                                 id INTEGER,
-                                time_of_event TIME,
-                                defective INTEGER,
+                                time_of_event TEXT,
+                                defective REAL,
                                 FOREIGN KEY(id) REFERENCES bike(id)
                                 );"""
                                 
@@ -60,10 +60,11 @@ def main():
                                 );"""
                                 
 	movement_table = """CREATE TABLE IF NOT EXISTS movement(
+								movement_id INTEGER PRIMARY KEY,
                                 bike_id INTEGER NOT NULL,
                                 user_id INTEGER NOT NULL,
                                 distance REAL,
-                                duration TIME,
+                                duration TEXT,
                                 FOREIGN KEY(bike_id) REFERENCES bike(id),
                                 FOREIGN KEY(user_id) REFERENCES customer(id)
                                 );"""                            
