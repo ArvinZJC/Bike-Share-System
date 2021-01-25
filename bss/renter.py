@@ -26,7 +26,7 @@ def renting(map,customer):
 			c = conn.cursor()
 			c.execute("SELECT * FROM bike where id=:Id", {'Id': bike_ids[0][0]})
 			bike_details = c.fetchall()
-			rented_bike = Bike(bike_ids[0][0], bike_details[0][1], [bike_details[0][2], bike_details[0][3]])
+			rented_bike = Bike(bike_ids[0][0], bike_details[0][1], [bike_details[0][2], bike_details[0][3]],bike_details[0][4])
 			conn.close()
 
 		else:
@@ -35,7 +35,7 @@ def renting(map,customer):
 			c = conn.cursor()
 			c.execute("SELECT * FROM bike where id=:Id", {'Id': rented_id})
 			bike_details = c.fetchall()
-			rented_bike = Bike(rented_id, bike_details[0][1], [bike_details[0][2], bike_details[0][3]])
+			rented_bike = Bike(rented_id, bike_details[0][1], [bike_details[0][2], bike_details[0][3]],bike_details[0][4])
 			conn.close()
 
 		return rented_bike

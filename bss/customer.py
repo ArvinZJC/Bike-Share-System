@@ -21,15 +21,13 @@ class Customer:
 
 	def charge(self, time):
 		amount = round(float(time)/60,2)*0.5
-		if amount > self.balance:
-			print("Balance not enough to pay! Invalid transaction.")
-			return
 		self.balance -= amount
 		conn = sqlite3.connect('data/TEAM_PJT.db')
 		c = conn.cursor()
 		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
 		conn.commit()
 		conn.close()
+		return amount
 
 	def update_balance(self, amount):
 		self.balance += amount
@@ -38,6 +36,9 @@ class Customer:
 		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
 		conn.commit()
 		conn.close()
+
+	def get_balance(self):
+		return self.balance
 
 	def get_location(self):
 		return self.location
@@ -102,4 +103,8 @@ class Customer:
 		self.riding = flag
 
 	def get_flag(self):
+		while self.get_balance()<0:
+			print("You can't rent a bike while your balance is negative. Please update your balance."),
+			amount = int(input("How much you want to transfer to your account? "))
+			self.update_balance(amount)
 		return self.riding

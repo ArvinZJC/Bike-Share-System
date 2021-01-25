@@ -6,11 +6,16 @@ from customer import *
 from login import *
 from mapping import *
 from renter import *
+import random
+from companysPocket import *
+from closestBike import *
+from reportBreakDown import *
 
 
 def customer_pilot(customer,our_map):
 	state = our_map.get_state()
 	direction = 'None'
+	centralPocket = CentralBank()
 
 	while direction != '':
 		our_map.print_nice()
@@ -18,6 +23,7 @@ def customer_pilot(customer,our_map):
 
 		if customer.get_flag() == False:
 			if direction!='unmount':
+				get_closest_bike(customer)
 				rented_bike = renting(our_map,customer)
 				if rented_bike!=False:
 					conn = sqlite3.connect('data/TEAM_PJT.db')
@@ -31,6 +37,11 @@ def customer_pilot(customer,our_map):
 					distance,extra_time = 0,0
 					customer.is_using_bike(True)
 					conn.close()
+					if customer.get_balance()<40:
+						answer = input("Your funds are low. Do you want to update your balance? ")
+						if answer == 'yes':
+							amount = int(input("How much you want to transfer to your account? "))
+							customer.update_balance(amount)
 
 			while True:
 				direction = input("Input direction[up,down,left,right]: ")
@@ -65,13 +76,16 @@ def customer_pilot(customer,our_map):
 
 			if direction == 'unmount':
 				customer.is_using_bike(False)
-				customer.charge(extra_time)
+				amount = customer.charge(extra_time)
 				extra_time = time.strftime("%H:%M:%S",time.gmtime(extra_time))
 				conn = sqlite3.connect('data/TEAM_PJT.db')
 				c = conn.cursor()
 				c.execute("INSERT INTO movement (movement_id,bike_id,user_id,distance,duration) VALUES ({},{},{},{},'{}')".format(movement_id,rented_bike.get_id(),customer.Id,distance,extra_time))
 				conn.commit()
 				conn.close()
+				rented_bike.set_mileage(distance)
+				centralPocket.track_changes(amount,time.strftime("%H:%M:%S",time.gmtime(time.time())))
+				reportBreak(rented_bike)
 
 			else:
 				og_loc = customer.get_location().copy()
@@ -79,4 +93,4 @@ def customer_pilot(customer,our_map):
 				
 				if customer.get_location()!=og_loc:
 					distance +=1
-					extra_time += random.randint(3,5)*random.randint(50,60)
+					extra_time += random.randint(3,5)*random.randint(50,60)* max(0.5,(1-rented_bike.get_defective()))

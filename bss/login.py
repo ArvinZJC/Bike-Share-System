@@ -32,7 +32,7 @@ def logging():
     elif typeOfUser == 2:
         c.execute("SELECT * From operator Where name=:name and password=:password", {'name': name,'password':password})
         values = c.fetchall()
-        user = OperatorWorker(values[0][0],values[0][1],values[0][2])
+        user = OperatorWorker(values[0][0],values[0][1],values[0][2],values[0][3],values[0][4])
 
     elif typeOfUser == 3:
         c.execute("SELECT * From manager Where name=:name and password=:password", {'name': name,'password':password})
