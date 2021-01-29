@@ -20,24 +20,36 @@ def logging():
 
     typeOfUser = hello()
 
-    name = input("Input your username: ")
-    password = input("Input your password: ")
+    user = None
 
-    if typeOfUser == 1:
-        c.execute("SELECT * FROM customer WHERE name=:name and password=:password", {'name': name,'password':password})
-        values = c.fetchall()
-        user = Customer(values[0][0], values[0][1], values[0][2], values[0][3],
-                            [values[0][4], values[0][5]])
+    while(user == None):
+        name = input("Input your username: ")
+        password = input("Input your password: ")
 
-    elif typeOfUser == 2:
-        c.execute("SELECT * From operator Where name=:name and password=:password", {'name': name,'password':password})
-        values = c.fetchall()
-        user = OperatorWorker(values[0][0],values[0][1],values[0][2],values[0][3],values[0][4])
+        if typeOfUser == 1:
+            c.execute("SELECT * FROM customer WHERE name=:name and password=:password", {'name': name,'password':password})
+            values = c.fetchall()
+            if len(values) == 0:
+                print("Your username or password is wrong,please try again.")
+            else:
+                user = Customer(values[0][0], values[0][1], values[0][2], values[0][3],
+                                [values[0][4], values[0][5]])
 
-    elif typeOfUser == 3:
-        c.execute("SELECT * From manager Where name=:name and password=:password", {'name': name,'password':password})
-        values = c.fetchall()
-        user = Manager(values[0][0],values[0][1],values[0][2])
+        elif typeOfUser == 2:
+            c.execute("SELECT * From operator Where name=:name and password=:password", {'name': name,'password':password})
+            values = c.fetchall()
+            if len(values) == 0:
+                print("Your username or password is wrong,please try again.")
+            else:
+                user = OperatorWorker(values[0][0],values[0][1],values[0][2],values[0][3],values[0][4])
+
+        elif typeOfUser == 3:
+            c.execute("SELECT * From manager Where name=:name and password=:password", {'name': name,'password':password})
+            values = c.fetchall()
+            if len(values) == 0:
+                print("Your username or password is wrong,please try again.")
+            else:
+                user = Manager(values[0][0],values[0][1],values[0][2])
 
     conn.close()
 
