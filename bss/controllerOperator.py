@@ -24,7 +24,11 @@ def operator_pilot(operatorWorker):
 		elif menu_choice==1:
 			operatorWorker.track_bikes()
 		elif menu_choice==2:
-			centralPocket.pay_operator(operatorWorker,operatorWorker.repair_bikes(),time.strftime("%H:%M:%S",time.gmtime(time.time())))
+			lst = operatorWorker.repair_bikes()
+			print(lst)
+			money = lst[0]
+			time = lst[1]
+			centralPocket.pay_operator(operatorWorker,money,time)
 		else:
 			operatorWorker.move_bikes()
 

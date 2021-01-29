@@ -35,6 +35,7 @@ def customer_pilot(customer,our_map):
 					except:
 						movement_id = 0
 					distance,extra_time = 0,0
+					timeOfStart = time.time()
 					customer.is_using_bike(True)
 					conn.close()
 					if customer.get_balance()<40:
@@ -77,15 +78,17 @@ def customer_pilot(customer,our_map):
 			if direction == 'unmount':
 				customer.is_using_bike(False)
 				amount = customer.charge(extra_time)
-				extra_time = time.strftime("%H:%M:%S",time.gmtime(extra_time))
+				duration = time.strftime("%H:%M:%S",time.gmtime(extra_time))
+				rented_bike.set_mileage(distance)
+				dateOfTransaction = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(extra_time+timeOfStart))
 				conn = sqlite3.connect('data/TEAM_PJT.db')
 				c = conn.cursor()
-				c.execute("INSERT INTO movement (movement_id,bike_id,user_id,distance,duration) VALUES ({},{},{},{},'{}')".format(movement_id,rented_bike.get_id(),customer.Id,distance,extra_time))
+				c.execute("INSERT INTO movement (movement_id,bike_id,user_id,distance,duration,startTime) VALUES ({},{},{},{},'{}','{}')".format(movement_id,rented_bike.get_id(),
+											customer.Id,distance,duration,dateOfTransaction))
 				conn.commit()
 				conn.close()
-				rented_bike.set_mileage(distance)
-				centralPocket.track_changes(amount,time.strftime("%H:%M:%S",time.gmtime(time.time())))
-				reportBreak(rented_bike)
+				centralPocket.track_changes(amount,dateOfTransaction)
+				reportBreak(rented_bike,dateOfTransaction)
 
 			else:
 				og_loc = customer.get_location().copy()

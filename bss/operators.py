@@ -53,19 +53,37 @@ class OperatorWorker:
 			else:
 				print("Invalid id for bike.Try again.")
 
+		c.execute("SELECT * FROM bike where id=:Id",{'Id':to_fix})
+		i = c.fetchone()
 		to_repair = Bike(i[0],i[1],[i[2],i[3]],i[4])
-		c.execute("SELECT defective_start from bike_status where id=:Id",{'Id':to_repair.get_id()})
-		how_broken = c.fetchall()
-		how_broken = how_broken[0][0]
-		c.execute("INSERT INTO bike_status (id,time_of_event,defective_start,defective_end) VALUES ({},'{}',{},{})".format(to_repair.get_id(),
-																										time.strftime("%H:%M:%S",time.gmtime(time.time())),1,0))
+		c.execute("SELECT defective_start,time_of_event from bike_status where id=:Id",{'Id':to_repair.get_id()})
+		rows = c.fetchall()
+		how_broken = rows[0][0]
+		timeBegin = rows[0][1]
 		conn.commit()
 		print("Fixing.....")
 		timeToFix = (60/self.skill_level)*how_broken
 		time.sleep(timeToFix)
+		timeToFix = timeToFix*10*self.skill_level
 		conn.close()
 		to_repair.set_defective()
-		return self.skill_level*timeToFix
+		timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.time()))
+
+		print(timeBegin)
+		print(time.time())
+		print(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")))
+
+		if (time.time()+timeToFix)<time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")):
+			timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S"))+timeToFix))
+
+		conn = sqlite3.connect('data/TEAM_PJT.db')
+		c = conn.cursor()
+
+		c.execute("INSERT INTO bike_status (id,time_of_event,defective_start,defective_end) VALUES ({},'{}',{},{})".format(to_repair.get_id(),
+																										timeOfFix,1,0))
+		conn.commit()
+		conn.close()
+		return [timeToFix/20,timeOfFix]
 
 	def move_bikes(self):
 		conn = sqlite3.connect('data/TEAM_PJT.db')
