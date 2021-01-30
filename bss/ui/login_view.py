@@ -1,14 +1,18 @@
 '''
 Description: the definition of a login view
-Version: 1.0.0.20210124
+Version: 1.0.5.20210130
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-24 18:23:21
+LastEditTime: 2021-01-30 18:23:21
 '''
 
-from tkinter import BooleanVar, Button, Checkbutton, Entry, font, Label, StringVar, Tk
+from tkinter import font, StringVar, Tk, Toplevel, ttk
 from tkinter.constants import E, W
+
+from bss.ui.conf import attrs, styles
+from bss.ui.signup_view import SignupView
+from bss.ui.tooltip import Tooltip
 
 
 class LoginView:
@@ -16,7 +20,7 @@ class LoginView:
     The class for creating a login view.
     '''
 
-    def __init__(self, parent: Tk) -> None:
+    def __init__(self, parent) -> None:
         '''
         The constructor of the class for creating a login view.
 
@@ -25,68 +29,171 @@ class LoginView:
         parent : the parent window for the login view to display
         '''
 
-        self.parent = parent
-        font_content = font.Font(self.parent, size = 12)  # TODO: consider conf file
-        font_placeholder = font.Font(self.parent, size = 5)
+        self.__parent = parent
+        self.__signup_window = None  # Initialise the sign-up window here to avoid opening duplicated windows.
+        screen_width = self.__parent.winfo_screenwidth()
+        screen_height = self.__parent.winfo_screenheight()
+        parent_width = 300
+        parent_height = 500
+        column_num = 2
+
+        self.__parent.geometry('%dx%d+%d+%d' % (parent_width, parent_height, (screen_width - parent_width) / 2, (screen_height - parent_height) / 2))  # Centre the __parent window.
+        self.__parent.title('Log in')
+        self.__parent.iconbitmap()  # TODO: add the path of the ICO image.
 
         # Enable auto-resizing controls with the grid geometry manager.
-        self.parent.columnconfigure(0, weight = 1)
-        self.parent.columnconfigure(1, weight = 1)
+        for index in range(column_num):
+            self.__parent.columnconfigure(index, weight = 1)
 
-        self.parent.geometry('300x500')
-        self.parent.title('Lab1_2d')  # TODO: change the title
+        font_dict = styles.apply_style()
 
-        Label(self.parent, text = '(TODO: image placeholder)').grid(columnspan = 2, row = 0)  # TODO: image
+        # The link font.
+        font_link = font.Font(family = attrs.FONT_FAMILY, size = attrs.CONTENT_FONT_SIZE)
+        font_link.config(underline = True)
 
-        Label(self.parent, font = font_placeholder).grid(columnspan = 2, row = 1)  # Placeholder.
-        Label(self.parent, font = font_content, text = 'Username:').grid(columnspan = 2, padx = 15, pady = 5, row = 2, sticky = W)  # The username label.
+        # TODO: New row: the logo image label.
+        row_count = 0  # Make it convenient to index the row of the grid.
+        ttk.Label(self.__parent, text = '(logo image placeholder)').grid(columnspan = column_num, row = row_count)
 
-        # The username entry.
-        variable_username = StringVar()
-        entry_username = Entry(self.parent, font = font_content, textvariable = variable_username)
-        entry_username.grid(columnspan = 2, padx = 15, row = 3, sticky = (E, W))
+        # New row: the role label.
+        row_count += 1
+        ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'Role:').grid(columnspan = column_num, padx = attrs.PADDING_X, pady = attrs.PADDING_Y, row = row_count, sticky = W)
 
-        Label(self.parent, font = font_placeholder).grid(columnspan = 2, row = 4)  # Placeholder.
-        Label(self.parent, font = font_content, text = 'Password:').grid(columnspan = 2, padx = 15, pady = 5, row = 5, sticky = W)  # The password label.
+        # New row: the role combobox.
+        row_count += 1
+        self.__role_list = ['Customer', 'Manager', 'Operator']
+        self.__variable_role = StringVar()
+        self.__combobox_role = ttk.Combobox(self.__parent, font = font_dict['content_font'], state = 'readonly', textvariable = self.__variable_role, values = self.__role_list)
+        self.__combobox_role.grid(columnspan = column_num, padx = attrs.PADDING_X, row = row_count, sticky = (E, W))
+        self.__combobox_role.bind('<<ComboboxSelected>>', self.__select_role)
 
-        # The password entry.
-        variable_password = StringVar()
-        entry_password = Entry(self.parent, font = font_content, show = '*', textvariable = variable_password)
-        entry_password.grid(columnspan = 2, padx = 15, row = 6, sticky = (E, W))
+        # New row: the username label.
+        row_count += 1
+        ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'Username:').grid(columnspan = column_num, padx = attrs.PADDING_X, pady = attrs.PADDING_Y, row = row_count, sticky = W)
 
-        Label(self.parent, font = font_placeholder).grid(columnspan = 2, row = 7)  # Placeholder.
+        # New row: the username entry.
+        row_count += 1
+        self.__variable_username = StringVar()
+        self.__entry_username = ttk.Entry(self.__parent, font = font_dict['content_font'], textvariable = self.__variable_username)
+        self.__entry_username.grid(columnspan = column_num, padx = attrs.PADDING_X, row = row_count, sticky = (E, W))
+        self.__entry_username.focus()
 
-        # The check button for remembering me.
-        variable_remember_me = BooleanVar(value = False)
-        checkbutton_remember_me = Checkbutton(self.parent, font = font_content, text = 'Remember me', variable = variable_remember_me)
-        checkbutton_remember_me.grid(columnspan = 2, padx = 15, pady = 5, row = 8, sticky = W)
+        # New row: the password label.
+        row_count += 1
+        ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'Password:').grid(columnspan = column_num, padx = attrs.PADDING_X, pady = attrs.PADDING_Y, row = row_count, sticky = W)
 
-        # The login button.
-        button_login = Button(self.parent, background = '#0081FF', command = self.log_in, font = font_content, foreground = 'white', text = 'Log in')
-        button_login.grid(columnspan = 2, padx = 15, row = 9, sticky = (E, W))
+        # New row: the password entry.
+        row_count += 1
+        self.__variable_password = StringVar()
+        self.__entry_password = ttk.Entry(self.__parent, font = font_dict['content_font'], show = '*', textvariable = self.__variable_password)
+        self.__entry_password.grid(columnspan = column_num, padx = attrs.PADDING_X, row = row_count, sticky = (E, W))
 
-        Label(self.parent, font = font_content, text = 'New here?').grid(row = 10, pady = 5, sticky = E)  # The label for questioning sign-up status.
+        # New row: placeholder.
+        row_count += 1
+        ttk.Label(self.__parent, style = styles.PLACEHOLDER_LABEL).grid(columnspan = 2, row = row_count)
 
-        # The sign-up label.
-        font_sign_up = font_content.copy()
-        font_sign_up.config(underline = True)
-        label_sign_up = Label(self.parent, font = font_sign_up, foreground = '#0081FF', text = 'Sign up now.')
-        label_sign_up.grid(column = 1, row = 10, pady = 5, sticky = W)
-        label_sign_up.bind('<Button-1>', self.sign_up)
+        # New row: the login button.
+        row_count += 1
+        self.__button_login = ttk.Button(self.__parent, command = self.__log_in, text = 'Log in')
+        self.__button_login.grid(columnspan = column_num, padx = attrs.PADDING_X, pady = attrs.PADDING_Y, row = row_count, sticky = (E, W))
 
-    def log_in(self) -> None:
+        # New row: the label for questioning sign-up status.
+        row_count += 1
+        column_count = 0  # Make it convenient to index the column of the grid.
+        ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'New here?').grid(column = column_count, row = row_count, sticky = E)
+
+        # Same row, new column: the sign-up label.
+        column_count += 1
+        self.__label_signup = ttk.Label(self.__parent, font = font_link, style = styles.LINK_LABEL, text = 'Sign up now.')
+        self.__label_signup.grid(column = column_count, row = row_count, sticky = W)
+        self.__label_signup.bind('<Button-1>', self.__goto_signup)
+        self.__tooltip_signup = Tooltip(self.__label_signup, None)
+
+        self.__combobox_role.current(0)
+        self.__select_role(None)
+
+    # noinspection PyUnusedLocal
+    def __select_role(self, event) -> None:
+        '''
+        Select the role to log in.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
         '''
 
+        if self.__combobox_role.get() == self.__role_list[0]:
+            self.__label_signup['state'] = '!disabled'
+            self.__tooltip_signup.set_text()
+            self.__label_signup.bind('<Enter>', self.__enter_label_signup)
+            self.__label_signup.bind('<Leave>', self.__leave_label_signup)
+        else:
+            self.__label_signup['state'] = 'disabled'
+            self.__tooltip_signup.set_text('You can only sign up as a customer.')
+
+        self.__entry_username.focus()
+
+    def __log_in(self) -> None:
+        '''
+        Log the user with the selected role in when the specified button is clicked.
         '''
 
         pass
 
-    def sign_up(self, event) -> None:
+    # noinspection PyUnusedLocal
+    def __enter_label_signup(self, event) -> None:
+        '''
+        Execute actions when the mouse enters the specified label.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
         '''
 
+        if str(self.__label_signup['state']) != 'disabled':
+            self.__label_signup['state'] = 'active'
+
+    # noinspection PyUnusedLocal
+    def __leave_label_signup(self, event) -> None:
+        '''
+        Execute actions when the mouse leaves the specified label.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
         '''
 
-        pass
+        if str(self.__label_signup['state']) != 'disabled':
+            self.__label_signup['state'] = '!active'
+
+    # noinspection PyUnusedLocal
+    def __goto_signup(self, event) -> None:
+        '''
+        Go to the sign-up view.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
+        '''
+
+        if str(self.__label_signup['state']) != 'disabled':
+            self.__label_signup.focus()
+            self.__entry_username.focus()
+
+            if self.__signup_window is None:
+                self.__signup_window = Toplevel(self.__parent)
+                self.__signup_window.protocol('WM_DELETE_WINDOW', self.__reset_signup_window)
+                SignupView(self.__signup_window)
+            else:
+                self.__signup_window.focus()
+
+    def __reset_signup_window(self) -> None:
+        '''
+        Reset the sign-up window.
+        '''
+
+        self.__signup_window.destroy()
+        self.__signup_window = None
 
 
 # Test purposes only.
