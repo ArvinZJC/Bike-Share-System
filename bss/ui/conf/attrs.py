@@ -1,12 +1,14 @@
 '''
 Description: an attribute sheet to make it convenient to manage attributes
-Version: 1.0.0.20210130
+Version: 1.0.1.20210131
 Author: Arvin Zhao
 Date: 2021-01-30 12:35:15
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-30 12:35:24
+LastEditTime: 2021-01-31 12:35:24
 '''
 
+APP_BANNER_PATH = 'img/banner.png'
+APP_ICON_PATH = 'img/icon.ico'
 APP_NAME = 'BikeSims'
 CONTENT_FONT_SIZE = 12
 EXPLANATION_FONT_SIZE = 10

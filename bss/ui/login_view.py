@@ -1,10 +1,10 @@
 '''
 Description: the definition of a login view
-Version: 1.0.5.20210130
+Version: 1.0.6.20210131
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-30 18:23:21
+LastEditTime: 2021-01-31 18:23:21
 '''
 
 from tkinter import font, StringVar, Tk, Toplevel, ttk
@@ -39,7 +39,7 @@ class LoginView:
 
         self.__parent.geometry('%dx%d+%d+%d' % (parent_width, parent_height, (screen_width - parent_width) / 2, (screen_height - parent_height) / 2))  # Centre the __parent window.
         self.__parent.title('Log in')
-        self.__parent.iconbitmap()  # TODO: add the path of the ICO image.
+        self.__parent.iconbitmap(attrs.APP_ICON_PATH)
 
         # Enable auto-resizing controls with the grid geometry manager.
         for index in range(column_num):
