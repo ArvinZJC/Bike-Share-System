@@ -7,6 +7,7 @@ Last Editors: Arvin Zhao
 LastEditTime: 2021-01-31 18:23:21
 '''
 
+from PIL import Image, ImageTk
 from tkinter import font, StringVar, Tk, Toplevel, ttk
 from tkinter.constants import E, W
 
@@ -34,12 +35,14 @@ class LoginView:
         screen_width = self.__parent.winfo_screenwidth()
         screen_height = self.__parent.winfo_screenheight()
         parent_width = 300
-        parent_height = 500
+        parent_height = 480
         column_num = 2
 
         self.__parent.geometry('%dx%d+%d+%d' % (parent_width, parent_height, (screen_width - parent_width) / 2, (screen_height - parent_height) / 2))  # Centre the __parent window.
         self.__parent.title('Log in')
         self.__parent.iconbitmap(attrs.APP_ICON_PATH)
+        self.__parent.resizable(False, True)
+        self.__parent.minsize(parent_width, parent_height)
 
         # Enable auto-resizing controls with the grid geometry manager.
         for index in range(column_num):
@@ -51,9 +54,12 @@ class LoginView:
         font_link = font.Font(family = attrs.FONT_FAMILY, size = attrs.CONTENT_FONT_SIZE)
         font_link.config(underline = True)
 
-        # TODO: New row: the logo image label.
+        # New row: the logo image label.
         row_count = 0  # Make it convenient to index the row of the grid.
-        ttk.Label(self.__parent, text = '(logo image placeholder)').grid(columnspan = column_num, row = row_count)
+        image_banner = Image.open(attrs.APP_BANNER_PATH)
+        image_banner = image_banner.resize((parent_width, 200), Image.ANTIALIAS)
+        self.__photo_image_banner = ImageTk.PhotoImage(image_banner)  # Keep a reference to prevent GC.
+        ttk.Label(self.__parent, image = self.__photo_image_banner).grid(columnspan = column_num, row = row_count)
 
         # New row: the role label.
         row_count += 1
@@ -106,9 +112,10 @@ class LoginView:
         column_count += 1
         self.__label_signup = ttk.Label(self.__parent, font = font_link, style = styles.LINK_LABEL, text = 'Sign up now.')
         self.__label_signup.grid(column = column_count, row = row_count, sticky = W)
-        self.__label_signup.bind('<Button-1>', self.__goto_signup)
+        self.__label_signup.bind('<ButtonRelease-1>', self.__goto_signup)
         self.__tooltip_signup = Tooltip(self.__label_signup, None)
 
+        # Initial the status of the role combobox.
         self.__combobox_role.current(0)
         self.__select_role(None)
 
@@ -176,9 +183,9 @@ class LoginView:
         event : the event bound to the widget calling this function
         '''
 
+        # TODO: (bug) should open a sign-up view only when the mouse is released in the label area.
         if str(self.__label_signup['state']) != 'disabled':
             self.__label_signup.focus()
-            self.__entry_username.focus()
 
             if self.__signup_window is None:
                 self.__signup_window = Toplevel(self.__parent)

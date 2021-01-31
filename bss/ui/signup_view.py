@@ -7,6 +7,7 @@ Last Editors: Arvin Zhao
 LastEditTime: 2021-01-31 18:31:39
 '''
 
+from PIL import Image, ImageTk
 from tkinter import StringVar, ttk, Tk
 from tkinter.constants import E, W
 
@@ -30,13 +31,15 @@ class SignupView:
         self.__parent = parent
         screen_width = self.__parent.winfo_screenwidth()
         screen_height = self.__parent.winfo_screenheight()
-        __parent_width = 300
-        __parent_height = 500
+        parent_width = 300
+        parent_height = 450
         column_num = 2
 
-        self.__parent.geometry('%dx%d+%d+%d' % (__parent_width, __parent_height, (screen_width - __parent_width) / 2, (screen_height - __parent_height) / 2))  # Centre the __parent window.
+        self.__parent.geometry('%dx%d+%d+%d' % (parent_width, parent_height, (screen_width - parent_width) / 2, (screen_height - parent_height) / 2))  # Centre the __parent window.
         self.__parent.title('Sign up')
-        self.__parent.iconbitmap()  # TODO: add the path of the ICO image.
+        self.__parent.iconbitmap(attrs.APP_ICON_PATH)
+        self.__parent.resizable(False, True)
+        self.__parent.minsize(parent_width, parent_height)
 
         # Enable auto-resizing controls with the grid geometry manager.
         for index in range(column_num):
@@ -44,9 +47,12 @@ class SignupView:
 
         font_dict = styles.apply_style()
 
-        # TODO: New row: the logo image label.
+        # New row: the logo image label.
         row_count = 0  # Make it convenient to index the row of the grid.
-        ttk.Label(self.__parent, text = '(logo image placeholder)').grid(columnspan = column_num, row = row_count)
+        image_banner = Image.open(attrs.APP_BANNER_PATH)
+        image_banner = image_banner.resize((parent_width, 200), Image.ANTIALIAS)
+        self.__photo_image_banner = ImageTk.PhotoImage(image_banner)  # Keep a reference to prevent GC.
+        ttk.Label(self.__parent, image = self.__photo_image_banner).grid(columnspan = column_num, row = row_count)
 
         # New row: the username label.
         row_count += 1
