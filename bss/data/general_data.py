@@ -1,4 +1,5 @@
-scimport sqlite3
+import sqlite3
+
 db = sqlite3.connect("TEAM_PJT.db")
 cursor = db.cursor()
 
