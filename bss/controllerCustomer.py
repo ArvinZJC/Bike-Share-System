@@ -16,6 +16,7 @@ def customer_pilot(customer,our_map):
 	state = our_map.get_state()
 	direction = 'None'
 	centralPocket = CentralBank()
+	db_path = 'data/' + attrs.DB_FILENAME
 
 	while direction != '':
 		our_map.print_nice()
@@ -26,7 +27,7 @@ def customer_pilot(customer,our_map):
 				get_closest_bike(customer)
 				rented_bike = renting(our_map,customer)
 				if rented_bike!=False:
-					conn = sqlite3.connect('data/TEAM_PJT.db')
+					conn = sqlite3.connect(db_path)
 					c = conn.cursor()
 					c.execute("SELECT movement_id FROM movement")
 					try:
@@ -81,7 +82,7 @@ def customer_pilot(customer,our_map):
 				duration = time.strftime("%H:%M:%S",time.gmtime(extra_time))
 				rented_bike.set_mileage(distance)
 				dateOfTransaction = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(extra_time+timeOfStart))
-				conn = sqlite3.connect('data/TEAM_PJT.db')
+				conn = sqlite3.connect(db_path)
 				c = conn.cursor()
 				c.execute("INSERT INTO movement (movement_id,bike_id,user_id,distance,duration,startTime) VALUES ({},{},{},{},'{}','{}')".format(movement_id,rented_bike.get_id(),
 											customer.Id,distance,duration,dateOfTransaction))

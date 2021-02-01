@@ -1,6 +1,9 @@
 import sqlite3
 import random
 
+from bss.conf import attrs
+
+
 class Bike:
 
 	def __init__(self, Id, defective, location,mileage):
@@ -8,6 +11,7 @@ class Bike:
 		self.location = location
 		self.defective = defective
 		self.mileage = mileage
+		self.__db_path = 'data/' + attrs.DB_FILENAME
 
 	def print_nice(self):
 		print("Bike Id: ",self.Id),
@@ -27,7 +31,7 @@ class Bike:
 		return self.defective>0.9
 
 	def set_defective(self):
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		if self.defective==1:
 			self.defective = 0
@@ -50,7 +54,7 @@ class Bike:
 
 	def set_mileage(self,val):
 		self.mileage += val
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE bike set mileage=:val where id=:Id",{'Id':self.get_id(),'val':val})
 		conn.commit()
@@ -60,7 +64,7 @@ class Bike:
 	def set_location(self, location,operator=1):
 		self.location = location
 		self.defective+=round(random.uniform(0.01,0.05),2)
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE bike set location_row =:location_row, location_col=:location_col,defective=:value where id=:Id",
 				  {'location_row': location[0], 'location_col': location[1],'value':self.defective, 'Id': self.Id})

@@ -3,12 +3,14 @@ import sqlite3
 
 import numpy as np
 
+from bss.conf import attrs
+
 
 class Mapping:
 
 	def __init__(self):
 		self.map_array = np.zeros((20, 20))
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 		c = conn.cursor()
 
 		c.execute("SELECT location_row FROM bike")

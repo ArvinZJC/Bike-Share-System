@@ -1,6 +1,8 @@
 import sqlite3
 
-db_name = 'TEAM_PJT.db'
+from bss.conf import attrs
+
+db_name = attrs.DB_FILENAME
 conn = sqlite3.connect(db_name)
 c = conn.cursor()
 

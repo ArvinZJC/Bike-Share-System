@@ -4,7 +4,7 @@ import numpy as np
 
 def get_closest_bike(customer):
 	location = customer.get_location().copy()
-	conn = sqlite3.connect('data/TEAM_PJT.db')
+	conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 	c = conn.cursor()
 	c.execute("SELECT location_row,location_col FROM bike where defective<1")
 	distance = np.inf

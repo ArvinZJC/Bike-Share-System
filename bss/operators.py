@@ -10,6 +10,7 @@ class OperatorWorker:
 		self.password = password
 		self.balance = balance
 		self.skill_level = skill_level
+		self.__db_path = 'data/' + attrs.DB_FILENAME
 
 	def print_nice(self):
 		print("Name: ",self.name),
@@ -21,7 +22,7 @@ class OperatorWorker:
 		return self.skill_level
 
 	def track_bikes(self):
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("SELECT * FROM bike")
 
@@ -35,7 +36,7 @@ class OperatorWorker:
 		return bikes
 
 	def repair_bikes(self):
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("SELECT * FROM bike where defective=1")
 
@@ -76,7 +77,7 @@ class OperatorWorker:
 		if (time.time()+timeToFix)<time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")):
 			timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S"))+timeToFix))
 
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 
 		c.execute("INSERT INTO bike_status (id,time_of_event,defective_start,defective_end) VALUES ({},'{}',{},{})".format(to_repair.get_id(),
@@ -86,7 +87,7 @@ class OperatorWorker:
 		return [timeToFix/20,timeOfFix]
 
 	def move_bikes(self):
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("SELECT id,location_row,location_col FROM bike")
 
@@ -118,7 +119,7 @@ class OperatorWorker:
 			except:
 				print('Invalid location. Try again.')
 
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE bike set location_row =:location_row, location_col=:location_col where id=:Id",
 				  {'location_row': location_row, 'location_col': location_col, 'Id': to_move})
@@ -128,7 +129,7 @@ class OperatorWorker:
 
 	def set_balance(self,money):
 		self.balance += money
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE operator set account=:sum where id=:Id",{'sum':self.balance,'Id':self.Id})
 		conn.commit()

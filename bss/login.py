@@ -17,7 +17,7 @@ def hello():
 
 
 def logging():
-    conn = sqlite3.connect('data/TEAM_PJT.db')
+    conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
     c = conn.cursor()
 
     typeOfUser = hello()
@@ -70,7 +70,7 @@ def register():
     elif len(username) == 0 or password1 == 0:
         print("The username and password cannot be empty!")
     else:
-        conn = sqlite3.connect('data/TEAM_PJT.db')
+        conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
         c = conn.cursor()
 
         balance = int(input('Please enter the money you want to recharge:'))

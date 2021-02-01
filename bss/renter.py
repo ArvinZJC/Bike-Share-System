@@ -5,7 +5,7 @@ import sqlite3
 
 def check_available_bikes(map,customer):
 	location = customer.get_location()
-	conn = sqlite3.connect('data/TEAM_PJT.db')
+	conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 	c = conn.cursor()
 	c.execute("SELECT id from bike where location_row=:location_row and location_col=:location_col and defective<0.9",
 				{'location_row': location[0], 'location_col': location[1]})
@@ -22,7 +22,7 @@ def renting(map,customer):
 	answer = input("Do you want to rent a bike? ")
 	if answer == "yes":
 		if len(bike_ids)==1:
-			conn = sqlite3.connect('data/TEAM_PJT.db')
+			conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 			c = conn.cursor()
 			c.execute("SELECT * FROM bike where id=:Id", {'Id': bike_ids[0][0]})
 			bike_details = c.fetchall()
@@ -35,7 +35,7 @@ def renting(map,customer):
 				ids.append(i[0])
 			print(ids)
 			rented_id = int(input("Select one of the following: "))
-			conn = sqlite3.connect('data/TEAM_PJT.db')
+			conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 			c = conn.cursor()
 			c.execute("SELECT * FROM bike where id=:Id", {'Id': rented_id})
 			bike_details = c.fetchall()

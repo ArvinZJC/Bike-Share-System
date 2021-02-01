@@ -1,5 +1,8 @@
 import sqlite3
 
+from bss.conf import attrs
+
+
 def connection_check(db_name):
 	# Checking for connection and create a database file named "TEAM_PJT.db" if not exists.
 	conn = None
@@ -22,7 +25,7 @@ def create_table(conn, sqldb_table):
 
 def main():
 
-	db_name = 'TEAM_PJT.db'  # version update
+	db_name = attrs.DB_FILENAME  # version update
 
 	bike_table = """CREATE TABLE IF NOT EXISTS bike(
 								id INTEGER PRIMARY KEY,

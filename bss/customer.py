@@ -1,5 +1,7 @@
 import sqlite3
 
+from bss.conf import attrs
+
 
 class Customer:
 
@@ -10,6 +12,7 @@ class Customer:
 		self.balance = balance
 		self.location = location
 		self.riding = False
+		self.__db_path = 'data/' + attrs.DB_FILENAME
 
 	# map.set_state(location,100)
 
@@ -22,7 +25,7 @@ class Customer:
 	def charge(self, time):
 		amount = round(float(time)/60,2)*0.5
 		self.balance -= amount
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
 		conn.commit()
@@ -31,7 +34,7 @@ class Customer:
 
 	def update_balance(self, amount):
 		self.balance += amount
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
 		conn.commit()
@@ -45,7 +48,7 @@ class Customer:
 
 	def set_location(self, location):
 		self.location = location
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE customer set location_row =:location_row, location_col=:location_col where id=:Id",
 				  {'location_row': location[0], 'location_col': location[1], 'Id': self.Id})
