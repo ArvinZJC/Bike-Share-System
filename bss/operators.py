@@ -112,7 +112,7 @@ class OperatorWorker:
 		while True:
 			try:
 				location_row,location_col = [int(x) for x in input("Give row & col to move the bike: ").split()]
-				if (location_row>19 or location_row<0) and (location_col<0 or location_row>19):
+				if (location_row>19 or location_row<0) or (location_col<0 or location_row>19):
 					raise SystemError
 				break
 			except:
