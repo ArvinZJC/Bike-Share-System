@@ -1,10 +1,10 @@
 '''
 Description: the definition of a login view
-Version: 1.0.6.20210131
+Version: 1.0.7.20210204
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-31 18:23:21
+LastEditTime: 2021-02-04 18:23:21
 '''
 
 from PIL import Image, ImageTk
@@ -112,8 +112,10 @@ class LoginView:
         column_count += 1
         self.__label_signup = ttk.Label(self.__parent, font = font_link, style = styles.LINK_LABEL, text = 'Sign up now.')
         self.__label_signup.grid(column = column_count, row = row_count, sticky = W)
+        self.__label_signup.bind('<Button-1>', self.__press_label_signup)
         self.__label_signup.bind('<ButtonRelease-1>', self.__goto_signup)
         self.__tooltip_signup = Tooltip(self.__label_signup, None)
+        self.__is_over_label_signup = False  # A flag indicating if the mouse is over the sign-up label.
 
         # Initial the status of the role combobox.
         self.__combobox_role.current(0)
@@ -157,6 +159,8 @@ class LoginView:
         event : the event bound to the widget calling this function
         '''
 
+        self.__is_over_label_signup = True
+
         if str(self.__label_signup['state']) != 'disabled':
             self.__label_signup['state'] = 'active'
 
@@ -170,8 +174,23 @@ class LoginView:
         event : the event bound to the widget calling this function
         '''
 
+        self.__is_over_label_signup = False
+
         if str(self.__label_signup['state']) != 'disabled':
             self.__label_signup['state'] = '!active'
+
+    # noinspection PyUnusedLocal
+    def __press_label_signup(self, event) -> None:
+        '''
+        Focus the sign-up label to look like it is pressed.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
+        '''
+
+        if str(self.__label_signup['state']) != 'disabled':
+            self.__label_signup.focus()
 
     # noinspection PyUnusedLocal
     def __goto_signup(self, event) -> None:
@@ -183,16 +202,16 @@ class LoginView:
         event : the event bound to the widget calling this function
         '''
 
-        # TODO: (bug) should open a sign-up view only when the mouse is released in the label area.
         if str(self.__label_signup['state']) != 'disabled':
-            self.__label_signup.focus()
+            self.__parent.focus()
 
-            if self.__signup_window is None:
-                self.__signup_window = Toplevel(self.__parent)
-                self.__signup_window.protocol('WM_DELETE_WINDOW', self.__reset_signup_window)
-                SignupView(self.__signup_window)
-            else:
-                self.__signup_window.focus()
+            if self.__is_over_label_signup:
+                if self.__signup_window is None:
+                    self.__signup_window = Toplevel(self.__parent)
+                    self.__signup_window.protocol('WM_DELETE_WINDOW', self.__reset_signup_window)
+                    SignupView(self.__signup_window)
+                else:
+                    self.__signup_window.focus()
 
     def __reset_signup_window(self) -> None:
         '''
