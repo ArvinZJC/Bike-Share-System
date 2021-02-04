@@ -1,10 +1,10 @@
 '''
-Description: a style sheet for Ttk to make it convenient to manage styles
-Version: 1.0.0.20210130
+Description: a style sheet for Ttk to make it convenient to manage theme styles
+Version: 1.0.1.20210201
 Author: Arvin Zhao
 Date: 2021-01-30 11:18:59
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-30 11:19:09
+LastEditTime: 2021-02-01 11:19:09
 '''
 
 from tkinter import ttk

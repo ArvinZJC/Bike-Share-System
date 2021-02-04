@@ -1,10 +1,10 @@
 '''
-Description: an attribute sheet to make it convenient to manage attributes
-Version: 1.0.1.20210131
+Description: an attribute sheet to make it convenient to manage theme attributes
+Version: 1.0.2.20210201
 Author: Arvin Zhao
 Date: 2021-01-30 12:35:15
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-31 12:35:24
+LastEditTime: 2021-02-01 12:35:24
 '''
 
 APP_BANNER_PATH = 'img/banner.png'
