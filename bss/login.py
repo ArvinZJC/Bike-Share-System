@@ -3,14 +3,15 @@ from customer import *
 from operators import *
 from manager import *
 import random
+import time
 
 
 def hello():
     while True:
         try:
             typeOfUser = int(input(
-                "Hello. Would you like to enter as :\n1) Customer\n2) Operator\n3)Manager\nChoose a number appropriately.\n"))
-            if typeOfUser in [1, 2, 3]:
+                "Hello. Would you like to enter as :\n1) Customer\n2) Operator\n3)Manager\n4)Sign in\nChoose a number appropriately.\n"))
+            if typeOfUser in [1, 2, 3,4]:
                 return typeOfUser
         except:
             print("Invalid input please try again")
@@ -24,10 +25,9 @@ def logging():
 
     user = None
 
-    while (user == None):
+    while (user == None and typeOfUser in [1, 2, 3]):
         name = input("Input your username: ")
         password = input("Input your password: ")
-
         if typeOfUser == 1:
             c.execute("SELECT * FROM customer WHERE name=:name and password=:password",
                       {'name': name, 'password': password})
@@ -56,35 +56,97 @@ def logging():
             else:
                 user = Manager(values[0][0], values[0][1], values[0][2])
 
-    conn.close()
+    if typeOfUser == 4:
+        flag = True
+        while flag:
+            username = input("please enter your username to register:")
+            try:
+                    password0 = int(input("Please enter your password:"))
+            except:
+                print("Invalid input please try again")
+                continue
+            try:
+                password1 = int(input("Please confirm the password you entered:"))
+                flag = False
+            except:
+                print("Invalid input please try again")
+                continue
+            if password0 != password1:
+                print("The two passwords you typed do not match!")
+                flag = True
+                continue
+            elif len(username) == 0:
+                print("The username cannot be empty!")
+                flag = True
+                continue
+            else:
+                conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+                c = conn.cursor()
+                balance = int(input('Please enter the money you want to recharge:'))
+                row = random.randint(0, 19)
+                col = random.randint(0, 19)
+                sql = "select max(id) from customer"
+                c.execute(sql)
+                id = c.fetchall()[0][0] + 1
+                try:
+                    c.execute(
+                        "INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(
+                            id, username, password1, balance, row, col))
+                    conn.commit()
+                    print(" You have registered successfully!\n Wait a second, the system will log you in automatically")
+                    time.sleep(5)
+                    c.execute("SELECT * FROM customer WHERE name=:username and password=:password0",
+                                {'username': username, 'password0': password0})
+                    values = c.fetchall()
+                    user = Customer(values[0][0], values[0][1], values[0][2], values[0][3],
+                                    [values[0][4], values[0][5]])
 
+                except sqlite3.IntegrityError:
+                    print("registration fails,the account already exists")
+
+    conn.close()
     return user
 
 
-def register():
-    username = input("please enter your username to register:")
-    password0 = int(input("Please enter your password:"))
-    password1 = int(input("Please confirm the password you entered:"))
-    if password0 != password1:
-        print("The two passwords you typed do not match!")
-    elif len(username) == 0 or password1 == 0:
-        print("The username and password cannot be empty!")
-    else:
-        conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
-        c = conn.cursor()
-
-        balance = int(input('Please enter the money you want to recharge:'))
-        row = random.randint(0,19)
-        col = random.randint(0,19)
-        sql = "select max(id) from customer"
-        c.execute(sql)
-        id = c.fetchall()[0][0]+1
-        try:
-            c.execute(
-                "INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(
-                    id, username, password1, balance, row, col))
-            conn.commit()
-            conn.close()
-            print(" You have registered successfully!")
-        except sqlite3.IntegrityError:
-            print("registration fails,the account already exists")
+# def register():
+#     flag = True
+#     while flag:
+#         username = input("please enter your username to register:")
+#         try:
+#             password0 = int(input("Please enter your password:"))
+#         except:
+#             print("Invalid input please try again")
+#             continue
+#         try:
+#             password1 = int(input("Please confirm the password you entered:"))
+#             flag = False
+#         except:
+#             print("Invalid input please try again")
+#             continue
+#         if password0 != password1:
+#             print("The two passwords you typed do not match!")
+#             flag = True
+#             continue
+#         elif len(username) == 0:
+#             print("The username cannot be empty!")
+#             flag = True
+#             continue
+#         else:
+#             conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+#             c = conn.cursor()
+#
+#             balance = int(input('Please enter the money you want to recharge:'))
+#             row = random.randint(0,19)
+#             col = random.randint(0,19)
+#             sql = "select max(id) from customer"
+#             c.execute(sql)
+#             id = c.fetchall()[0][0]+1
+#             try:
+#                 c.execute(
+#                     "INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(
+#                         id, username, password1, balance, row, col))
+#                 conn.commit()
+#                 conn.close()
+#                 print(" You have registered successfully!")
+#             except sqlite3.IntegrityError:
+#                 print("registration fails,the account already exists")
