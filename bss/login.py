@@ -4,6 +4,7 @@ from operators import *
 from manager import *
 import random
 import time
+from bss.data.db_path import get_db_path
 
 
 def hello():
@@ -18,7 +19,7 @@ def hello():
 
 
 def logging():
-    conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+    conn = sqlite3.connect(get_db_path())
     c = conn.cursor()
 
     typeOfUser = hello()
@@ -80,7 +81,7 @@ def logging():
                 flag = True
                 continue
             else:
-                conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+                conn = sqlite3.connect(get_db_path())
                 c = conn.cursor()
                 balance = int(input('Please enter the money you want to recharge:'))
                 row = random.randint(0, 19)
@@ -132,7 +133,7 @@ def logging():
 #             flag = True
 #             continue
 #         else:
-#             conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+#             conn = sqlite3.connect(get_db_path())
 #             c = conn.cursor()
 #
 #             balance = int(input('Please enter the money you want to recharge:'))

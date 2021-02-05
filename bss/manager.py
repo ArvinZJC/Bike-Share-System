@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sqlite3
 from datetime import datetime
+from bss.data.db_path import get_db_path
 
 
 class Manager:
@@ -33,7 +34,7 @@ class Manager:
 
 	def viz(self,choice):
 
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(get_db_path())
 		c = conn.cursor()
 
 		if choice == 1:

@@ -1,8 +1,8 @@
 import sqlite3
 
-from bss.conf import attrs
+from bss.data.db_path import get_db_path
 
-db = sqlite3.connect(attrs.DB_FILENAME)
+db = sqlite3.connect(get_db_path())
 cursor = db.cursor()
 
 cursor.execute("""

@@ -10,13 +10,14 @@ import random
 from companysPocket import *
 from closestBike import *
 from reportBreakDown import *
+from bss.data.db_path import get_db_path
 
 
 def customer_pilot(customer,our_map):
 	state = our_map.get_state()
 	direction = 'None'
 	centralPocket = CentralBank()
-	db_path = 'data/' + attrs.DB_FILENAME
+	db_path = get_db_path()
 
 	while direction != '':
 		our_map.print_nice()

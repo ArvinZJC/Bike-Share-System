@@ -1,12 +1,12 @@
 import sqlite3
 
-from conf import attrs
+from bss.data.db_path import get_db_path
 
 
 class CentralBank:
 
 	def __init__(self):
-		self.__db_path = 'data/' + attrs.DB_FILENAME
+		self.__db_path = get_db_path()
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("SELECT account From companyMoney")

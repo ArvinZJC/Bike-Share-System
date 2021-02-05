@@ -1,6 +1,6 @@
 import sqlite3
 
-from conf import attrs
+from bss.data.db_path import get_db_path
 
 
 class Customer:
@@ -12,7 +12,7 @@ class Customer:
 		self.balance = balance
 		self.location = location
 		self.riding = False
-		self.__db_path = 'data/' + attrs.DB_FILENAME
+		self.__db_path = get_db_path()
 
 	# map.set_state(location,100)
 
