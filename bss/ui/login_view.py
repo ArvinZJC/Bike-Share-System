@@ -1,6 +1,6 @@
 '''
 Description: the definition of a login view
-Version: 1.1.0.20210205
+Version: 1.1.1.20210205
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
@@ -57,7 +57,7 @@ class LoginView:
         row_count = 0  # Make it convenient to index the row of the grid.
         image_banner = Image.open(get_img_path(attrs.APP_BANNER_FILENAME))
         image_banner = image_banner.resize((parent_width, ui_attrs.BANNER_WIDTH), Image.ANTIALIAS)
-        self.__photo_image_banner = ImageTk.PhotoImage(image_banner)  # Keep a reference to prevent GC.
+        self.__photo_image_banner = ImageTk.PhotoImage(image_banner)  # Keep a reference in self to prevent GC.
         ttk.Label(self.__parent, image = self.__photo_image_banner).grid(columnspan = column_num, row = row_count)
 
         # New row: the role label.
@@ -66,8 +66,7 @@ class LoginView:
 
         # New row: the role combobox.
         row_count += 1
-        self.__variable_role = StringVar()
-        self.__combobox_role = ttk.Combobox(self.__parent, font = font_dict['content_font'], state = 'readonly', textvariable = self.__variable_role, values = attrs.ROLE_LIST)
+        self.__combobox_role = ttk.Combobox(self.__parent, font = font_dict['content_font'], state = 'readonly', values = attrs.ROLE_LIST)
         self.__combobox_role.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
         self.__combobox_role.bind('<<ComboboxSelected>>', self.__select_role)
 
@@ -88,22 +87,22 @@ class LoginView:
 
         # New row: a frame for the password area.
         row_count += 1
-        self.__frame_password_area = ttk.Frame(self.__parent)
-        self.__frame_password_area.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
+        frame_password = ttk.Frame(self.__parent)
+        frame_password.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
 
         # Same row in the frame: the password entry.
         self.__variable_password = StringVar()
-        self.__entry_password = ttk.Entry(self.__frame_password_area, font = font_dict['content_font'], show = '*', textvariable = self.__variable_password)
+        self.__entry_password = ttk.Entry(frame_password, font = font_dict['content_font'], show = '*', textvariable = self.__variable_password)
         self.__entry_password.pack(expand = True, fill = X, side = LEFT)
 
         # Same row in the frame: the button with an eye image for controlling the visibility of password
         image_opening_eye = Image.open(get_img_path(attrs.OPENING_EYE_FILENAME))
         image_opening_eye = image_opening_eye.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
-        self.__photo_image_opening_eye = ImageTk.PhotoImage(image_opening_eye)
+        self.__photo_image_opening_eye = ImageTk.PhotoImage(image_opening_eye)  # Keep a reference in self to prevent GC.
         image_closed_eye = Image.open(get_img_path(attrs.CLOSED_EYE_FILENAME))
         image_closed_eye = image_closed_eye.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
-        self.__photo_image_closed_eye = ImageTk.PhotoImage(image_closed_eye)
-        self.__button_password_eye = ttk.Button(self.__frame_password_area, command = self.__set_password_visibility, image = self.__photo_image_closed_eye, style = styles.SQUARE_BUTTON)
+        self.__photo_image_closed_eye = ImageTk.PhotoImage(image_closed_eye)  # Keep a reference in self to prevent GC.
+        self.__button_password_eye = ttk.Button(frame_password, command = self.__set_password_visibility, image = self.__photo_image_closed_eye, style = styles.SQUARE_BUTTON)
         self.__button_password_eye.pack(side = RIGHT)
         self.__text_show_password = 'Click to show the password.'
         self.__text_hide_password = 'Click to hide the password.'
@@ -115,8 +114,8 @@ class LoginView:
 
         # New row: the login button.
         row_count += 1
-        self.__button_login = ttk.Button(self.__parent, command = self.__log_in, text = 'Log in')
-        self.__button_login.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_count, sticky = (E, W))
+        button_login = ttk.Button(self.__parent, command = self.__log_in, text = 'Log in')
+        button_login.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_count, sticky = (E, W))
 
         # New row: the label for questioning sign-up status.
         row_count += 1
