@@ -1,6 +1,6 @@
 import sqlite3
 
-from bss.conf import attrs
+from conf import attrs
 
 
 class CentralBank:

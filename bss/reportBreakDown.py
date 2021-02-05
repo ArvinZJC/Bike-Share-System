@@ -1,7 +1,7 @@
 import sqlite3
 import time
 
-from bss.conf import attrs
+from conf import attrs
 
 
 def reportBreak(bike,time):

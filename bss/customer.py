@@ -1,6 +1,6 @@
 import sqlite3
 
-from bss.conf import attrs
+from conf import attrs
 
 
 class Customer:
@@ -27,7 +27,7 @@ class Customer:
 		self.balance -= amount
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
+		c.execute("UPDATE customer SET wallet =:new_amount where id=:Id",{'new_amount':self.balance,'Id':self.Id})
 		conn.commit()
 		conn.close()
 		return amount
@@ -36,7 +36,7 @@ class Customer:
 		self.balance += amount
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
+		c.execute("UPDATE customer SET wallet =:new_amount where id=:Id",{'new_amount':self.balance,'Id':self.Id})
 		conn.commit()
 		conn.close()
 

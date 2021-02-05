@@ -1,8 +1,6 @@
 import sqlite3
-
-from bss.conf import attrs
-
-db_name = attrs.DB_FILENAME
+from conf import attrs
+db_name = attrs.DB_FILENAME 
 
 try:
 	conn = sqlite3.connect(db_name)
@@ -26,30 +24,18 @@ c.execute("INSERT INTO manager (id,name,password) VALUES({},'{}','{}')".format(1
 
 
 
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(1,0,11,15,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(2,0,12,16,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(3,0,13,10,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(4,0,7,5,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(5,0,4,17,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(6,0,10,19,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(7,0,19,18,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(8,0,17,16,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(9,0,14,12,0))
-c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage) VALUES({},{},{},{},{})".format(10,0,1,6,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(1,0,11,15,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(2,0,12,16,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(3,0,13,10,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(4,0,7,5,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(5,0,4,17,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(6,0,10,19,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(7,0,19,18,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(8,0,17,16,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(9,0,14,12,0,0))
+c.execute("INSERT INTO bike (id,defective,location_row,location_col,mileage,is_being_used) VALUES({},{},{},{},{},{})".format(10,0,1,6,0,0))
 
 
 conn.commit()
-
-c.execute("SELECT * FROM customer")
-rows=c.fetchall()
-for i in rows:
-	print(i)
-
-
-
-c.execute("SELECT * FROM bike")
-rows=c.fetchall()
-for i in rows:
-	print(i)
 
 conn.close()

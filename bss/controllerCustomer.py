@@ -27,18 +27,9 @@ def customer_pilot(customer,our_map):
 				get_closest_bike(customer)
 				rented_bike = renting(our_map,customer)
 				if rented_bike!=False:
-					conn = sqlite3.connect(db_path)
-					c = conn.cursor()
-					c.execute("SELECT movement_id FROM movement")
-					try:
-						movement_id = max(c.fetchall())
-						movement_id = movement_id[0]+1
-					except:
-						movement_id = 0
 					distance,extra_time = 0,0
 					timeOfStart = time.time()
 					customer.is_using_bike(True)
-					conn.close()
 					if customer.get_balance()<40:
 						answer = input("Your funds are low. Do you want to update your balance? ")
 						if answer == 'yes':
@@ -81,13 +72,15 @@ def customer_pilot(customer,our_map):
 				amount = customer.charge(extra_time)
 				duration = time.strftime("%H:%M:%S",time.gmtime(extra_time))
 				rented_bike.set_mileage(distance)
-				dateOfTransaction = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(extra_time+timeOfStart))
+				dateOfTransaction = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.time()))
 				conn = sqlite3.connect(db_path)
 				c = conn.cursor()
-				c.execute("INSERT INTO movement (movement_id,bike_id,user_id,distance,duration,startTime) VALUES ({},{},{},{},'{}','{}')".format(movement_id,rented_bike.get_id(),
+				c.execute("INSERT INTO movement (bike_id,user_id,distance,duration,startTime) VALUES ({},{},{},'{}','{}')".format(rented_bike.get_id(),
 											customer.Id,distance,duration,dateOfTransaction))
 				conn.commit()
 				conn.close()
+				rented_bike.set_is_being_used()
+				our_map.get_state()
 				centralPocket.track_changes(amount,dateOfTransaction)
 				reportBreak(rented_bike,dateOfTransaction)
 

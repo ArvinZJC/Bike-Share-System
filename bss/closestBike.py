@@ -1,14 +1,14 @@
 import sqlite3
 import numpy as np
 
-from bss.conf import attrs
+from conf import attrs
 
 
 def get_closest_bike(customer):
 	location = customer.get_location().copy()
 	conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 	c = conn.cursor()
-	c.execute("SELECT location_row,location_col FROM bike where defective<1")
+	c.execute("SELECT location_row,location_col FROM bike where defective<1 and is_being_used=0")
 	distance = np.inf
 	for i,j in c.fetchall():
 		temp_distance = abs(i-location[0]) + abs(j-location[1])

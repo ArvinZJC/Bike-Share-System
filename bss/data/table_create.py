@@ -1,8 +1,5 @@
 import sqlite3
-
-from bss.conf import attrs
-
-
+from conf import attrs
 def connection_check(db_name):
 	# Checking for connection and create a database file named "TEAM_PJT.db" if not exists.
 	conn = None
@@ -32,7 +29,8 @@ def main():
 								defective REAL DEFAULT 0,
 								location_row INTEGER NOT NULL,
 								location_col INTEGER NOT NULL,
-								mileage REAL
+								mileage REAL,
+								is_being_used INTEGER NOT NULL
 								);"""
 								
 	customer_table = """ CREATE TABLE IF NOT EXISTS customer(
@@ -67,7 +65,7 @@ def main():
 								);"""
 								
 	movement_table = """CREATE TABLE IF NOT EXISTS movement(
-								movement_id INTEGER PRIMARY KEY,
+								movement_id INTEGER PRIMARY KEY AUTOINCREMENT,
 								bike_id INTEGER NOT NULL,
 								user_id INTEGER NOT NULL,
 								distance REAL,

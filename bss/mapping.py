@@ -3,7 +3,7 @@ import sqlite3
 
 import numpy as np
 
-from bss.conf import attrs
+from conf import attrs
 
 
 class Mapping:
@@ -13,9 +13,9 @@ class Mapping:
 		conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 		c = conn.cursor()
 
-		c.execute("SELECT location_row FROM bike")
+		c.execute("SELECT location_row FROM bike where defective<1")
 		rows = c.fetchall()
-		c.execute("SELECT location_col FROM bike")
+		c.execute("SELECT location_col FROM bike where defective<1")
 		cols = c.fetchall()
 		for i, j in zip(rows, cols):
 			self.map_array[i, j] += 1
@@ -30,6 +30,25 @@ class Mapping:
 		conn.close()
 
 	def get_state(self):
+		self.map_array = np.zeros((20, 20))
+		conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+		c = conn.cursor()
+
+		c.execute("SELECT location_row FROM bike where defective<1")
+		rows = c.fetchall()
+		c.execute("SELECT location_col FROM bike where defective<1")
+		cols = c.fetchall()
+		for i, j in zip(rows, cols):
+			self.map_array[i, j] += 1
+
+		c.execute("SELECT location_row FROM customer")
+		rows = c.fetchall()
+		c.execute("SELECT location_col FROM customer")
+		cols = c.fetchall()
+		for i, j in zip(rows, cols):
+			self.map_array[i, j] += 100
+
+		conn.close()
 		return self.map_array
 
 	def get_square_val(self, location):
