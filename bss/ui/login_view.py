@@ -1,18 +1,18 @@
 '''
 Description: the definition of a login view
-Version: 1.1.1.20210205
+Version: 1.1.1.20210206
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-05 18:23:21
+LastEditTime: 2021-02-06 18:23:21
 '''
 
 from PIL import Image, ImageTk
 from tkinter import font, messagebox, StringVar, Tk, Toplevel, ttk
 from tkinter.constants import E, LEFT, RIGHT, W, X
 
-import bss.login_temp as login  # TODO
 from bss.conf import attrs
+from bss.login_temp import logging  # TODO
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.home_view import HomeView
 from bss.ui.img_path import get_img_path
@@ -102,7 +102,7 @@ class LoginView:
         image_closed_eye = Image.open(get_img_path(attrs.CLOSED_EYE_FILENAME))
         image_closed_eye = image_closed_eye.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
         self.__photo_image_closed_eye = ImageTk.PhotoImage(image_closed_eye)  # Keep a reference in self to prevent GC.
-        self.__button_password_eye = ttk.Button(frame_password, command = self.__set_password_visibility, image = self.__photo_image_closed_eye, style = styles.SQUARE_BUTTON)
+        self.__button_password_eye = ttk.Button(frame_password, command = self.__set_password_visibility, image = self.__photo_image_closed_eye, style = styles.IMG_BUTTON)
         self.__button_password_eye.pack(side = RIGHT)
         self.__text_show_password = 'Click to show the password.'
         self.__text_hide_password = 'Click to hide the password.'
@@ -172,14 +172,14 @@ class LoginView:
 
     def __log_in(self) -> None:
         '''
-        Log the user with the selected role in when the specified button is clicked.
+        Log in the user with the selected role when the specified button is clicked.
         '''
 
         self.__variable_username.set(self.__variable_username.get().strip())
-        user = login.logging(self.__combobox_role.get(), self.__variable_username.get(), self.__variable_password.get())
+        user = logging(self.__combobox_role.get(), self.__variable_username.get(), self.__variable_password.get())
 
         if user is None:
-            messagebox.showerror(attrs.APP_NAME, 'Your username or password is wrong. Please try again!')
+            messagebox.showerror(attrs.APP_NAME, 'Wrong username or password. Please try again!')
         else:
             self.__parent.destroy()
             self.__parent = None
@@ -249,7 +249,7 @@ class LoginView:
                 if self.__signup_window is None:
                     self.__signup_window = Toplevel(self.__parent)
                     self.__signup_window.protocol('WM_DELETE_WINDOW', self.__reset_signup_window)
-                    SignupView(self.__signup_window)
+                    SignupView(self.__signup_window, attrs.CUSTOMER, 'Sign up')
                 else:
                     self.__signup_window.focus()
 
