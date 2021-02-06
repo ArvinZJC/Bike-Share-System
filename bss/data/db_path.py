@@ -1,10 +1,10 @@
 '''
 Description: a database file location helper
-Version: 1.0.0.20210204
+Version: 1.0.1.20210206
 Author: Arvin Zhao
 Date: 2021-02-04 12:58:54
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-04 13:23:33
+LastEditTime: 2021-02-06 13:23:33
 '''
 
 import os
@@ -31,5 +31,6 @@ def get_db_path() -> str:
         return os.path.join('..', attrs.DATA_BASENAME, attrs.DB_FILENAME)
 
 
+# Test purposes only.
 if __name__ == '__main__':
     print(get_db_path())

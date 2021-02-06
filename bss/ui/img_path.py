@@ -1,10 +1,10 @@
 '''
 Description: an image file location helper
-Version: 1.0.0.20210205
+Version: 1.0.1.20210206
 Author: Arvin Zhao
 Date: 2021-02-05 14:04:27
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-05 14:05:23
+LastEditTime: 2021-02-06 14:05:23
 '''
 
 import os
@@ -35,5 +35,6 @@ def get_img_path(img_filename: str) -> str:
         return os.path.join('..', attrs.UI_BASENAME, attrs.UI_IMG_BASENAME, img_filename)
 
 
+# Test purposes only.
 if __name__ == '__main__':
     print(get_img_path(attrs.APP_BANNER_FILENAME))

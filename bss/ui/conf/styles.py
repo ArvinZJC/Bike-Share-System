@@ -15,9 +15,9 @@ from bss.ui.conf import attrs, colours
 
 CONTENT_LABEL = 'Content.TLabel'  # The style name of a content label.
 EXPLANATION_LABEL = 'Explanation.TLabel'  # The style name of an explanation label.
+IMG_BUTTON = 'Img.TButton'  # The style name of an image button.
 LINK_LABEL = 'Link.TLabel'  # The style name of a link label.
 PLACEHOLDER_LABEL = 'Placeholder.TLabel'  # The style name of a placeholder label.
-SQUARE_BUTTON = 'Square.TButton'  # The style name of a square button.
 
 
 def apply_style() -> dict:
@@ -39,8 +39,8 @@ def apply_style() -> dict:
     style.configure('TButton', padding=attrs.PADDING_Y)
     style.configure(CONTENT_LABEL, padding = [0, attrs.PADDING_Y, 0, 0])  # The style of a content label.
     style.configure(EXPLANATION_LABEL, background = colours.TOOLTIP_BACKGROUND, font = font_explanation, relief = SOLID)  # The style of an explanation label.
+    style.configure(IMG_BUTTON, padding = attrs.IMG_BUTTON_PADDING)  # The style of an image button.
     style.configure(PLACEHOLDER_LABEL, font = font_placeholder)  # The style of a placeholder label.
-    style.configure(SQUARE_BUTTON, padding = attrs.SQUARE_BUTTON_PADDING)  # The style of a square button.
 
     # The style of a link label.
     style.configure(LINK_LABEL, foreground = colours.HIGHLIGHT, padding = [0, attrs.PADDING_Y, 0, 0])
