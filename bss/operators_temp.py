@@ -1,7 +1,16 @@
+'''
+Description: a definition of operators
+Author: Antony
+Last Editors: Arvin Zhao
+LastEditTime: 2021-02-04 09:57:33
+'''
+
 import sqlite3
-from bike import *
 import time
+
+from bss.bike import Bike
 from bss.data.db_path import get_db_path
+
 
 class OperatorWorker:
 
@@ -30,7 +39,7 @@ class OperatorWorker:
 		bikes = c.fetchall()
 
 		for i in bikes:
-			Bike(i[0],i[1],[i[2],i[3]],i[4],[5]).print_details()
+			Bike(i[0],i[1],[i[2],i[3]],i[4]).print_details()
 
 		conn.close()
 
@@ -57,7 +66,7 @@ class OperatorWorker:
 
 		c.execute("SELECT * FROM bike where id=:Id",{'Id':to_fix})
 		i = c.fetchone()
-		to_repair = Bike(i[0],i[1],[i[2],i[3]],i[4],i[5])
+		to_repair = Bike(i[0],i[1],[i[2],i[3]],i[4])
 		c.execute("SELECT defective_start,time_of_event from bike_status where id=:Id",{'Id':to_repair.get_id()})
 		rows = c.fetchall()
 		how_broken = rows[0][0]
@@ -70,6 +79,10 @@ class OperatorWorker:
 		conn.close()
 		to_repair.set_defective()
 		timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.time()))
+
+		print(timeBegin)
+		print(time.time())
+		print(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")))
 
 		if (time.time()+timeToFix)<time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")):
 			timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S"))+timeToFix))

@@ -1,4 +1,5 @@
 import sqlite3
+from bss.data.db_path import get_db_path
 
 def connection_check(db_name):
 	# Checking for connection and create a database file named "TEAM_PJT.db" if not exists.
@@ -22,14 +23,15 @@ def create_table(conn, sqldb_table):
 
 def main():
 
-	db_name = 'TEAM_PJT.db'  # version update
+	db_name = get_db_path()  # version update
 
 	bike_table = """CREATE TABLE IF NOT EXISTS bike(
 								id INTEGER PRIMARY KEY,
 								defective REAL DEFAULT 0,
 								location_row INTEGER NOT NULL,
 								location_col INTEGER NOT NULL,
-								mileage REAL
+								mileage REAL,
+								is_being_used INTEGER NOT NULL
 								);"""
 								
 	customer_table = """ CREATE TABLE IF NOT EXISTS customer(
@@ -64,7 +66,7 @@ def main():
 								);"""
 								
 	movement_table = """CREATE TABLE IF NOT EXISTS movement(
-								movement_id INTEGER PRIMARY KEY,
+								movement_id INTEGER PRIMARY KEY AUTOINCREMENT,
 								bike_id INTEGER NOT NULL,
 								user_id INTEGER NOT NULL,
 								distance REAL,

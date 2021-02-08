@@ -1,10 +1,10 @@
 '''
-Description: a style sheet for Ttk to make it convenient to manage styles
-Version: 1.0.0.20210130
+Description: a style sheet for Ttk to make it convenient to manage theme styles
+Version: 1.0.1.20210201
 Author: Arvin Zhao
 Date: 2021-01-30 11:18:59
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-30 11:19:09
+LastEditTime: 2021-02-01 11:19:09
 '''
 
 from tkinter import ttk
@@ -15,6 +15,7 @@ from bss.ui.conf import attrs, colours
 
 CONTENT_LABEL = 'Content.TLabel'  # The style name of a content label.
 EXPLANATION_LABEL = 'Explanation.TLabel'  # The style name of an explanation label.
+IMG_BUTTON = 'Img.TButton'  # The style name of an image button.
 LINK_LABEL = 'Link.TLabel'  # The style name of a link label.
 PLACEHOLDER_LABEL = 'Placeholder.TLabel'  # The style name of a placeholder label.
 
@@ -35,10 +36,11 @@ def apply_style() -> dict:
     style = ttk.Style()
 
     style.configure('.', font = font_content)  # The style of every widget (it can be overridden by another style).
+    style.configure('TButton', padding=attrs.PADDING_Y)
     style.configure(CONTENT_LABEL, padding = [0, attrs.PADDING_Y, 0, 0])  # The style of a content label.
     style.configure(EXPLANATION_LABEL, background = colours.TOOLTIP_BACKGROUND, font = font_explanation, relief = SOLID)  # The style of an explanation label.
+    style.configure(IMG_BUTTON, padding = attrs.IMG_BUTTON_PADDING)  # The style of an image button.
     style.configure(PLACEHOLDER_LABEL, font = font_placeholder)  # The style of a placeholder label.
-    style.configure('TButton', padding = attrs.PADDING_Y)
 
     # The style of a link label.
     style.configure(LINK_LABEL, foreground = colours.HIGHLIGHT, padding = [0, attrs.PADDING_Y, 0, 0])

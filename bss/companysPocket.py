@@ -1,9 +1,13 @@
 import sqlite3
 
+from bss.data.db_path import get_db_path
+
+
 class CentralBank:
 
 	def __init__(self):
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		self.__db_path = get_db_path()
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("SELECT account From companyMoney")
 		self.money = c.fetchall()
@@ -15,7 +19,7 @@ class CentralBank:
 		return self.money
 
 	def track_changes(self,sumOfMoney,time):
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("INSERT INTO transactions (sumOfMoney,timeOfEvent) VALUES({},'{}')".format(sumOfMoney,time))
 		conn.commit()
@@ -24,7 +28,7 @@ class CentralBank:
 		
 
 	def change(self,sumOfMoney):
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		self.money+= sumOfMoney
 		c.execute("UPDATE companyMoney set account=:sumOfMoney",{'sumOfMoney':self.money})

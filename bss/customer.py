@@ -1,5 +1,7 @@
 import sqlite3
 
+from bss.data.db_path import get_db_path
+
 
 class Customer:
 
@@ -10,6 +12,7 @@ class Customer:
 		self.balance = balance
 		self.location = location
 		self.riding = False
+		self.__db_path = get_db_path()
 
 	# map.set_state(location,100)
 
@@ -22,18 +25,18 @@ class Customer:
 	def charge(self, time):
 		amount = round(float(time)/60,2)*0.5
 		self.balance -= amount
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
+		c.execute("UPDATE customer SET wallet =:new_amount where id=:Id",{'new_amount':self.balance,'Id':self.Id})
 		conn.commit()
 		conn.close()
 		return amount
 
 	def update_balance(self, amount):
 		self.balance += amount
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE customer SET wallet =:new_amount",{'new_amount':self.balance})
+		c.execute("UPDATE customer SET wallet =:new_amount where id=:Id",{'new_amount':self.balance,'Id':self.Id})
 		conn.commit()
 		conn.close()
 
@@ -45,7 +48,7 @@ class Customer:
 
 	def set_location(self, location):
 		self.location = location
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute("UPDATE customer set location_row =:location_row, location_col=:location_col where id=:Id",
 				  {'location_row': location[0], 'location_col': location[1], 'Id': self.Id})

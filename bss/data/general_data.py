@@ -1,5 +1,8 @@
-scimport sqlite3
-db = sqlite3.connect("TEAM_PJT.db")
+import sqlite3
+
+from bss.data.db_path import get_db_path
+
+db = sqlite3.connect(get_db_path())
 cursor = db.cursor()
 
 cursor.execute("""
