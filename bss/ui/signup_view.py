@@ -1,10 +1,10 @@
 '''
 Description: the definition of a sign-up view
-Version: 1.1.0.20210206
+Version: 1.1.5.20210208
 Author: Arvin Zhao
 Date: 2021-01-30 18:31:28
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-06 18:31:39
+LastEditTime: 2021-02-08 18:31:39
 '''
 
 from PIL import Image, ImageTk
@@ -39,28 +39,35 @@ class SignupView:
         screen_width = self.__parent.winfo_screenwidth()
         screen_height = self.__parent.winfo_screenheight()
         parent_width = 300
-        parent_height = 345
+        parent_height = 330
         column_num = 2
 
         self.__parent.geometry('%dx%d+%d+%d' % (parent_width, parent_height, (screen_width - parent_width) / 2, (screen_height - parent_height) / 2))  # Centre the parent window.
         self.__parent.title(signup_text)
         self.__parent.iconbitmap(get_img_path(attrs.APP_ICON_FILENAME))
-        self.__parent.resizable(False, False)
+        self.__parent.minsize(parent_width, parent_height)
+        self.__parent.maxsize(parent_width * 2, parent_height * 2)
+
+        # Enable auto-resizing controls with the grid geometry manager.
+        for index in range(column_num):
+            self.__parent.columnconfigure(index, weight = 1)
 
         font_dict = styles.apply_style()
 
         # New row: the logo image label.
         row_count = 0  # Make it convenient to index the row of the grid.
         image_banner = Image.open(get_img_path(attrs.APP_BANNER_FILENAME))
-        image_banner = image_banner.resize((parent_width, ui_attrs.BANNER_WIDTH), Image.ANTIALIAS)
+        image_banner = image_banner.resize((parent_width, ui_attrs.BANNER_HEIGHT), Image.ANTIALIAS)
         self.__photo_image_banner = ImageTk.PhotoImage(image_banner)  # Keep a reference in self to prevent GC.
         ttk.Label(self.__parent, image = self.__photo_image_banner).grid(columnspan = column_num, row = row_count)
+        self.__parent.rowconfigure(row_count, weight = 1)
 
         # New row: a frame for the username label area.
         row_count += 1
         frame_username_label = ttk.Frame(self.__parent)
         frame_username_label.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
         ttk.Label(frame_username_label, style = styles.CONTENT_LABEL, text = 'Username:').pack(fill = X, side = LEFT)  # Same row in the frame: the username label.
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # Same row in the frame: the username hint label.
         image_hint = Image.open(get_img_path(attrs.HINT_FILENAME))
@@ -76,11 +83,14 @@ class SignupView:
         entry_username = ttk.Entry(self.__parent, font = font_dict['content_font'], textvariable = self.__variable_username)
         entry_username.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
         entry_username.focus()
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: a frame for the password label area.
         row_count += 1
         frame_password_label = ttk.Frame(self.__parent)
         frame_password_label.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
+        self.__parent.rowconfigure(row_count, weight = 0)
+
         ttk.Label(frame_password_label, style = styles.CONTENT_LABEL, text = 'Password:').pack(fill = X, side = LEFT)  # Same row in the frame: the password label.
 
         # Same row in the frame: the password hint label.
@@ -92,6 +102,7 @@ class SignupView:
         row_count += 1
         frame_password = ttk.Frame(self.__parent)
         frame_password.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # Same row in the frame: the password entry.
         self.__variable_password = StringVar()
@@ -114,11 +125,23 @@ class SignupView:
         # New row: placeholder.
         row_count += 1
         ttk.Label(self.__parent, style = styles.PLACEHOLDER_LABEL).grid(columnspan = 2, row = row_count)
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: the sign-up button.
         row_count += 1
-        button_signup = ttk.Button(self.__parent, command = self.__sign_up, text = signup_text)
+        button_signup = ttk.Button(self.__parent, command = lambda: self.__sign_up(None), text = signup_text)
         button_signup.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_count, sticky = (E, W))
+        self.__parent.rowconfigure(row_count, weight = 0)
+
+        # New row: placeholder.
+        row_count += 1
+        ttk.Label(self.__parent, style=styles.PLACEHOLDER_LABEL).grid(columnspan=2, row=row_count)
+        self.__parent.rowconfigure(row_count, weight = 1)
+
+        # Bind events.
+        entry_username.bind('<Return>', self.__sign_up)
+        self.__entry_password.bind('<Return>', self.__sign_up)
+        button_signup.bind('<Return>', self.__sign_up)
 
     def __set_password_visibility(self) -> None:
         '''
@@ -134,9 +157,14 @@ class SignupView:
             self.__button_password_eye['image'] = self.__photo_image_closed_eye
             self.__tooltip_password_eye.set_text(self.__text_show_password)
 
-    def __sign_up(self) -> None:
+    # noinspection PyUnusedLocal
+    def __sign_up(self, event) -> None:
         '''
         Sign up a user when the specified button is clicked.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
         '''
 
         if self.__role == attrs.CUSTOMER:

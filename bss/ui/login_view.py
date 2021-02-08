@@ -1,10 +1,10 @@
 '''
 Description: the definition of a login view
-Version: 1.1.1.20210206
+Version: 1.1.5.20210208
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-06 18:23:21
+LastEditTime: 2021-02-08 18:23:21
 '''
 
 from PIL import Image, ImageTk
@@ -39,13 +39,18 @@ class LoginView:
         screen_width = self.__parent.winfo_screenwidth()
         screen_height = self.__parent.winfo_screenheight()
         parent_width = 300
-        parent_height = 430
+        parent_height = 450
         column_num = 2
 
         self.__parent.geometry('%dx%d+%d+%d' % (parent_width, parent_height, (screen_width - parent_width) / 2, (screen_height - parent_height) / 2))  # Centre the parent window.
         self.__parent.title('Log in')
         self.__parent.iconbitmap(get_img_path(attrs.APP_ICON_FILENAME))
-        self.__parent.resizable(False, False)
+        self.__parent.minsize(parent_width, parent_height)
+        self.__parent.maxsize(parent_width * 2, parent_height * 2)
+
+        # Enable auto-resizing controls with the grid geometry manager.
+        for index in range(column_num):
+            self.__parent.columnconfigure(index, weight = 1)
 
         font_dict = styles.apply_style()
 
@@ -56,23 +61,26 @@ class LoginView:
         # New row: the logo image label.
         row_count = 0  # Make it convenient to index the row of the grid.
         image_banner = Image.open(get_img_path(attrs.APP_BANNER_FILENAME))
-        image_banner = image_banner.resize((parent_width, ui_attrs.BANNER_WIDTH), Image.ANTIALIAS)
+        image_banner = image_banner.resize((parent_width, ui_attrs.BANNER_HEIGHT), Image.ANTIALIAS)
         self.__photo_image_banner = ImageTk.PhotoImage(image_banner)  # Keep a reference in self to prevent GC.
         ttk.Label(self.__parent, image = self.__photo_image_banner).grid(columnspan = column_num, row = row_count)
+        self.__parent.rowconfigure(row_count, weight = 1)
 
         # New row: the role label.
         row_count += 1
         ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'Role:').grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_count, sticky = W)
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: the role combobox.
         row_count += 1
         self.__combobox_role = ttk.Combobox(self.__parent, font = font_dict['content_font'], state = 'readonly', values = attrs.ROLE_LIST)
         self.__combobox_role.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
-        self.__combobox_role.bind('<<ComboboxSelected>>', self.__select_role)
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: the username label.
         row_count += 1
         ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'Username:').grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_count, sticky = W)
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: the username entry.
         row_count += 1
@@ -80,15 +88,18 @@ class LoginView:
         self.__entry_username = ttk.Entry(self.__parent, font = font_dict['content_font'], textvariable = self.__variable_username)
         self.__entry_username.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
         self.__entry_username.focus()
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: the password label.
         row_count += 1
         ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'Password:').grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_count, sticky = W)
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: a frame for the password area.
         row_count += 1
         frame_password = ttk.Frame(self.__parent)
         frame_password.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_count, sticky = (E, W))
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # Same row in the frame: the password entry.
         self.__variable_password = StringVar()
@@ -111,25 +122,39 @@ class LoginView:
         # New row: placeholder.
         row_count += 1
         ttk.Label(self.__parent, style = styles.PLACEHOLDER_LABEL).grid(columnspan = 2, row = row_count)
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: the login button.
         row_count += 1
-        button_login = ttk.Button(self.__parent, command = self.__log_in, text = 'Log in')
+        button_login = ttk.Button(self.__parent, command = lambda: self.__log_in(None), text = 'Log in')
         button_login.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_count, sticky = (E, W))
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # New row: the label for questioning sign-up status.
         row_count += 1
         column_count = 0  # Make it convenient to index the column of the grid.
         ttk.Label(self.__parent, style = styles.CONTENT_LABEL, text = 'New here?').grid(column = column_count, row = row_count, sticky = E)
+        self.__parent.rowconfigure(row_count, weight = 0)
 
         # Same row, new column: the sign-up label.
         column_count += 1
         self.__label_signup = ttk.Label(self.__parent, font = font_link, style = styles.LINK_LABEL, text = 'Sign up now.')
         self.__label_signup.grid(column = column_count, row = row_count, sticky = W)
-        self.__label_signup.bind('<Button-1>', self.__press_label_signup)
-        self.__label_signup.bind('<ButtonRelease-1>', self.__goto_signup)
         self.__tooltip_signup = Tooltip(self.__label_signup, None)
         self.__is_over_label_signup = False  # A flag indicating if the mouse is over the sign-up label.
+
+        # New row: placeholder.
+        row_count += 1
+        ttk.Label(self.__parent, style=styles.PLACEHOLDER_LABEL).grid(columnspan=2, row=row_count)
+        self.__parent.rowconfigure(row_count, weight = 1)
+
+        # Bind events.
+        self.__combobox_role.bind('<<ComboboxSelected>>', self.__select_role)
+        self.__entry_username.bind('<Return>', self.__log_in)
+        self.__entry_password.bind('<Return>', self.__log_in)
+        button_login.bind('<Return>', self.__log_in)
+        self.__label_signup.bind('<Button-1>', self.__press_label_signup)
+        self.__label_signup.bind('<ButtonRelease-1>', self.__goto_signup)
 
         # Initial the status of the role combobox.
         self.__combobox_role.current(0)
@@ -170,9 +195,14 @@ class LoginView:
             self.__button_password_eye['image'] = self.__photo_image_closed_eye
             self.__tooltip_password_eye.set_text(self.__text_show_password)
 
-    def __log_in(self) -> None:
+    # noinspection PyUnusedLocal
+    def __log_in(self, event) -> None:
         '''
         Log in the user with the selected role when the specified button is clicked.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
         '''
 
         self.__variable_username.set(self.__variable_username.get().strip())
@@ -186,7 +216,7 @@ class LoginView:
 
             # TODO: create different views for various roles?
             home_window = Tk()
-            HomeView(home_window)
+            HomeView(home_window, user)
             home_window.mainloop()
 
     # noinspection PyUnusedLocal
