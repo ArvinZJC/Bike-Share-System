@@ -26,6 +26,7 @@ class SignupView:
     def __init__(self, parent, role: str, signup_text: str) -> None:
         '''
         The constructor of the class for creating a sign-up view.
+        This view is role-specific. All roles can have access to it.
 
         Parameters
         ----------
@@ -136,7 +137,7 @@ class SignupView:
 
         # New row: placeholder.
         row_index += 1
-        ttk.Label(self.__parent, style=styles.PLACEHOLDER_LABEL).grid(columnspan = 2, row = row_index)
+        ttk.Label(self.__parent, style = styles.PLACEHOLDER_LABEL).grid(columnspan = 2, row = row_index)
         self.__parent.rowconfigure(row_index, weight = 1)
 
         # Bind events.
