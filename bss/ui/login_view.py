@@ -13,6 +13,7 @@ from tkinter.constants import E, LEFT, RIGHT, W, X
 
 from bss.conf import attrs
 from bss.login_temp import logging  # TODO
+from bss.manager import Manager
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.home_view import HomeView
 from bss.ui.img_path import get_img_path
@@ -28,6 +29,7 @@ class LoginView:
     def __init__(self, parent) -> None:
         '''
         The constructor of the class for creating a login view.
+        All roles can have access to this view.
 
         Parameters
         ----------
@@ -146,7 +148,7 @@ class LoginView:
 
         # New row: placeholder.
         row_index += 1
-        ttk.Label(self.__parent, style=styles.PLACEHOLDER_LABEL).grid(columnspan = 2, row = row_index)
+        ttk.Label(self.__parent, style = styles.PLACEHOLDER_LABEL).grid(columnspan = 2, row = row_index)
         self.__parent.rowconfigure(row_index, weight = 1)
 
         # Bind events.
@@ -171,6 +173,7 @@ class LoginView:
         event : the event bound to the widget calling this function
         '''
 
+        # Managers and operators should not be registered in a sign-up view opened from a login view.
         if self.__combobox_role.get() == attrs.CUSTOMER:
             self.__label_signup['state'] = '!disabled'
             self.__tooltip_signup.set_text()
@@ -215,10 +218,12 @@ class LoginView:
             self.__parent.destroy()
             self.__parent = None
 
-            # TODO: create different views for various roles?
-            home_window = Tk()
-            HomeView(home_window, user)
-            home_window.mainloop()
+            if isinstance(user, Manager):
+                pass  # TODO: a manager dashboard view
+            else:
+                home_window = Tk()
+                HomeView(home_window, user)
+                home_window.mainloop()
 
     # noinspection PyUnusedLocal
     def __enter_label_signup(self, event) -> None:
