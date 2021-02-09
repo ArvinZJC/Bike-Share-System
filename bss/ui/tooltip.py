@@ -1,10 +1,10 @@
 '''
 Description: the definition of a user widget Tooltip
-Version: 1.0.0.20210131
+Version: 1.0.1.20210209
 Author: Arvin Zhao
 Date: 2021-01-30 20:51:12
 Last Editors: Arvin Zhao
-LastEditTime: 2021-01-30 20:53:00
+LastEditTime: 2021-02-09 20:53:00
 '''
 
 from tkinter import Toplevel, ttk
@@ -53,7 +53,7 @@ class Tooltip:
 
         styles.apply_style()
 
-        self.label_tooltip = ttk.Label(self.tooltip_window, style = styles.EXPLANATION_LABEL, text = self.text)
+        self.label_tooltip = ttk.Label(self.tooltip_window, style = styles.TOOLTIP_LABEL, text = self.text)
         self.label_tooltip.pack(ipadx = 1)
 
     # noinspection PyUnusedLocal
