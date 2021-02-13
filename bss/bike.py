@@ -1,17 +1,16 @@
 import sqlite3
 import random
 
-from bss.data.db_path import get_db_path
+from conf import attrs
 
 
 class Bike:
 
-	def __init__(self, Id, defective, location,mileage,is_being_used):
+	def __init__(self, Id, defective, location,is_being_used):
 		self.Id = Id
 		self.location = location
 		self.defective = defective
-		self.mileage = mileage
-		self.__db_path = get_db_path()
+		self.__db_path = 'data/' + attrs.DB_FILENAME
 		self.is_being_used = is_being_used
 
 	def print_nice(self):
@@ -22,7 +21,6 @@ class Bike:
 	def print_details(self):
 		print("Bike Id: ",self.Id),
 		print("%% defective: ",self.defective),
-		print("Mileage: ",self.mileage)
 		print("Location: ",self.location)
 
 	def get_defective(self):
@@ -69,18 +67,6 @@ class Bike:
 
 	def get_location(self):
 		return self.location
-
-	def get_mileage(self):
-		return self.mileage
-
-	def set_mileage(self,val):
-		self.mileage += val
-		conn = sqlite3.connect(self.__db_path)
-		c = conn.cursor()
-		c.execute("UPDATE bike set mileage=:val where id=:Id",{'Id':self.get_id(),'val':val})
-		conn.commit()
-		conn.close()
-
 
 	def set_location(self, location,operator=1):
 		self.location = location

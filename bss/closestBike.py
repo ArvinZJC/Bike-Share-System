@@ -1,12 +1,12 @@
 import sqlite3
 import numpy as np
 
-from bss.data.db_path import get_db_path
+from conf import attrs
 
 
 def get_closest_bike(customer):
 	location = customer.get_location().copy()
-	conn = sqlite3.connect(get_db_path())
+	conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 	c = conn.cursor()
 	c.execute("SELECT location_row,location_col FROM bike where defective<1 and is_being_used=0")
 	distance = np.inf
@@ -29,3 +29,4 @@ def get_closest_bike(customer):
 		s += 'You have to go '+str(row - location[0])+ ' down.'
 
 	print(s)
+

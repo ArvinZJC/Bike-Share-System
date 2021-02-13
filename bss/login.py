@@ -4,7 +4,6 @@ from operators import *
 from manager import *
 import random
 import time
-from bss.data.db_path import get_db_path
 
 
 def hello():
@@ -19,7 +18,7 @@ def hello():
 
 
 def logging():
-    conn = sqlite3.connect(get_db_path())
+    conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
     c = conn.cursor()
 
     typeOfUser = hello()
@@ -30,7 +29,7 @@ def logging():
         name = input("Input your username: ")
         password = input("Input your password: ")
         if typeOfUser == 1:
-            c.execute("SELECT * FROM customer WHERE name=:name and password=:password",
+            c.execute("SELECT * FROM customer WHERE name=:name and password=:password and is_online = 0",
                       {'name': name, 'password': password})
             values = c.fetchall()
             if len(values) == 0:
@@ -38,24 +37,32 @@ def logging():
             else:
                 user = Customer(values[0][0], values[0][1], values[0][2], values[0][3],
                                 [values[0][4], values[0][5]])
+                c.execute("UPDATE customer SET is_online = 1 where id =:val",{'val':values[0][0]})
+                conn.commit()
 
         elif typeOfUser == 2:
-            c.execute("SELECT * From operator Where name=:name and password=:password",
+            c.execute("SELECT * From operator Where name=:name and password=:password and is_online = 0",
                       {'name': name, 'password': password})
             values = c.fetchall()
             if len(values) == 0:
                 print("Your username or password is wrong,please try again.")
             else:
                 user = OperatorWorker(values[0][0], values[0][1], values[0][2], values[0][3], values[0][4])
+                c.execute("UPDATE operator SET is_online = 1 where id =:val",{'val':values[0][0]})
+                conn.commit()
+
 
         elif typeOfUser == 3:
-            c.execute("SELECT * From manager Where name=:name and password=:password",
+            c.execute("SELECT * From manager Where name=:name and password=:password and is_online = 0",
                       {'name': name, 'password': password})
             values = c.fetchall()
             if len(values) == 0:
                 print("Your username or password is wrong,please try again.")
             else:
                 user = Manager(values[0][0], values[0][1], values[0][2])
+                c.execute("UPDATE manager SET is_online = 1 where id =:val",{'val':values[0][0]})
+                conn.commit()
+
 
     if typeOfUser == 4:
         flag = True
@@ -81,26 +88,26 @@ def logging():
                 flag = True
                 continue
             else:
-                conn = sqlite3.connect(get_db_path())
+                conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
                 c = conn.cursor()
                 balance = int(input('Please enter the money you want to recharge:'))
                 row = random.randint(0, 19)
                 col = random.randint(0, 19)
-                sql = "select max(id) from customer"
-                c.execute(sql)
-                id = c.fetchall()[0][0] + 1
+                c.execute("SELECT max(id) from customer")
+                id = c.fetchone()
+                
                 try:
                     c.execute(
-                        "INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(
-                            id, username, password1, balance, row, col))
+                        "INSERT INTO customer (id,name,password,wallet,location_row,location_col,is_online) VALUES({},'{}','{}',{},{},{},{})".format(
+                            id,username, password1, balance, row, col,1))
                     conn.commit()
                     print(" You have registered successfully!\n Wait a second, the system will log you in automatically")
                     time.sleep(5)
                     c.execute("SELECT * FROM customer WHERE name=:username and password=:password0",
                                 {'username': username, 'password0': password0})
                     values = c.fetchall()
-                    user = Customer(values[0][0], values[0][1], values[0][2], values[0][3],
-                                    [values[0][4], values[0][5]])
+                    user = Customer(values[0][0], values[0][1], values[0][2],
+                                    [values[0][3], values[0][4]],values[0][5])
 
                 except sqlite3.IntegrityError:
                     print("registration fails,the account already exists")
@@ -133,7 +140,7 @@ def logging():
 #             flag = True
 #             continue
 #         else:
-#             conn = sqlite3.connect(get_db_path())
+#             conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 #             c = conn.cursor()
 #
 #             balance = int(input('Please enter the money you want to recharge:'))

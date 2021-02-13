@@ -1,6 +1,6 @@
 import sqlite3
 
-from bss.data.db_path import get_db_path
+from conf import attrs
 
 
 class Customer:
@@ -12,9 +12,11 @@ class Customer:
 		self.balance = balance
 		self.location = location
 		self.riding = False
-		self.__db_path = get_db_path()
+		self.__db_path = 'data/' + attrs.DB_FILENAME
 
 	# map.set_state(location,100)
+	def get_id(self):
+		return self.Id
 
 	def print_nice(self):
 		print("ID: ", self.Id),

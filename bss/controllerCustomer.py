@@ -10,14 +10,13 @@ import random
 from companysPocket import *
 from closestBike import *
 from reportBreakDown import *
-from bss.data.db_path import get_db_path
 
 
 def customer_pilot(customer,our_map):
 	state = our_map.get_state()
 	direction = 'None'
 	centralPocket = CentralBank()
-	db_path = get_db_path()
+	db_path = 'data/' + attrs.DB_FILENAME
 
 	while direction != '':
 		our_map.print_nice()
@@ -72,7 +71,6 @@ def customer_pilot(customer,our_map):
 				customer.is_using_bike(False)
 				amount = customer.charge(extra_time)
 				duration = time.strftime("%H:%M:%S",time.gmtime(extra_time))
-				rented_bike.set_mileage(distance)
 				dateOfTransaction = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.time()))
 				conn = sqlite3.connect(db_path)
 				c = conn.cursor()
@@ -92,3 +90,9 @@ def customer_pilot(customer,our_map):
 				if customer.get_location()!=og_loc:
 					distance +=1
 					extra_time += random.randint(3,5)*random.randint(50,60)* max(0.5,(1-rented_bike.get_defective()))
+
+	conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+	c = conn.cursor()
+	c.execute("UPDATE customer SET is_online = 0 where id =:val",{'val':customer.get_id()})
+	conn.commit()
+	conn.close()

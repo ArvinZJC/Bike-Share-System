@@ -20,6 +20,11 @@ def operator_pilot(operatorWorker):
 			continue
 
 		if menu_choice==4:
+			conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+			c = conn.cursor()
+			c.execute("UPDATE operator SET is_online = 0 where id =:val",{'val':operatorWorker.get_id()})
+			conn.commit()
+			conn.close()
 			break
 		elif menu_choice==1:
 			operatorWorker.track_bikes()

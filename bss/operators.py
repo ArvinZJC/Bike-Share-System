@@ -1,7 +1,6 @@
 import sqlite3
 from bike import *
 import time
-from bss.data.db_path import get_db_path
 
 class OperatorWorker:
 
@@ -11,7 +10,7 @@ class OperatorWorker:
 		self.password = password
 		self.balance = balance
 		self.skill_level = skill_level
-		self.__db_path = get_db_path()
+		self.__db_path = 'data/' + attrs.DB_FILENAME
 
 	def print_nice(self):
 		print("Name: ",self.name),
@@ -22,6 +21,9 @@ class OperatorWorker:
 	def get_skill_level(self):
 		return self.skill_level
 
+	def get_id(self):
+		return self.Id
+
 	def track_bikes(self):
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
@@ -30,7 +32,7 @@ class OperatorWorker:
 		bikes = c.fetchall()
 
 		for i in bikes:
-			Bike(i[0],i[1],[i[2],i[3]],i[4],[5]).print_details()
+			Bike(i[0],i[1],[i[2],i[3]],i[4]).print_details()
 
 		conn.close()
 
