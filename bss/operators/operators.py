@@ -1,6 +1,7 @@
 import sqlite3
 from bike import *
 import time
+import os
 
 class OperatorWorker:
 
@@ -10,7 +11,7 @@ class OperatorWorker:
 		self.password = password
 		self.balance = balance
 		self.skill_level = skill_level
-		self.__db_path = 'data/' + attrs.DB_FILENAME
+		self.__db_path = os.getcwd()+'\\data\\' + attrs.DB_FILENAME
 
 	def print_nice(self):
 		print("Name: ",self.name),

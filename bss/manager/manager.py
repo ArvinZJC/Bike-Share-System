@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sqlite3
 from datetime import datetime
+import os
 
 
 class Manager:
@@ -35,8 +36,9 @@ class Manager:
 		return choice
 
 	def viz(self,choice):
+		print(os.getcwd())
 
-		conn = sqlite3.connect('data/BACKUP.db')
+		conn=sqlite3.connect(os.getcwd()+'\\data\\BACKUP.db')
 		c = conn.cursor()
 
 		if choice == 1:

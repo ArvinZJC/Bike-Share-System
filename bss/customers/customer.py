@@ -1,7 +1,7 @@
 import sqlite3
 
 from conf import attrs
-
+import os
 
 class Customer:
 
@@ -12,7 +12,7 @@ class Customer:
 		self.balance = balance
 		self.location = location
 		self.riding = False
-		self.__db_path = 'data/' + attrs.DB_FILENAME
+		self.__db_path = os.getcwd()+'\\data\\' + attrs.DB_FILENAME
 
 	# map.set_state(location,100)
 	def get_id(self):

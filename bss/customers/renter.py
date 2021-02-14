@@ -1,11 +1,11 @@
-from customer import *
+from customers.customer import *
 from bike import *
 import sqlite3
-
+import os
 
 def check_available_bikes(map,customer):
 	location = customer.get_location()
-	conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+	conn = sqlite3.connect(os.getcwd()+'\\data\\' + attrs.DB_FILENAME)
 	c = conn.cursor()
 	c.execute("SELECT id from bike where location_row=:location_row and location_col=:location_col and defective<0.9 and is_being_used=0",
 				{'location_row': location[0], 'location_col': location[1]})

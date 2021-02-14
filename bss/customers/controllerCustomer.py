@@ -2,21 +2,22 @@ import sqlite3
 import time
 import random
 from bike import *
-from customer import *
+from customers.customer import *
 from login import *
 from mapping import *
-from renter import *
+from customers.renter import *
 import random
 from companysPocket import *
-from closestBike import *
-from reportBreakDown import *
+from customers.closestBike import *
+from customers.reportBreakDown import *
+import os
 
 
 def customer_pilot(customer,our_map):
 	state = our_map.get_state()
 	direction = 'None'
 	centralPocket = CentralBank()
-	db_path = 'data/' + attrs.DB_FILENAME
+	db_path = os.getcwd()+'\\data\\' + attrs.DB_FILENAME
 
 	while direction != '':
 		our_map.print_nice()
