@@ -2,10 +2,10 @@ import random
 import sqlite3
 
 from bss.conf import attrs
-from bss.customer import Customer
+from bss.temp.customer.customer import Customer
 from bss.data.db_path import get_db_path
-from bss.manager import Manager
-from bss.operators_temp import OperatorWorker  # TODO
+from bss.manager.manager import Manager
+from bss.temp.operator.operator import OperatorWorker  # TODO
 
 
 def logging(role: str, name: str, password: str) -> object:
@@ -29,26 +29,30 @@ def logging(role: str, name: str, password: str) -> object:
     user = None
 
     if role == attrs.CUSTOMER:
-        c.execute("SELECT * FROM customer WHERE name=:name and password=:password",
-                  {'name': name, 'password': password})
+        # TODO: add " and is_online = 0" after implementing logging out.
+        c.execute("SELECT * FROM customer WHERE name=:name and password=:password", {'name': name, 'password': password})
         values = c.fetchall()
-        if len(values) > 0:
-            user = Customer(values[0][0], values[0][1], values[0][2], values[0][3],
-                            [values[0][4], values[0][5]])
 
+        if len(values) > 0:
+            user = Customer(values[0][0], values[0][1], values[0][2], values[0][3], [values[0][4], values[0][5]])
+            # TODO: c.execute("UPDATE customer SET is_online = 1 where id =:val", {'val': values[0][0]})
     elif role == attrs.OPERATOR:
-        c.execute("SELECT * From operator Where name=:name and password=:password",
-                  {'name': name, 'password': password})
+        # TODO: add " and is_online = 0" after implementing logging out.
+        c.execute("SELECT * From operator Where name=:name and password=:password", {'name': name, 'password': password})
         values = c.fetchall()
+
         if len(values) > 0:
             user = OperatorWorker(values[0][0], values[0][1], values[0][2], values[0][3], values[0][4])
-
+            # TODO: c.execute("UPDATE operator SET is_online = 1 where id =:val", {'val': values[0][0]})
     elif role == attrs.MANAGER:
+        # TODO: add " and is_online = 0" after implementing logging out.
         c.execute("SELECT * From manager Where name=:name and password=:password",
                   {'name': name, 'password': password})
         values = c.fetchall()
+
         if len(values) > 0:
             user = Manager(values[0][0], values[0][1], values[0][2])
+            # TODO: c.execute("UPDATE manager SET is_online = 1 where id =:val", {'val': values[0][0]})
 
     conn.close()
 
@@ -79,16 +83,14 @@ def register_customer(name: str, password: str) -> int:
     else:
         conn = sqlite3.connect(get_db_path())
         c = conn.cursor()
-
         row = random.randint(0, attrs.MAP_LENGTH - 1)
         col = random.randint(0, attrs.MAP_LENGTH - 1)
         sql = "select max(id) from customer"
         c.execute(sql)
-        cid = c.fetchall()[0][0]+1
+        cid = c.fetchall()[0][0] + 1
+
         try:
-            c.execute(
-                "INSERT INTO customer (id,name,password,wallet,location_row,location_col) VALUES({},'{}','{}',{},{},{})".format(
-                    cid, name, password, 0.0, row, col))
+            c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col,is_online) VALUES({},'{}','{}',{},{},{},{})".format(cid, name, password, 0.0, row, col, attrs.OFFLINE))
             conn.commit()
             conn.close()
             return attrs.PASS  # Sign up a user successfully.
@@ -98,10 +100,10 @@ def register_customer(name: str, password: str) -> int:
 
 # Test purposes only.
 if __name__ == '__main__':
-    print(logging(attrs.CUSTOMER, 'jichen', '12345') is None)
-    print(logging(attrs.MANAGER, '???????', 'hello_world') is None)
-    print(register_customer('ji_chen', 'hello12345'))
-    print(register_customer('jichen', '123456'))
-    print(register_customer('jichen', 'hello_world'))
-    print(register_customer('jichen', 'helloworld'))
-    print(register_customer('jichen', 'hello12345'))
+    print(logging(attrs.CUSTOMER, 'jichen', '12345') is None)  # Expect: False
+    print(logging(attrs.MANAGER, '???????', 'hello_world') is None)  # Expect: True
+    print(register_customer('ji_chen', 'hello12345'))  # Expect: 0
+    print(register_customer('jichen', '123456'))  # Expect: 0
+    print(register_customer('jichen', 'hello_world'))  # Expect: 0
+    print(register_customer('jichen', 'helloworld'))  # Expect: 0
+    print(register_customer('jichen', 'hello12345'))  # Expect: -1

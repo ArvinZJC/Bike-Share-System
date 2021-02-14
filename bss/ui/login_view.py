@@ -1,19 +1,20 @@
 '''
 Description: the definition of a login view
-Version: 1.1.6.20210209
+Version: 1.1.7.20210214
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-09 18:23:21
+LastEditTime: 2021-02-14 18:23:21
 '''
 
-from PIL import Image, ImageTk
 from tkinter import font, messagebox, StringVar, Tk, Toplevel, ttk
 from tkinter.constants import E, LEFT, RIGHT, W, X
 
+from PIL import Image, ImageTk
+
 from bss.conf import attrs
-from bss.login_temp import logging  # TODO
-from bss.manager import Manager
+from bss.temp.login import logging  # TODO
+from bss.manager.manager import Manager
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.home_view import HomeView
 from bss.ui.img_path import get_img_path
@@ -173,7 +174,7 @@ class LoginView:
         event : the event bound to the widget calling this function
         '''
 
-        # Managers and operators should not be registered in a sign-up view opened from a login view.
+        # Managers and operator should not be registered in a sign-up view opened from a login view.
         if self.__combobox_role.get() == attrs.CUSTOMER:
             self.__label_signup['state'] = '!disabled'
             self.__tooltip_signup.set_text()

@@ -1,18 +1,19 @@
 '''
 Description: the definition of a sign-up view
-Version: 1.1.6.20210209
+Version: 1.1.7.20210214
 Author: Arvin Zhao
 Date: 2021-01-30 18:31:28
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-09 18:31:39
+LastEditTime: 2021-02-14 18:31:39
 '''
 
-from PIL import Image, ImageTk
 from tkinter import messagebox, StringVar, ttk, Tk
 from tkinter.constants import E, LEFT, RIGHT, W, X
 
+from PIL import Image, ImageTk
+
 from bss.conf import attrs
-from bss.login_temp import register_customer
+from bss.temp.login import register_customer
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.img_path import get_img_path
 from bss.ui.tooltip import Tooltip
@@ -178,9 +179,11 @@ class SignupView:
                 self.__parent.destroy()
                 self.__parent = None
             elif status_code == attrs.FAIL:
-                messagebox.showerror(attrs.APP_NAME, 'Invalid username or password. Please see the hints by hovering over the question mark icon.')
+                if messagebox.showerror(attrs.APP_NAME, 'Invalid username or password. Please see the hints by hovering over the question mark icon.') == messagebox.OK:
+                    self.__parent.focus()
             else:
-                messagebox.showerror(attrs.APP_NAME, 'The username already exists.')
+                if messagebox.showerror(attrs.APP_NAME, 'The username already exists.') == messagebox.OK:
+                    self.__parent.focus()
         else:
             pass  # TODO: manager/operator
 
