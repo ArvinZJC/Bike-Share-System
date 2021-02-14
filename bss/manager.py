@@ -36,7 +36,7 @@ class Manager:
 
 	def viz(self,choice):
 
-		conn = sqlite3.connect('data/TEAM_PJT.db')
+		conn = sqlite3.connect('data/BACKUP.db')
 		c = conn.cursor()
 
 		if choice == 1:
@@ -113,7 +113,7 @@ class Manager:
 			plt.subplots(1,3,figsize=(20,8))
 
 			plt.subplot(1,3,1)
-			plt.hist(transactions,bins=10,color='b')
+			plt.hist(transactions,bins=15,color='b')
 			plt.xlabel('Distance in Miles')
 			plt.title('Distance Travelled Per Trip')
 			plt.ylabel('Number of trips')
@@ -138,7 +138,7 @@ class Manager:
 			plt.grid(axis='both',linewidth=1)
 
 			plt.subplot(1,3,3)
-			plt.hist(charges,bins=10,color='y')
+			plt.hist(charges,bins=15,color='y')
 			plt.xlabel('Money')
 			plt.title('Cost Per Trip')
 			plt.ylabel('Number of trips')

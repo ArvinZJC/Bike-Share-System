@@ -34,8 +34,7 @@ class Bike:
 		c = conn.cursor()
 		if self.defective==1:
 			self.defective = 0
-			self.mileage = 0
-			c.execute("UPDATE bike set mileage=0,defective=0 where id=:Id",{'Id':self.get_id()})
+			c.execute("UPDATE bike set defective=0 where id=:Id",{'Id':self.get_id()})
 		
 		else:
 			self.defective = 1

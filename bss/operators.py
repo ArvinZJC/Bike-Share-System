@@ -59,7 +59,7 @@ class OperatorWorker:
 
 		c.execute("SELECT * FROM bike where id=:Id",{'Id':to_fix})
 		i = c.fetchone()
-		to_repair = Bike(i[0],i[1],[i[2],i[3]],i[4],i[5])
+		to_repair = Bike(i[0],i[1],[i[2],i[3]],i[4])
 		c.execute("SELECT defective_start,time_of_event from bike_status where id=:Id",{'Id':to_repair.get_id()})
 		rows = c.fetchall()
 		how_broken = rows[0][0]

@@ -1,7 +1,7 @@
 import sqlite3
-from bss.data.db_path import get_db_path
-
-conn = sqlite3.connect(get_db_path())
+from conf import attrs
+db_name = attrs.DB_FILENAME 
+conn = sqlite3.connect(db_name)
 c = conn.cursor()
 
 
