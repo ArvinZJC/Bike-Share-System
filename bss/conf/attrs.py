@@ -14,6 +14,7 @@ APP_NAME = 'BikeSims'
 CLOSED_EYE_FILENAME = 'closed_eye.png'
 CUSTOMER = 'Customer'
 CUSTOMER_AVATAR_FILENAME = 'customer.png'
+MANAGER_AVATAR_FILENAME = 'manager.png'
 DATA_BASENAME = 'data'
 DB_FILENAME = 'TEAM_PJT.db'
 ERROR = -1
