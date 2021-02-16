@@ -1,10 +1,10 @@
 '''
 Description: an attribute sheet to make it convenient to manage code attributes
-Version: 1.0.7.20210215
+Version: 1.0.8.20210216
 Author: Arvin Zhao
 Date: 2021-02-01 17:00:57
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-15 17:01:54
+LastEditTime: 2021-02-16 17:01:54
 '''
 
 ALREADY_ONLINE = -1
@@ -14,9 +14,9 @@ APP_NAME = 'BikeSims'
 CLOSED_EYE_FILENAME = 'closed_eye.png'
 CUSTOMER = 'Customer'
 CUSTOMER_AVATAR_FILENAME = 'customer.png'
-MANAGER_AVATAR_FILENAME = 'manager.png'
 DATA_BASENAME = 'data'
 DB_FILENAME = 'TEAM_PJT.db'
+EMPTY_CELL_WEIGHT = 0
 ERROR = -1
 FAIL = 0
 HINT_FILENAME = 'hint.png'

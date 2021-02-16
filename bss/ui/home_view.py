@@ -82,7 +82,7 @@ class HomeView:
         ttk.Label(frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
-        # New row in the dashboard frame: the top-up button. TODO: image and text?
+        # New row in the dashboard frame: the top-up button.
         frame_row_index += 1
         ttk.Button(frame_dashboard, text = 'Top up').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
@@ -102,7 +102,7 @@ class HomeView:
         ttk.Label(frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
-        # New row in the dashboard frame: the button for picking up/dropping a bike. TODO: image and text?
+        # New row in the dashboard frame: the button for picking up/dropping a bike.
         frame_row_index += 1
         ttk.Button(frame_dashboard, text = 'Pick up the bike').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)

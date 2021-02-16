@@ -4,7 +4,6 @@ from tkinter.constants import E, N, RAISED, S, SOLID, W
 from PIL import Image, ImageTk
 
 from bss.conf import attrs
-from bss.temp.customer.customer import Customer
 from bss.temp.manager.manager import Manager
 
 from bss.ui.conf import attrs as ui_attrs, colours, styles
