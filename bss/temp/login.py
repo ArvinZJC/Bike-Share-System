@@ -8,7 +8,7 @@ from bss.manager.manager import Manager
 from bss.temp.operator.operator import OperatorWorker  # TODO
 
 
-def logging(role: str, name: str, password: str) -> object:
+def logging(role: str, name: str, password: str):
     '''
     Backend code of the login process.
 
@@ -20,7 +20,7 @@ def logging(role: str, name: str, password: str) -> object:
 
     Returns
     -------
-    user : a `Customer` or `OperatorWorker` or `Manager` object
+    user : a `Customer` or `OperatorWorker` or `Manager` object or `None` or a status code indicating the user has already logged in somewhere else.
     '''
 
     conn = sqlite3.connect(get_db_path())
@@ -29,31 +29,38 @@ def logging(role: str, name: str, password: str) -> object:
     user = None
 
     if role == attrs.CUSTOMER:
-        # TODO: add " and is_online = 0" after implementing logging out.
         c.execute("SELECT * FROM customer WHERE name=:name and password=:password", {'name': name, 'password': password})
         values = c.fetchall()
 
         if len(values) > 0:
-            user = Customer(values[0][0], values[0][1], values[0][2], values[0][3], [values[0][4], values[0][5]])
-            # TODO: c.execute("UPDATE customer SET is_online = 1 where id =:val", {'val': values[0][0]})
+            if values[0][6] == attrs.OFFLINE:
+                user = Customer(values[0][0], values[0][1], values[0][2], values[0][3], [values[0][4], values[0][5]])
+                # TODO: c.execute("UPDATE customer SET is_online =:status where id =:val", {'status': attrs.ONLINE, 'val': values[0][0]})
+            else:
+                return attrs.ALREADY_ONLINE
     elif role == attrs.OPERATOR:
-        # TODO: add " and is_online = 0" after implementing logging out.
         c.execute("SELECT * From operator Where name=:name and password=:password", {'name': name, 'password': password})
         values = c.fetchall()
 
         if len(values) > 0:
-            user = OperatorWorker(values[0][0], values[0][1], values[0][2], values[0][3], values[0][4])
-            # TODO: c.execute("UPDATE operator SET is_online = 1 where id =:val", {'val': values[0][0]})
+            if values[0][5] == attrs.OFFLINE:
+                user = OperatorWorker(values[0][0], values[0][1], values[0][2], values[0][3], values[0][4])
+                # TODO: c.execute("UPDATE operator SET is_online =:status where id =:val", {'status': attrs.ONLINE, 'val': values[0][0]})
+            else:
+                return attrs.ALREADY_ONLINE
     elif role == attrs.MANAGER:
-        # TODO: add " and is_online = 0" after implementing logging out.
         c.execute("SELECT * From manager Where name=:name and password=:password",
                   {'name': name, 'password': password})
         values = c.fetchall()
 
         if len(values) > 0:
-            user = Manager(values[0][0], values[0][1], values[0][2])
-            # TODO: c.execute("UPDATE manager SET is_online = 1 where id =:val", {'val': values[0][0]})
+            if values[0][3] == attrs.OFFLINE:
+                user = Manager(values[0][0], values[0][1], values[0][2])
+                # TODO: c.execute("UPDATE manager SET is_online =:status where id =:val", {'status': attrs.ONLINE, 'val': values[0][0]})
+            else:
+                return attrs.ALREADY_ONLINE
 
+    conn.commit()
     conn.close()
 
     return user

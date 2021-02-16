@@ -1,12 +1,13 @@
 '''
 Description: an attribute sheet to make it convenient to manage code attributes
-Version: 1.0.6.20210214
+Version: 1.0.7.20210215
 Author: Arvin Zhao
 Date: 2021-02-01 17:00:57
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-14 17:01:54
+LastEditTime: 2021-02-15 17:01:54
 '''
 
+ALREADY_ONLINE = -1
 APP_BANNER_FILENAME = 'banner.png'
 APP_ICON_FILENAME = 'icon.ico'
 APP_NAME = 'BikeSims'

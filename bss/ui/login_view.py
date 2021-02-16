@@ -1,10 +1,10 @@
 '''
 Description: the definition of a login view
-Version: 1.1.7.20210214
+Version: 1.1.8.20210215
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-14 18:23:21
+LastEditTime: 2021-02-15 18:23:21
 '''
 
 from tkinter import font, messagebox, StringVar, Tk, Toplevel, ttk
@@ -215,6 +215,8 @@ class LoginView:
 
         if user is None:
             messagebox.showerror(attrs.APP_NAME, 'Wrong username or password. Please try again!')
+        elif user == attrs.ALREADY_ONLINE:
+            messagebox.showerror(attrs.APP_NAME, 'You have already logged in somewhere else.')
         else:
             self.__parent.destroy()
             self.__parent = None
