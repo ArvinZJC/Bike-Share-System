@@ -5,6 +5,16 @@ conn = sqlite3.connect(db_name)
 c = conn.cursor()
 
 
+print("Customer table")
+print("========================")
+
+c.execute("SELECT * FROM customer")
+rows=c.fetchall()
+for i in rows:
+	print(i)
+
+print('========================')
+
 print("Bike status table")
 print("========================")
 

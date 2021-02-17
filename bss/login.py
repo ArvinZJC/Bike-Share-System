@@ -1,6 +1,6 @@
 import sqlite3
 from customer import *
-from operators import *
+from operator import *
 from manager import *
 import random
 import time

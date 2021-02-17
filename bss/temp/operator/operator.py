@@ -1,14 +1,7 @@
-'''
-Description: a definition of operators
-Author: Antony
-Last Editors: Arvin Zhao
-LastEditTime: 2021-02-04 09:57:33
-'''
-
 import sqlite3
 import time
 
-from bss.bike import Bike
+from bss.temp.bike import Bike
 from bss.data.db_path import get_db_path
 
 

@@ -1,10 +1,10 @@
 '''
 Description: a database file location helper
-Version: 1.0.1.20210206
+Version: 1.0.3.20210215
 Author: Arvin Zhao
 Date: 2021-02-04 12:58:54
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-06 13:23:33
+LastEditTime: 2021-02-15 13:23:33
 '''
 
 import os
@@ -21,7 +21,7 @@ def get_db_path() -> str:
     db_path : the suitable relative path of the database file
     '''
 
-    basename = os.path.basename(os.path.abspath('.'))  # Get the basename of the script file that is run.
+    basename = os.path.basename(os.getcwd())  # Get the basename of the script file that is run.
 
     if basename == attrs.DATA_BASENAME:
         return attrs.DB_FILENAME
