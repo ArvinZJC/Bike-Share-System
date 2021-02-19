@@ -2,8 +2,8 @@ import random
 import sqlite3
 
 from bss.conf import attrs
-from bss.temp.customer.customer import Customer
-from bss.data.db_path import get_db_path
+from bss.temp.customer.customer import Customer  # TODO
+from bss.data import db_path as db
 from bss.manager.manager import Manager
 from bss.temp.operator.operator import OperatorWorker  # TODO
 
@@ -23,7 +23,7 @@ def logging(role: str, name: str, password: str):
     user : a `Customer` or `OperatorWorker` or `Manager` object or `None` or a status code indicating the user has already logged in somewhere else.
     '''
 
-    conn = sqlite3.connect(get_db_path())
+    conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
     
     user = None
@@ -88,7 +88,7 @@ def register_customer(name: str, password: str) -> int:
     if re.match(username_pattern, name) is None or re.match(password_pattern, password) is None:
         return attrs.FAIL  # Invalid username or password.
     else:
-        conn = sqlite3.connect(get_db_path())
+        conn = sqlite3.connect(db.get_db_path())
         c = conn.cursor()
         row = random.randint(0, attrs.MAP_LENGTH - 1)
         col = random.randint(0, attrs.MAP_LENGTH - 1)

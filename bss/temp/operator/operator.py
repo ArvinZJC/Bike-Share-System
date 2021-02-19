@@ -1,8 +1,8 @@
 import sqlite3
 import time
 
-from bss.temp.bike import Bike
-from bss.data.db_path import get_db_path
+from bss.temp.bike import Bike  # TODO
+from bss.data import db_path as db
 
 
 class OperatorWorker:
@@ -13,7 +13,7 @@ class OperatorWorker:
 		self.password = password
 		self.balance = balance
 		self.skill_level = skill_level
-		self.__db_path = get_db_path()
+		self.__db_path = db.get_db_path()
 
 	def print_nice(self):
 		print("Name: ",self.name),

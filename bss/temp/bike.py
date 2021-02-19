@@ -1,7 +1,7 @@
 import sqlite3
 import random
 
-from bss.data.db_path import get_db_path
+from bss.data import db_path as db
 
 
 class Bike:
@@ -10,7 +10,7 @@ class Bike:
 		self.Id = Id
 		self.location = location
 		self.defective = defective
-		self.__db_path = get_db_path()
+		self.__db_path = db.get_db_path()
 		self.is_being_used = is_being_used
 
 	def print_nice(self):

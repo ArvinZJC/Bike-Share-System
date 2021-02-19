@@ -1,6 +1,6 @@
 import sqlite3
 
-from bss.data.db_path import get_db_path
+from bss.data import db_path as db
 
 
 class Manager:
@@ -10,4 +10,4 @@ class Manager:
         self.name = name
         self.password = password
         self.riding = False
-        self.__db_path = get_db_path()
+        self.__db_path = db.get_db_path()
