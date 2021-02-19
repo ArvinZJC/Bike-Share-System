@@ -32,7 +32,7 @@ def get_img_path(img_filename: str) -> str:
     elif basename == attrs.ROOT_BASENAME:
         return os.path.join(attrs.UI_BASENAME, attrs.UI_IMG_BASENAME, img_filename)
     else:
-        return os.path.join('..', attrs.UI_BASENAME, attrs.UI_IMG_BASENAME, img_filename)
+        return os.path.join('../..', attrs.UI_BASENAME, attrs.UI_IMG_BASENAME, img_filename)
 
 
 # Test purposes only.
