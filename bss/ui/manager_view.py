@@ -6,8 +6,8 @@ from PIL import Image, ImageTk
 from bss.conf import attrs
 from bss.temp.manager.manager import Manager
 
+from bss.ui import img_path as img
 from bss.ui.conf import attrs as ui_attrs, colours, styles
-from bss.ui.img_path import get_img_path
 
 
 class ManagerView:
@@ -34,7 +34,7 @@ class ManagerView:
                              (screen_height - self.__parent_height) / 2))  # Centre the parent window.
 
         self.__parent.title('Manager')
-        self.__parent.iconbitmap(get_img_path(attrs.APP_ICON_FILENAME))
+        self.__parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         self.__parent.minsize(self.__parent_width, self.__parent_height)
         self.__parent.maxsize(int(self.__parent_width * 1.5), int(self.__parent_height * 1.5))
 
@@ -62,7 +62,7 @@ class ManagerView:
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
         if isinstance(user, Manager):
-            image_avatar = Image.open(get_img_path(attrs.MANAGER_AVATAR_FILENAME))
+            image_avatar = Image.open(img.get_img_path(attrs.MANAGER_AVATAR_FILENAME))
 
         image_avatar = image_avatar.resize((ui_attrs.AVATAR_LENGTH, ui_attrs.AVATAR_LENGTH), Image.ANTIALIAS)
         label_avatar.image = ImageTk.PhotoImage(image_avatar)
