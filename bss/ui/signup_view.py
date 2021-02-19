@@ -1,10 +1,10 @@
 '''
 Description: the definition of a sign-up view
-Version: 1.1.8.20210216
+Version: 1.1.9.20210219
 Author: Arvin Zhao
 Date: 2021-01-30 18:31:28
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-16 18:31:39
+LastEditTime: 2021-02-19 18:31:39
 '''
 
 from tkinter import messagebox, StringVar, ttk, Tk
@@ -15,8 +15,8 @@ from PIL import Image, ImageTk
 from bss.conf import attrs
 from bss.temp.login import register_customer  # TODO
 from bss.ui.conf import attrs as ui_attrs, styles
-from bss.ui.img_path import get_img_path
-from bss.ui.tooltip import Tooltip
+from bss.ui.utils import img_path as img
+from bss.ui.utils.tooltip import Tooltip
 
 
 class SignupView:
@@ -46,7 +46,7 @@ class SignupView:
 
         self.__parent.geometry('%dx%d+%d+%d' % (parent_width, parent_height, (screen_width - parent_width) / 2, (screen_height - parent_height) / 2))  # Centre the parent window.
         self.__parent.title(signup_text)
-        self.__parent.iconbitmap(get_img_path(attrs.APP_ICON_FILENAME))
+        self.__parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         self.__parent.minsize(parent_width, parent_height)
         self.__parent.maxsize(parent_width * 2, parent_height * 2)
 
@@ -59,7 +59,7 @@ class SignupView:
         row_index = 0  # Make it convenient to index the row of the grid.
         label_banner = ttk.Label(self.__parent)
         label_banner.grid(columnspan=column_num, row=row_index)
-        image_banner = Image.open(get_img_path(attrs.APP_BANNER_FILENAME))
+        image_banner = Image.open(img.get_img_path(attrs.APP_BANNER_FILENAME))
         image_banner = image_banner.resize((parent_width, ui_attrs.BANNER_HEIGHT), Image.ANTIALIAS)
         label_banner.image = ImageTk.PhotoImage(image_banner)
         label_banner['image'] = label_banner.image  # Keep a reference to prevent GC.
@@ -73,7 +73,7 @@ class SignupView:
         self.__parent.rowconfigure(row_index, weight = 0)
 
         # Same row in the frame: the username hint label.
-        image_hint = Image.open(get_img_path(attrs.HINT_FILENAME))
+        image_hint = Image.open(img.get_img_path(attrs.HINT_FILENAME))
         image_hint = image_hint.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
         self.__photo_image_hint = ImageTk.PhotoImage(image_hint)  # Keep a reference in self to prevent GC.
         label_username_hint = ttk.Label(frame_username_label, image = self.__photo_image_hint, style = styles.CONTENT_LABEL)
@@ -113,10 +113,10 @@ class SignupView:
         self.__entry_password.pack(expand = True, fill = X, side = LEFT)
 
         # Same row in the frame: the button with an eye image for controlling the visibility of password
-        image_opening_eye = Image.open(get_img_path(attrs.OPENING_EYE_FILENAME))
+        image_opening_eye = Image.open(img.get_img_path(attrs.OPENING_EYE_FILENAME))
         image_opening_eye = image_opening_eye.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
         self.__photo_image_opening_eye = ImageTk.PhotoImage(image_opening_eye)  # Keep a reference in self to prevent GC.
-        image_closed_eye = Image.open(get_img_path(attrs.CLOSED_EYE_FILENAME))
+        image_closed_eye = Image.open(img.get_img_path(attrs.CLOSED_EYE_FILENAME))
         image_closed_eye = image_closed_eye.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
         self.__photo_image_closed_eye = ImageTk.PhotoImage(image_closed_eye)  # Keep a reference in self to prevent GC.
         self.__button_password_eye = ttk.Button(frame_password, command = self.__set_password_visibility, image = self.__photo_image_closed_eye, style = styles.IMG_BUTTON)

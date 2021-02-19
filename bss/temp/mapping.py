@@ -8,6 +8,10 @@ from bss.data import db_path as db
 
 
 class Mapping:
+	'''
+	The class for defining the mapping array.
+	'''
+
 	def __init__(self, customer = None) -> None:
 		'''
 		The constructor of the class for defining the mapping array.
@@ -106,10 +110,3 @@ class Mapping:
 			return True
 		else:
 			return False
-
-	def print_nice(self):
-		for i in range(20):
-			for j in range(20):
-				#print("row:", i," col: ",j),
-				print(self.get_square_val([i, j]), end="\t"),
-			print("\n")

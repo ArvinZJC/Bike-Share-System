@@ -8,8 +8,9 @@ from bss.temp.customer.customer import Customer  # TODO
 from bss.temp.customer import renter  # TODO
 from bss.temp.mapping import Mapping  # TODO
 from bss.ui.conf import attrs as ui_attrs, colours, styles
-from bss.ui.img_path import get_img_path
-from bss.ui.tooltip import Tooltip
+from bss.ui.utils import img_path as img
+from bss.ui.utils.simpledialog import FloatDialogue
+from bss.ui.utils.tooltip import Tooltip
 
 
 class HomeView:
@@ -37,7 +38,7 @@ class HomeView:
 
         self.__parent.geometry('%dx%d+%d+%d' % (self.__parent_width, self.__parent_height, (screen_width - self.__parent_width) / 2, (screen_height - self.__parent_height) / 2))  # Centre the parent window.
         self.__parent.title('Home')
-        self.__parent.iconbitmap(get_img_path(attrs.APP_ICON_FILENAME))
+        self.__parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         self.__parent.minsize(self.__parent_width, self.__parent_height)
         self.__parent.maxsize(int(self.__parent_width * 1.5), int(self.__parent_height * 1.5))
 
@@ -63,9 +64,9 @@ class HomeView:
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         if isinstance(self.__user, Customer):
-            image_avatar = Image.open(get_img_path(attrs.CUSTOMER_AVATAR_FILENAME))
+            image_avatar = Image.open(img.get_img_path(attrs.CUSTOMER_AVATAR_FILENAME))
         else:
-            image_avatar = Image.open(get_img_path(attrs.OPERATOR_AVATAR_FILENAME))
+            image_avatar = Image.open(img.get_img_path(attrs.OPERATOR_AVATAR_FILENAME))
 
         image_avatar = image_avatar.resize((ui_attrs.AVATAR_LENGTH, ui_attrs.AVATAR_LENGTH), Image.ANTIALIAS)
         label_avatar.image = ImageTk.PhotoImage(image_avatar)
@@ -88,7 +89,7 @@ class HomeView:
 
         # New row in the dashboard frame: the top-up button.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text = 'Top up').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
+        ttk.Button(frame_dashboard, command = self.__topup, text = 'Top up').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: placeholder.
@@ -108,7 +109,7 @@ class HomeView:
 
         # New row in the dashboard frame: the button for picking up/dropping a bike.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text = 'Pick up the bike').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
+        ttk.Button(frame_dashboard, command = self.__use_bike, text = 'Pick up the bike').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: TODO: bike renting info area
@@ -146,10 +147,10 @@ class HomeView:
         self.__map_element_list = []  # Store rows of map elements.
         self.__image_empty_cell = Image.new('1', (ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), color = colours.EMPTY_CELL_BACKGROUND)
         self.__image_avatar_cell = image_avatar.copy().resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
-        self.__image_available_bike = Image.open(get_img_path(attrs.AVAILABLE_BIKE_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
-        self.__image_bike_with_rider = Image.open(get_img_path(attrs.BIKE_WITH_RIDER_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
-        self.__image_busy_bike = Image.open(get_img_path(attrs.BUSY_BIKE_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
-        self.__image_defective_bike = Image.open(get_img_path(attrs.DEFECTIVE_BIKE_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
+        self.__image_available_bike = Image.open(img.get_img_path(attrs.AVAILABLE_BIKE_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
+        self.__image_bike_with_rider = Image.open(img.get_img_path(attrs.BIKE_WITH_RIDER_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
+        self.__image_busy_bike = Image.open(img.get_img_path(attrs.BUSY_BIKE_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
+        self.__image_defective_bike = Image.open(img.get_img_path(attrs.DEFECTIVE_BIKE_FILENAME)).resize((ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH), Image.ANTIALIAS)
 
         for row in range(attrs.MAP_LENGTH):
             map_element_row_list = []  # Store map elements of a row.
@@ -184,6 +185,20 @@ class HomeView:
         self.__parent.bind('<Right>', self.__move)
         self.__parent.bind('<Up>', self.__move)
         self.__parent.bind('<Down>', self.__move)
+
+    def __topup(self) -> None:
+        '''
+        Top up a customer account.
+        '''
+
+        print(FloatDialogue.askfloat('Top up', 'Dunno'))
+
+    def __use_bike(self) -> None:
+        '''
+
+        '''
+
+        pass
 
     # noinspection PyUnusedLocal
     def __resize_frames(self, event) -> None:

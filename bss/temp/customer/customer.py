@@ -4,6 +4,10 @@ from bss.data import db_path as db
 
 
 class Customer:
+	'''
+	The class for defining a customer and his/her actions.
+	'''
+
 	def __init__(self, user_id, name, password, balance, location) -> None:
 		'''
 		The constructor of the class for defining a customer and his/her actions.
@@ -34,12 +38,6 @@ class Customer:
 		'''
 
 		return self.__name
-
-	def print_nice(self):
-		print("ID: ", self.__Id)
-		print(" Name: ", self.__name)
-		print(" Balance: ", self.__balance)
-		print(" Location: ", self.__location)
 
 	def charge(self, time):
 		amount = round(float(time) / 60, 2) * 0.5

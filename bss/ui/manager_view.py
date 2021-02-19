@@ -6,8 +6,8 @@ from PIL import Image, ImageTk
 from bss.conf import attrs
 from bss.temp.manager.manager import Manager
 
-from bss.ui import img_path as img
 from bss.ui.conf import attrs as ui_attrs, colours, styles
+from bss.ui.utils import img_path as img
 
 
 class ManagerView:
