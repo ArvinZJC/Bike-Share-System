@@ -1,4 +1,4 @@
-from customers.customer import *
+from customer.customer import *
 from bike import *
 import sqlite3
 import os
