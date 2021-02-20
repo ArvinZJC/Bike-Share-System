@@ -44,16 +44,24 @@ class Customer:
 		self.__balance -= amount
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE customer SET wallet =:new_amount where id=:__Id", {'new_amount': self.__balance, 'Id': self.__Id})
+		c.execute('UPDATE customer SET wallet =:new_amount where id=:__Id', {'new_amount': self.__balance, 'Id': self.__Id})
 		conn.commit()
 		conn.close()
 		return amount
 
-	def update_balance(self, amount):
+	def update_balance(self, amount) -> None:
+		'''
+		Add the customer's balance.
+
+		Parameters
+		----------
+		amount : the amount to add
+		'''
+
 		self.__balance += amount
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE customer SET wallet =:new_amount where id=:Id", {'new_amount': self.__balance, 'Id': self.__Id})
+		c.execute('UPDATE customer SET wallet =:new_amount where id=:Id', {'new_amount': self.__balance, 'Id': self.__Id})
 		conn.commit()
 		conn.close()
 
@@ -79,11 +87,19 @@ class Customer:
 
 		return self.__location
 
-	def set_location(self, location):
+	def set_location(self, location) -> None:
+		'''
+		Set the location of a customer.
+
+		Parameters
+		----------
+		location : a specified location
+		'''
+
 		self.__location = location
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE customer set location_row =:location_row, location_col=:location_col where id=:Id", {'location_row': self.__location[0], 'location_col': self.__location[1], 'Id': self.__Id})
+		c.execute('UPDATE customer set location_row =:location_row, location_col=:location_col where id=:Id', {'location_row': self.__location[0], 'location_col': self.__location[1], 'Id': self.__Id})
 		conn.commit()
 		conn.close()
 
@@ -101,12 +117,24 @@ class Customer:
 			direction=='unmount'
 			self.is_using_bike(False)
 
-	def is_using_bike(self, flag):
+	def is_using_bike(self, flag) -> None:
+		'''
+		Set a value to the flag indicating if a customer is riding a bike.
+
+		Parameters
+		----------
+		flag : a value indicating if a customer is riding a bike
+		'''
+
 		self.__riding = flag
 
-	def get_flag(self):
-		while self.get_balance() < 0:
-			print("You can't rent a bike while your balance is negative. Please update your balance."),
-			amount = int(input("How much you want to transfer to your account? "))
-			self.update_balance(amount)
+	def get_flag(self) -> bool:
+		'''
+		Riding status flag getter.
+
+		Returns
+		-------
+		riding : `True` if the customer is riding; otherwise, `False`
+		'''
+
 		return self.__riding

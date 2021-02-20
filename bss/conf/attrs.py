@@ -1,10 +1,10 @@
 '''
 Description: an attribute sheet to make it convenient to manage code attributes
-Version: 1.0.8.20210219
+Version: 1.0.9.20210220
 Author: Arvin Zhao
 Date: 2021-02-01 17:00:57
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-19 17:01:54
+LastEditTime: 2021-02-20 17:01:54
 '''
 
 # Login status.
@@ -17,7 +17,6 @@ APP_BANNER_FILENAME = 'banner.png'
 APP_ICON_FILENAME = 'icon.ico'
 AVAILABLE_BIKE_FILENAME = 'available_bike.png'
 BIKE_WITH_RIDER_FILENAME = 'bike_with_rider.png'
-BUSY_BIKE_FILENAME = 'busy_bike.png'
 CLOSED_EYE_FILENAME = 'closed_eye.png'
 CUSTOMER_AVATAR_FILENAME = 'customer.png'
 DB_FILENAME = 'TEAM_PJT.db'
@@ -35,11 +34,11 @@ PASS = 1
 # Map attributes.
 AVAILABLE_BIKE_CODE = 0  # 2nd
 AVATAR_CODE = 2  # 4th
-BIKE_WITH_RIDER_CODE = 3  # 5th
 BUSY_BIKE_CODE = 1  # 3rd
 DEFECTIVE_BIKE_CODE = -1  # 1st
-EMPTY_CELL_CODE = 5  # 6th
+EMPTY_CELL_CODE = 3  # 5th
 MAP_LENGTH = 20
+REFRESHING_INTERVAL = 1000  # unit: ms
 
 # Project configuration.
 APP_NAME = 'BikeSims'
