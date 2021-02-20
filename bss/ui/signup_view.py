@@ -175,7 +175,7 @@ class SignupView:
             status_code = register_customer(username, self.__variable_password.get())
 
             if status_code == attrs.PASS:
-                messagebox.showinfo(attrs.APP_NAME, 'Congratulations! ' + attrs.CUSTOMER + ' "' + username + '" has been registered successfully.')
+                messagebox.showinfo(attrs.APP_NAME, 'Hurray! ' + attrs.CUSTOMER + ' "' + username + '" has been registered successfully.')
                 self.__parent.destroy()
                 self.__parent = None
             elif status_code == attrs.FAIL:

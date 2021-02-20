@@ -29,7 +29,7 @@ def logging(role: str, name: str, password: str):
     user = None
 
     if role == attrs.CUSTOMER:
-        c.execute("SELECT * FROM customer WHERE name=:name and password=:password", {'name': name, 'password': password})
+        c.execute('SELECT * FROM customer WHERE name=:name and password=:password', {'name': name, 'password': password})
         values = c.fetchall()
 
         if len(values) > 0:
@@ -39,7 +39,7 @@ def logging(role: str, name: str, password: str):
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.OPERATOR:
-        c.execute("SELECT * From operator Where name=:name and password=:password", {'name': name, 'password': password})
+        c.execute('SELECT * From operator Where name=:name and password=:password', {'name': name, 'password': password})
         values = c.fetchall()
 
         if len(values) > 0:
@@ -49,8 +49,7 @@ def logging(role: str, name: str, password: str):
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.MANAGER:
-        c.execute("SELECT * From manager Where name=:name and password=:password",
-                  {'name': name, 'password': password})
+        c.execute('SELECT * From manager Where name=:name and password=:password', {'name': name, 'password': password})
         values = c.fetchall()
 
         if len(values) > 0:
