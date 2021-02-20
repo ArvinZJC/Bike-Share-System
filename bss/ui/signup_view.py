@@ -12,7 +12,7 @@ from tkinter.constants import E, LEFT, RIGHT, W, X
 
 from PIL import Image, ImageTk
 
-from bss.temp import login  # TODO
+from bss.temp import account  # TODO
 from bss.conf import attrs
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.utils import img_path as img
@@ -172,7 +172,7 @@ class SignupView:
 
         if self.__role == attrs.CUSTOMER:
             username = self.__variable_username.get()
-            status_code = login.register_customer(username, self.__variable_password.get())
+            status_code = account.register_customer(username, self.__variable_password.get())
 
             if status_code == attrs.PASS:
                 messagebox.showinfo(attrs.APP_NAME, 'Hurray! ' + attrs.CUSTOMER + ' "' + username + '" has been registered successfully.')

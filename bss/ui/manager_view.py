@@ -3,7 +3,7 @@ from tkinter.constants import E, N, RAISED, S, SOLID, W
 
 from PIL import Image, ImageTk
 
-from bss.temp import login  # TODO
+from bss.temp import account  # TODO
 from bss.conf import attrs
 from bss.temp.manager.manager import Manager  # TODO
 from bss.ui.conf import attrs as ui_attrs, colours, styles
@@ -242,7 +242,7 @@ class ManagerView:
             if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?'):
                 return
 
-            login.log_out(self.__user)
+            account.log_out(self.__user)
             self.__parent.destroy()
             self.__parent = None
 

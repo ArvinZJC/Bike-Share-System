@@ -12,7 +12,7 @@ from tkinter.constants import E, END, LEFT, RIGHT, W, X
 
 from PIL import Image, ImageTk
 
-from bss.temp import login  # TODO
+from bss.temp import account  # TODO
 from bss.conf import attrs
 from bss.manager.manager import Manager
 from bss.ui.conf import attrs as ui_attrs, styles
@@ -212,7 +212,7 @@ class LoginView:
         '''
 
         self.__variable_username.set(self.__variable_username.get().strip())
-        user = login.logging(self.__combobox_role.get(), self.__variable_username.get(), self.__variable_password.get())
+        user = account.logging(self.__combobox_role.get(), self.__variable_username.get(), self.__variable_password.get())
 
         if user is None:
             messagebox.showerror(attrs.APP_NAME, 'Wrong username or password. Please try again!')
