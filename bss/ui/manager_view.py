@@ -1,29 +1,35 @@
-from tkinter import Tk, ttk
+from tkinter import messagebox, Tk, ttk
 from tkinter.constants import E, N, RAISED, S, SOLID, W
 
 from PIL import Image, ImageTk
 
+from bss.temp import login  # TODO
 from bss.conf import attrs
-from bss.temp.manager.manager import Manager
-
+from bss.temp.manager.manager import Manager  # TODO
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.utils import img_path as img
 
 
 class ManagerView:
-    def __init__(self, parent, user) -> None:
+    '''
+    The class for creating a manager view.
+    '''
+
+    def __init__(self, parent, user, toplevel = None) -> None:
         '''
-        The constructor of the class for creating a home view.
-        manager can have access to this view.
+        The constructor of the class for creating a manager view.
+        Only managers can have access to this view.
 
         Parameters
         ----------
-        parent : the parent window for the home view to display
-        user : a Manager object
+        parent : the parent window for the manager view to display
+        user : a `Manager` object
+        toplevel : the top-level widget of the manager view
         '''
 
         self.__parent = parent
-
+        self.__user = user
+        self.__toplevel = toplevel
         screen_width = self.__parent.winfo_screenwidth()
         screen_height = self.__parent.winfo_screenheight()
         self.__parent_width = 900
@@ -172,10 +178,10 @@ class ManagerView:
         ttk.Label(frame_dashboard, style=styles.PLACEHOLDER_LABEL).grid(row=frame_row_index)
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
-        # New row in the dashboard frame: TODO: the log-out area
+        # New row in the dashboard frame: the log-out button
         frame_row_index += 1
         frame_column_index = 0
-        ttk.Label(frame_dashboard, style=styles.CONTENT_LABEL, text='Log out').grid(column=frame_column_index,
+        ttk.Button(frame_dashboard, command = self.__log_out, text='Log out').grid(column=frame_column_index,
                                                                                     padx=ui_attrs.PADDING_X,
                                                                                     row=frame_row_index, sticky=(S, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=1)
@@ -218,9 +224,32 @@ class ManagerView:
             self.__map_label_list.append(map_label_row_list)
 
         # Bind events.
+        self.__parent.protocol('WM_DELETE_WINDOW', lambda: self.__log_out(False))
         self.__parent.bind('<Configure>', self.__resize_frames)
 
-# noinspection PyUnusedLocal
+    def __log_out(self, is_logout_button = True) -> None:
+        '''
+        Log out the account.
+
+        Parameters
+        ----------
+        is_logout_button : a flag indicating if a user tries to log out himself/herself by clicking the log-out button
+        '''
+
+        if self.__user.get_flag():
+            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike and paying.')
+        else:
+            if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?'):
+                return
+
+            login.log_out(self.__user)
+            self.__parent.destroy()
+            self.__parent = None
+
+            if self.__toplevel is not None:
+                self.__toplevel.deiconify()
+
+    # noinspection PyUnusedLocal
     def __resize_frames(self, event) -> None:
         '''
         Auto-resize the two frames.
