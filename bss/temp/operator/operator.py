@@ -7,8 +7,8 @@ from bss.data import db_path as db
 
 class OperatorWorker:
 
-	def __init__(self, Id, name, password,balance,skill_level):
-		self.Id = Id
+	def __init__(self, operator_id, name, password,balance,skill_level):
+		self.__Id = operator_id
 		self.name = name
 		self.password = password
 		self.balance = balance
@@ -17,9 +17,20 @@ class OperatorWorker:
 
 	def print_nice(self):
 		print("Name: ",self.name),
-		print("Id: ",self.Id),
+		print("Id: ",self.__Id),
 		print("Skill Level: ",self.skill_level)
 		print("Balance: ",self.balance)
+
+	def get_id(self) -> int:
+		'''
+		Operator ID getter.
+
+		Returns
+		-------
+		operator_id : the ID of an operator
+		'''
+
+		return self.__Id
 
 	def get_skill_level(self):
 		return self.skill_level
@@ -84,7 +95,7 @@ class OperatorWorker:
 		c = conn.cursor()
 
 		c.execute("INSERT INTO bike_status (id,time_of_event,defective_start,defective_end) VALUES ({},'{}',{},{})".format(to_repair.get_id(),
-																										timeOfFix,1,0))
+																										timeOfFix,1,0)) # TODO: 1 should be how_broken i think
 		conn.commit()
 		conn.close()
 		return [timeToFix/20,timeOfFix]
@@ -134,7 +145,7 @@ class OperatorWorker:
 		self.balance += money
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE operator set account=:sum where id=:Id",{'sum':self.balance,'Id':self.Id})
+		c.execute("UPDATE operator set account=:sum where id=:Id",{'sum':self.balance,'Id':self.__Id})
 		conn.commit()
 		conn.close()
 

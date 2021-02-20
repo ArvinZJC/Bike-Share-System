@@ -1,5 +1,6 @@
 import sqlite3
 
+from bss.temp.customer import renter
 from bss.data import db_path as db
 
 
@@ -25,7 +26,15 @@ class Customer:
 		self.__riding = False
 		self.__db_path = db.get_db_path()
 
-	def get_id(self):
+	def get_id(self) -> int:
+		'''
+		Customer ID getter.
+
+		Returns
+		-------
+		user_id : the ID of a customer
+		'''
+
 		return self.__Id
 
 	def get_name(self) -> str:
@@ -39,12 +48,24 @@ class Customer:
 
 		return self.__name
 
-	def charge(self, time):
-		amount = round(float(time) / 60, 2) * 0.5
+	def charge(self, time) -> float:
+		'''
+		Charge for the ride.
+
+		Parameters
+		----------
+		time : the time for calculating the fee
+
+		Returns
+		-------
+		amount : the amount of money for the ride
+		'''
+
+		amount = renter.calculate_charge(time)
 		self.__balance -= amount
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute('UPDATE customer SET wallet =:new_amount where id=:__Id', {'new_amount': self.__balance, 'Id': self.__Id})
+		c.execute('UPDATE customer SET wallet =:new_amount where id=:Id', {'new_amount': self.__balance, 'Id': self.__Id})
 		conn.commit()
 		conn.close()
 		return amount
@@ -102,20 +123,6 @@ class Customer:
 		c.execute('UPDATE customer set location_row =:location_row, location_col=:location_col where id=:Id', {'location_row': self.__location[0], 'location_col': self.__location[1], 'Id': self.__Id})
 		conn.commit()
 		conn.close()
-
-	def move_with_bike(self, direction, mapping, bike):
-		print("% to defect: ", bike.get_defective())
-		if not bike.is_defective():
-			if direction == 'unmount':
-				self.is_using_bike(False)
-
-			else:
-				bike.move(direction, mapping)
-				self.move(direction, mapping)
-		else:
-			print("This bike broke down. Forced to unmount.")
-			direction=='unmount'
-			self.is_using_bike(False)
 
 	def is_using_bike(self, flag) -> None:
 		'''

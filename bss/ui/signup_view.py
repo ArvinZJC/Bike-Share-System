@@ -1,10 +1,10 @@
 '''
 Description: the definition of a sign-up view
-Version: 1.1.9.20210219
+Version: 1.2.0.20210220
 Author: Arvin Zhao
 Date: 2021-01-30 18:31:28
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-19 18:31:39
+LastEditTime: 2021-02-20 18:31:39
 '''
 
 from tkinter import messagebox, StringVar, ttk, Tk
@@ -12,8 +12,8 @@ from tkinter.constants import E, LEFT, RIGHT, W, X
 
 from PIL import Image, ImageTk
 
+from bss.temp import login  # TODO
 from bss.conf import attrs
-from bss.temp.login import register_customer  # TODO
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.utils import img_path as img
 from bss.ui.utils.tooltip import Tooltip
@@ -32,7 +32,7 @@ class SignupView:
         Parameters
         ----------
         parent : the parent window for the sign-up view to display
-        role : the user role
+        role : the user role (customer or manager)
         signup_text : the parent window's title and the text on the sign-up button
         '''
 
@@ -172,7 +172,7 @@ class SignupView:
 
         if self.__role == attrs.CUSTOMER:
             username = self.__variable_username.get()
-            status_code = register_customer(username, self.__variable_password.get())
+            status_code = login.register_customer(username, self.__variable_password.get())
 
             if status_code == attrs.PASS:
                 messagebox.showinfo(attrs.APP_NAME, 'Hurray! ' + attrs.CUSTOMER + ' "' + username + '" has been registered successfully.')
@@ -185,7 +185,7 @@ class SignupView:
                 if messagebox.showerror(attrs.APP_NAME, 'The username already exists.') == messagebox.OK:
                     self.__parent.focus()
         else:
-            pass  # TODO: manager/operator
+            pass  # TODO: manager
 
 
 # Test purposes only.

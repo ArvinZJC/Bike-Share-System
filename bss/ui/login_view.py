@@ -1,22 +1,23 @@
 '''
 Description: the definition of a login view
-Version: 1.1.9.20210219
+Version: 1.2.0.20210220
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-19 18:23:21
+LastEditTime: 2021-02-20 18:23:21
 '''
 
 from tkinter import font, messagebox, StringVar, Tk, Toplevel, ttk
-from tkinter.constants import E, LEFT, RIGHT, W, X
+from tkinter.constants import E, END, LEFT, RIGHT, W, X
 
 from PIL import Image, ImageTk
 
+from bss.temp import login  # TODO
 from bss.conf import attrs
-from bss.temp.login import logging  # TODO
 from bss.manager.manager import Manager
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.home_view import HomeView
+from bss.ui.manager_view import ManagerView
 from bss.ui.signup_view import SignupView
 from bss.ui.utils import img_path as img
 from bss.ui.utils.tooltip import Tooltip
@@ -211,21 +212,26 @@ class LoginView:
         '''
 
         self.__variable_username.set(self.__variable_username.get().strip())
-        user = logging(self.__combobox_role.get(), self.__variable_username.get(), self.__variable_password.get())
+        user = login.logging(self.__combobox_role.get(), self.__variable_username.get(), self.__variable_password.get())
 
         if user is None:
             messagebox.showerror(attrs.APP_NAME, 'Wrong username or password. Please try again!')
         elif user == attrs.ALREADY_ONLINE:
             messagebox.showerror(attrs.APP_NAME, 'You have already logged in somewhere else.')
         else:
-            self.__parent.destroy()
-            self.__parent = None
+            self.__combobox_role.current(0)
+            self.__select_role(None)
+            self.__entry_username.delete(0, END)
+            self.__entry_password.delete(0, END)
+            self.__parent.withdraw()  # Hide the parent window for the login view.
 
             if isinstance(user, Manager):
-                pass  # TODO: a manager dashboard view
+                manager_window = Toplevel(self.__parent)
+                ManagerView(manager_window, user, self.__parent)
+                manager_window.mainloop()
             else:
-                home_window = Tk()
-                HomeView(home_window, user)
+                home_window = Toplevel(self.__parent)
+                HomeView(home_window, user, self.__parent)
                 home_window.mainloop()
 
     # noinspection PyUnusedLocal

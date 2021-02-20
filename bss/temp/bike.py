@@ -30,38 +30,51 @@ class Bike:
 		self.__distance = 0
 		self.__extra_time = 0
 
-	def print_nice(self):
-		print("Bike Id: ",self.__Id),
-		print("%% defective: ",self.__defective)
+	def get_defective(self) -> float:
+		'''
+		Defective level getter.
 
-	def print_details(self):
-		print("Bike Id: ",self.__Id),
-		print("%% defective: ",self.__defective),
-		print("Location: ",self.__location)
+		Returns
+		-------
+		defective : a defective level of a bike
+		'''
 
-	def get_defective(self):
 		return self.__defective
 
-	def is_defective(self):
-		return self.__defective>0.9
+	def is_defective(self) -> bool:
+		'''
+		Check if a bike is defective or needs overhauling.
 
-	def set_defective(self):
-		conn = sqlite3.connect(self.__db_path)
-		c = conn.cursor()
-		if self.__defective==1:
-			self.__defective = 0
-			c.execute("UPDATE bike set defective=0 where id=:Id",{'Id':self.get_id()})
-		
-		else:
-			self.__defective = 1
-			c.execute("UPDATE bike set defective=1 where id=:Id",{'Id':self.get_id()})
+		Returns
+		-------
+		is_defective : `True` if a bike is defective; otherwise, `False`
+		'''
 
-		conn.commit()
-		conn.close()
+		return self.__defective >= attrs.DEFECTIVE_BIKE_THRESHOLD
 
-	def get_is_being_used(self):
+	def set_defective(self, location: list, defective: float) -> None:
+		'''
+		Defective level setter.
+
+		Parameters
+		----------
+		location : the location of a bike
+		defective : a defective level of a bike
+		'''
+
+		if attrs.BIKE_DAMAGE_MIN <= defective <= attrs.BIKE_DAMAGE_MAX:
+			self.__defective = defective
+			conn = sqlite3.connect(self.__db_path)
+			c = conn.cursor()
+			c.execute(
+				"UPDATE bike set location_row =:location_row, location_col=:location_col, defective=:value where id=:Id",
+				{'location_row': location[0], 'location_col': location[1], 'value': self.__defective, 'Id': self.__Id})
+			conn.commit()
+			conn.close()
+
+	def get_is_being_used(self):  # TODO
 		return self.__is_being_used
-		
+
 	def set_is_being_used(self) -> None:
 		'''
 		Set the using status of a bike.
@@ -112,50 +125,37 @@ class Bike:
 
 		self.__extra_time += random.randint(3, 5) * random.randint(50, 60) * max(0.5, (1 - self.get_defective()))
 
-	def get_location(self):
+	def get_location(self) -> list:
+		'''
+
+		Returns
+		-------
+
+		'''
+
 		return self.__location
 
-	def set_location(self, location,operator=1):
+	def set_location(self, location) -> None:
+		'''
+		Move a bike to a location.
+
+		Parameters
+		----------
+		location : a specified location
+		'''
+
 		self.__location = location
-		self.__defective+=round(random.uniform(0.01,0.05),2)
-		conn = sqlite3.connect(self.__db_path)
-		c = conn.cursor()
-		c.execute("UPDATE bike set location_row =:location_row, location_col=:location_col,defective=:value where id=:Id",
-				  {'location_row': location[0], 'location_col': location[1],'value':self.__defective, 'Id': self.__Id})
-		conn.commit()
-		conn.close()
+		self.__defective += round(random.uniform(0.01, 0.05), 2)
+		self.__defective = attrs.BIKE_DAMAGE_MAX if self.__defective > attrs.BIKE_DAMAGE_MAX else self.__defective
+		self.set_defective(location, self.__defective)
 
-	def get_id(self):
+	def get_id(self) -> int:
+		'''
+		Get the ID of a bike.
+
+		Returns
+		-------
+		Id : the ID of a bike
+		'''
+
 		return self.__Id
-
-	def move(self, direction, map):
-		location = self.get_location()
-
-		og_val = map.get_square_val(location)
-		if direction == 'up':
-			if location[0]>0:
-				map.set_state(location, og_val - 1)
-				location[0] -= 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)
-
-		elif direction == 'down':
-			if location[0]<19:
-				map.set_state(location, og_val - 1)
-				location[0] += 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)
-
-		elif direction == 'left':
-			if location[1]>0:
-				map.set_state(location, og_val - 1)
-				location[1] -= 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)
-
-		else:
-			if location[1]<19:
-				map.set_state(location, og_val - 1)
-				location[1] += 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)

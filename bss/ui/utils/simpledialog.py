@@ -1,10 +1,10 @@
 '''
 Description: the definition of customised Tkinter simple dialogues
-Version: 1.0.0.20210219
+Version: 1.0.1.20210220
 Author: Arvin Zhao
 Date: 2021-02-19 10:20:30
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-19 10:57:50
+LastEditTime: 2021-02-20 10:57:50
 '''
 
 from tkinter import simpledialog
@@ -44,7 +44,37 @@ class FloatDialogue(simpledialog._QueryFloat):
 
 
 # noinspection PyProtectedMember
-class StringDialogue(simpledialog._QueryString):
+class IntegerDialogue(simpledialog._QueryInteger):
+    '''
+    The class for creating a customised Tkinter simple integer dialogue.
+    '''
+
+    def body(self, master):
+        super().body(master)
+        self.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
+
+    @staticmethod
+    def askinteger(title: str, prompt: str, **kw) -> int:
+        '''
+        Show a customised Tkinter simple integer dialogue.
+
+        Parameters
+        ----------
+        title : the dialogue's title
+        prompt : the prompt on the dialogue
+        kw : some properties controlling the dialogue's behaviours
+
+        Returns
+        -------
+        result : an integer or `None`
+        '''
+
+        d = IntegerDialogue(title, prompt, **kw)
+        return d.result
+
+
+# noinspection PyProtectedMember
+class StringDialogue(simpledialog._QueryString):  # TODO: remove this if it is not used
     '''
     The class for creating a customised Tkinter simple string dialogue.
     '''
@@ -85,5 +115,6 @@ if __name__ == '__main__':
     test_window.title('Test')
     test_window.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
     print(FloatDialogue.askfloat('Float dialogue test', 'Enter anything for testing:'))
+    print(IntegerDialogue.askinteger('Integer dialogue test', 'Enter anything for testing:'))
     print(StringDialogue.askstring('String dialogue test', 'Enter anything for testing:'))
     test_window.mainloop()

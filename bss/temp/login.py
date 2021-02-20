@@ -2,10 +2,7 @@ import random
 import sqlite3
 
 from bss.conf import attrs
-from bss.temp.customer.customer import Customer  # TODO
 from bss.data import db_path as db
-from bss.manager.manager import Manager
-from bss.temp.operator.operator import OperatorWorker  # TODO
 
 
 def logging(role: str, name: str, password: str):
@@ -23,6 +20,11 @@ def logging(role: str, name: str, password: str):
     user : a `Customer` or `OperatorWorker` or `Manager` object or `None` or a status code indicating the user has already logged in somewhere else.
     '''
 
+    # Put module references here to attempt to avoid a circular import.
+    from bss.temp.customer.customer import Customer  # TODO
+    from bss.temp.manager.manager import Manager  # TODO
+    from bss.temp.operator.operator import OperatorWorker  # TODO
+
     conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
     
@@ -35,7 +37,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][6] == attrs.OFFLINE:
                 user = Customer(values[0][0], values[0][1], values[0][2], values[0][3], [values[0][4], values[0][5]])
-                # TODO: c.execute("UPDATE customer SET is_online =:status where id =:val", {'status': attrs.ONLINE, 'val': values[0][0]})
+                c.execute('UPDATE customer SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.OPERATOR:
@@ -45,7 +47,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][5] == attrs.OFFLINE:
                 user = OperatorWorker(values[0][0], values[0][1], values[0][2], values[0][3], values[0][4])
-                # TODO: c.execute("UPDATE operator SET is_online =:status where id =:val", {'status': attrs.ONLINE, 'val': values[0][0]})
+                c.execute('UPDATE operator SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.MANAGER:
@@ -55,7 +57,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][3] == attrs.OFFLINE:
                 user = Manager(values[0][0], values[0][1], values[0][2])
-                # TODO: c.execute("UPDATE manager SET is_online =:status where id =:val", {'status': attrs.ONLINE, 'val': values[0][0]})
+                c.execute('UPDATE manager SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
 
@@ -63,6 +65,34 @@ def logging(role: str, name: str, password: str):
     conn.close()
 
     return user
+
+
+def log_out(user) -> None:
+    '''
+    Backend code of the log-out process.
+
+    Parameters
+    ----------
+    user : a `Customer` or `OperatorWorker` or `Manager` object
+    '''
+
+    # Put module references here to attempt to avoid a circular import.
+    from bss.temp.customer.customer import Customer  # TODO
+    from bss.temp.manager.manager import Manager  # TODO
+    from bss.temp.operator.operator import OperatorWorker  # TODO
+
+    conn = sqlite3.connect(db.get_db_path())
+    c = conn.cursor()
+
+    if isinstance(user, Customer):
+        c.execute('UPDATE customer SET is_online =:status where id =:val', {'status': attrs.OFFLINE, 'val': user.get_id()})
+    elif isinstance(user, OperatorWorker):
+        c.execute('UPDATE operator SET is_online =:status where id =:val', {'status': attrs.OFFLINE, 'val': user.get_id()})
+    elif isinstance(user, Manager):
+        c.execute('UPDATE manager SET is_online =:status where id =:val', {'status': attrs.OFFLINE, 'val': user.get_id()})
+
+    conn.commit()
+    conn.close()
 
 
 def register_customer(name: str, password: str) -> int:
@@ -96,7 +126,7 @@ def register_customer(name: str, password: str) -> int:
         cid = c.fetchall()[0][0] + 1
 
         try:
-            c.execute("INSERT INTO customer (id,name,password,wallet,location_row,location_col,is_online) VALUES({},'{}','{}',{},{},{},{})".format(cid, name, password, 0.0, row, col, attrs.OFFLINE))
+            c.execute("INSERT INTO customer(id,name,password,wallet,location_row,location_col,is_online) VALUES({},'{}','{}',{},{},{},{})".format(cid, name, password, 0.0, row, col, attrs.OFFLINE))
             conn.commit()
             conn.close()
             return attrs.PASS  # Sign up a user successfully.
@@ -106,7 +136,7 @@ def register_customer(name: str, password: str) -> int:
 
 # Test purposes only.
 if __name__ == '__main__':
-    print(logging(attrs.CUSTOMER, 'jichen', '12345') is None)  # Expect: False
+    print(logging(attrs.CUSTOMER, 'jichen ', '12345') is None)  # Expect: True
     print(logging(attrs.MANAGER, '???????', 'hello_world') is None)  # Expect: True
     print(register_customer('ji_chen', 'hello12345'))  # Expect: 0
     print(register_customer('jichen', '123456'))  # Expect: 0

@@ -4,13 +4,14 @@ from tkinter.constants import E, N, RAISED, S, SOLID, W
 from PIL import Image, ImageTk
 import numpy as np
 
+from bss.temp import login  # TODO
 from bss.conf import attrs
-from bss.temp.customer.customer import Customer  # TODO
 from bss.temp.customer import renter  # TODO
+from bss.temp.customer.customer import Customer  # TODO
 from bss.temp.mapping import Mapping  # TODO
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.utils import img_path as img
-from bss.ui.utils.simpledialog import FloatDialogue
+from bss.ui.utils.simpledialog import FloatDialogue, IntegerDialogue
 from bss.ui.utils.tooltip import Tooltip
 
 
@@ -19,26 +20,30 @@ class HomeView:
     The class for creating a home view.
     '''
 
-    def __init__(self, parent, user) -> None:
+    def __init__(self, parent, user, toplevel = None) -> None:
         '''
         The constructor of the class for creating a home view.
-        Customers and operator can have access to this view.
+        Customers and operators can have access to this view.
 
         Parameters
         ----------
         parent : the parent window for the home view to display
         user : a `Customer` or `OperatorWorker` object
+        toplevel : the top-level widget of the home view
         '''
+
+        self.__PICKUP_BIKE_TEXT = 'Pick up the bike'
+        self.__DROP_BIKE_TEXT = 'Drop the bike and pay'
+        self.__HINT_INFO = '\nHint: use arrow keys to move.\n'
 
         self.__parent = parent
         self.__user = user
+        self.__toplevel = toplevel
         screen_width = self.__parent.winfo_screenwidth()
         screen_height = self.__parent.winfo_screenheight()
         self.__parent_width = 900
         self.__parent_height = 600
-        self.__PICKUP_BIKE_TEXT = 'Pick up the bike'
-        self.__DROP_BIKE_TEXT = 'Drop the bike'
-        self.__can_move = True  # A flag used to control the ability of moving during some operations,
+        self.__rented_bike = None
 
         self.__parent.geometry('%dx%d+%d+%d' % (self.__parent_width, self.__parent_height, (screen_width - self.__parent_width) / 2, (screen_height - self.__parent_height) / 2))  # Centre the parent window.
         self.__parent.title('Home')
@@ -85,7 +90,7 @@ class HomeView:
         frame_row_index += 1
         self.__label_balance = ttk.Label(frame_dashboard, style = styles.EXPLANATION_LABEL)
         self.__label_balance.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index)
-        self.__label_balance['text'] = self.__get_balance_text()
+        self.__update_balance_text()
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: placeholder.
@@ -119,20 +124,22 @@ class HomeView:
         self.__button_use_bike.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
-        # New row in the dashboard frame: TODO: bike renting info area
+        # New row in the dashboard frame: the info label.
         frame_row_index += 1
-        ttk.Label(frame_dashboard, style = styles.CONTENT_LABEL, text = 'Hint: use arrow keys to move.').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = frame_row_index)
+        self.__label_info = ttk.Label(frame_dashboard, style = styles.CONTENT_LABEL)
+        self.__label_info.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = frame_row_index)
+        self.__update_ride_info()
         frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
-        # New row in the dashboard frame: TODO: the log-out area
+        # New row in the dashboard frame: the log-out button.
         frame_row_index += 1
         frame_column_index = 0
-        ttk.Label(frame_dashboard, style = styles.CONTENT_LABEL, text = 'Log out').grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (S, W))
+        ttk.Button(frame_dashboard, command = self.__log_out, text = 'Log out').grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (S, W))
         frame_dashboard.rowconfigure(frame_row_index, weight = 1)
 
-        # Same row, new column in the dashboard frame: TODO: the settings area
+        # Same row, new column in the dashboard frame: the settings button.
         frame_column_index += 1
-        ttk.Label(frame_dashboard, style = styles.CONTENT_LABEL, text = 'Settings').grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, S))
+        ttk.Button(frame_dashboard, text = 'Settings').grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, S))
 
         # New row in the dashboard frame: placeholder.
         frame_row_index += 1
@@ -190,6 +197,7 @@ class HomeView:
             self.__map_element_list.append(map_element_row_list)
 
         # Bind events.
+        self.__parent.protocol('WM_DELETE_WINDOW', lambda: self.__log_out(False))
         self.__parent.bind('<Configure>', self.__resize_frames)
         self.__parent.bind('<Left>', self.__move)
         self.__parent.bind('<Right>', self.__move)
@@ -198,69 +206,156 @@ class HomeView:
 
         self.__parent.after(attrs.REFRESHING_INTERVAL, self.__refresh_map)  # Refresh the map regularly.
 
-    def __get_balance_text(self) -> str:
+    def __update_balance_text(self) -> None:
         '''
-        Get the balance text.
-
-        Returns
-        -------
-        balance_text : the balance text
+        Update the text of the balance label.
         '''
 
-        return 'Balance: ￡' + '%.2f' % self.__user.get_balance()
+        self.__label_balance['text'] = 'Balance: ￡' + '%.2f' % self.__user.get_balance()
 
     def __topup(self) -> None:
         '''
         Top up a customer account.
         '''
 
-        result = FloatDialogue.askfloat('Top up', 'Enter the amount you want to top up (￡)\n(Please note that a maximum of 2 decimal places will be processed.)', minvalue = 0.01)
+        topup_result = FloatDialogue.askfloat('Top up', 'Enter the amount you want to top up (￡)\n(Please note that a maximum of 2 decimal places will be processed.)', minvalue = 0.01)
 
-        if result is not None:
-            amount_split = str(result).split('.')
+        if topup_result is not None:
+            amount_split = str(topup_result).split('.')
             amount = float(amount_split[0] + '.' + amount_split[1][:2])
             self.__user.update_balance(amount)
-            self.__label_balance['text'] = self.__get_balance_text()
+            self.__update_balance_text()
             messagebox.showinfo(attrs.APP_NAME, 'Hurray! Your wallet has been topped up successfully.')
 
     def __use_bike(self) -> None:
         '''
-        TODO: what about operators?
+        Pick up/Drop a bike as a customer. TODO: operators?
         '''
 
         if self.__user.get_balance() > 0:
-            location = self.__user.get_location()
-
             # Drop a bike.
             if self.__user.get_flag():
-                #self.__button_use_bike['text'] = self.__PICKUP_BIKE_TEXT
-                pass
+                if self.__user.get_balance() < renter.calculate_charge(self.__rented_bike.get_extra_time()):
+                    messagebox.showerror(attrs.APP_NAME, "Oops! You haven't got enough money. Please top up your wallet first.")
+                else:
+                    self.__button_use_bike['text'] = self.__PICKUP_BIKE_TEXT
+                    self.__user, self.__rented_bike, transaction_date = renter.drop_bike(self.__user, self.__rented_bike)
+                    location = self.__user.get_location()
+                    label_map_element = self.__map_element_list[location[0]][location[1]][0]
+                    tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
+                    label_map_element.image = ImageTk.PhotoImage(self.__image_avatar_cell)
+                    label_map_element['image'] = label_map_element.image
+                    available_bike_count = len(renter.check_bikes(location))
+                    tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]) + '\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else '')
+                    self.__update_balance_text()
+                    self.__update_ride_info()
+
+                    if self.__rented_bike.is_defective():
+                        messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using! The bike you dropped will be unavailable for overhauling.\n\nDid the bike work fine?')
+                        renter.report_break(self.__rented_bike, transaction_date)
+                    else:
+                        if not messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using!\n\nDid the bike work fine?'):
+                            renter.report_break(self.__rented_bike, transaction_date)
             # Attempt to pick up a bike.
             else:
-                bike_result = renter.get_closest_bike(location)
+                bike_result = renter.get_closest_bike(self.__user.get_location())
 
                 if isinstance(bike_result, list):
-                    if len(bike_result) > 1:
-                        pass
-                    elif len(bike_result) == 1:
-                        rented_bike = renter.renting(bike_result[0], location)
+                    bike_id_list = [bike[0] for bike in bike_result]
+                    available_bike_count = len(bike_id_list)
 
-                        if rented_bike is None:
-                            messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.')
-                        else:
-                            self.__button_use_bike['text'] = self.__DROP_BIKE_TEXT
-                            self.__user.is_using_bike(True)
-                            label_map_element = self.__map_element_list[location[0]][location[1]][0]
-                            tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
-                            label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider)
-                            label_map_element['image'] = label_map_element.image
-                            tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]))
+                    if available_bike_count > 1:
+                        bike_choice = None
+
+                        while bike_choice not in bike_id_list:
+                            bike_choice = IntegerDialogue.askinteger('Select a bike', 'IDs of available bikes: ' + ', '.join(str(bike_id) for bike_id in sorted(bike_id_list)) + '\nEnter the ID of the bike you want to pick up')
+
+                            if bike_choice is None:
+                                break
+
+                        if bike_choice is not None:
+                            self.__pick_up_bike(bike_choice, available_bike_count)
+                    elif available_bike_count == 1:
+                        self.__pick_up_bike(bike_id_list[0], available_bike_count)
                     else:
                         messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.')
                 else:
                     messagebox.showwarning(attrs.APP_NAME, bike_result)
         else:
-            messagebox.showwarning(attrs.APP_NAME, 'Oops! Low balance! Please top up your wallet.')
+            messagebox.showwarning(attrs.APP_NAME, 'Oops! Empty wallet. Please top up it.')
+
+    def __pick_up_bike(self, bike_id: int, available_bike_count: int) -> None:
+        '''
+        Attempt to pick up a bike and update the properties of relevant widgets.
+
+        Parameters
+        ----------
+        bike_id : the ID of a bike
+        available_bike_count : the number of available bikes before successfully picking up
+        '''
+
+        location = self.__user.get_location()
+        self.__rented_bike = renter.renting(bike_id, location)
+
+        if self.__rented_bike is None:
+            messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.')
+        else:
+            self.__button_use_bike['text'] = self.__DROP_BIKE_TEXT
+            self.__user.is_using_bike(True)
+            label_map_element = self.__map_element_list[location[0]][location[1]][0]
+            tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
+            label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider)
+            label_map_element['image'] = label_map_element.image
+            available_bike_count -= 1
+            tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]) + '\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else '')
+            self.__update_ride_info()
+
+    def __update_ride_info(self) -> None:
+        '''
+        Update the riding info in the info label.
+        '''
+
+        if self.__user.get_flag():
+            defective = self.__rented_bike.get_defective()
+            bike_status_info = '\n\nBike status (est.): '
+
+            if defective < attrs.FINE_BIKE_THRESHOLD:
+                bike_status_info += attrs.FINE_STATUS
+            elif defective < attrs.DEFECTIVE_BIKE_THRESHOLD:
+                bike_status_info += attrs.GOOD_STATUS
+            else:
+                bike_status_info += attrs.DEFECTIVE_STATUS
+
+            self.__label_info['text'] =\
+                self.__HINT_INFO\
+                + '\n\nBike ID: ' + str(self.__rented_bike.get_id())\
+                + bike_status_info\
+                + '\n\nDistance: ' + str(self.__rented_bike.get_distance())\
+                + '\n\nCharge: ￡' + '%.2f' % renter.calculate_charge(self.__rented_bike.get_extra_time())
+        else:
+            self.__label_info['text'] = self.__HINT_INFO
+
+    def __log_out(self, is_logout_button = True) -> None:
+        '''
+        Log out the account.
+
+        Parameters
+        ----------
+        is_logout_button : a flag indicating if a user tries to log out himself/herself by clicking the log-out button
+        '''
+
+        if self.__user.get_flag():
+            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike and paying.')
+        else:
+            if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?'):
+                return
+
+            login.log_out(self.__user)
+            self.__parent.destroy()
+            self.__parent = None
+
+            if self.__toplevel is not None:
+                self.__toplevel.deiconify()
 
     def __refresh_map(self) -> None:
         '''
@@ -334,61 +429,65 @@ class HomeView:
 
     def __move(self, event) -> None:
         '''
-        Move the avatar of a customer, or move a bike if the user is an operator.
+        Move the avatar of a customer, or move a bike if the user is an operator.TODO
 
         Parameters
         ----------
         event : the event bound to the widget calling this function
         '''
 
-        if self.__can_move:
-            if isinstance(self.__user, Customer):
-                location = self.__user.get_location()
-                label_map_element = self.__map_element_list[location[0]][location[1]][0]
-                tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
+        location = self.__user.get_location()
+        label_map_element = self.__map_element_list[location[0]][location[1]][0]
+        tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
 
-                if (event.keysym == 'Left' and location[1] > 0)\
-                        or (event.keysym == 'Right' and location[1] < attrs.MAP_LENGTH - 1)\
-                        or (event.keysym == 'Up' and location[0] > 0)\
-                        or (event.keysym == 'Down' and location[0] < attrs.MAP_LENGTH - 1):
-                    available_bike_id_list = renter.check_bikes(location)
-                    available_bike_count = len(available_bike_id_list)
+        if (event.keysym == 'Left' and location[1] > 0) \
+                or (event.keysym == 'Right' and location[1] < attrs.MAP_LENGTH - 1) \
+                or (event.keysym == 'Up' and location[0] > 0) \
+                or (event.keysym == 'Down' and location[0] < attrs.MAP_LENGTH - 1):
+            new_location = location.copy()
 
-                    if available_bike_count == 0:
-                        defective_bike_id_list = renter.check_bikes(location, attrs.DEFECTIVE_BIKE_CODE)
-
-                        if len(defective_bike_id_list) == 0:
-                            label_map_element.image = ImageTk.PhotoImage(self.__image_empty_cell)
-                            label_map_element['image'] = label_map_element.image
-                        else:
-                            label_map_element.image = ImageTk.PhotoImage(self.__image_defective_bike)
-                            label_map_element['image'] = label_map_element.image
-                    else:
-                        label_map_element.image = ImageTk.PhotoImage(self.__image_available_bike)
-                        label_map_element['image'] = label_map_element.image
-                        tooltip_map_element.set_text('Location: (%d, %d)\nAvailable bike(s): %d' % (location[0], location[1], available_bike_count))
-
-                    if event.keysym == 'Left':
-                        location[1] -= 1
-                    elif event.keysym == 'Right':
-                        location[1] += 1
-                    elif event.keysym == 'Up':
-                        location[0] -= 1
-                    else:
-                        location[0] += 1
-
-                    self.__user.set_location(location)
-                    self.__mapping.set_state(location, attrs.AVATAR_CODE)
-                    label_map_element = self.__map_element_list[location[0]][location[1]][0]
-                    tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
-                    label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider) if self.__user.get_flag() else ImageTk.PhotoImage(self.__image_avatar_cell)
-                    label_map_element['image'] = label_map_element.image
-                    available_bike_count = len(renter.check_bikes(location))
-
-                    if available_bike_count > 0:
-                        tooltip_map_element.set_text('Location: (%d, %d)\nAvailable bike(s): %d' % (location[0], location[1], available_bike_count))
+            if event.keysym == 'Left':
+                new_location[1] -= 1
+            elif event.keysym == 'Right':
+                new_location[1] += 1
+            elif event.keysym == 'Up':
+                new_location[0] -= 1
             else:
-                pass  # TODO: operator actions
+                new_location[0] += 1
+
+            if self.__user.get_flag():
+                self.__rented_bike.set_location(new_location)
+                self.__rented_bike.add_distance()
+                self.__rented_bike.add_extra_time()
+                self.__update_ride_info()
+
+            available_bike_id_list = renter.check_bikes(location)
+            available_bike_count = len(available_bike_id_list)
+
+            if available_bike_count == 0:
+                defective_bike_id_list = renter.check_bikes(location, attrs.DEFECTIVE_BIKE_CODE)
+
+                if len(defective_bike_id_list) == 0:
+                    label_map_element.image = ImageTk.PhotoImage(self.__image_empty_cell)
+                    label_map_element['image'] = label_map_element.image
+                else:
+                    label_map_element.image = ImageTk.PhotoImage(self.__image_defective_bike)
+                    label_map_element['image'] = label_map_element.image
+            else:
+                label_map_element.image = ImageTk.PhotoImage(self.__image_available_bike)
+                label_map_element['image'] = label_map_element.image
+                tooltip_map_element.set_text('Location: (%d, %d)\nAvailable bike(s): %d' % (location[0], location[1], available_bike_count))
+
+            self.__user.set_location(new_location)
+            self.__mapping.set_state(new_location, attrs.AVATAR_CODE)
+            label_map_element = self.__map_element_list[new_location[0]][new_location[1]][0]
+            tooltip_map_element = self.__map_element_list[new_location[0]][new_location[1]][1]
+            label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider) if self.__user.get_flag() else ImageTk.PhotoImage(self.__image_avatar_cell)
+            label_map_element['image'] = label_map_element.image
+            available_bike_count = len(renter.check_bikes(new_location))
+
+            if available_bike_count > 0:
+                tooltip_map_element.set_text('Location: (%d, %d)\nAvailable bike(s): %d' % (new_location[0], new_location[1], available_bike_count))
 
 
 # Test purposes only.
