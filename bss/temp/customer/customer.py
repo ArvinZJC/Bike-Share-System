@@ -20,7 +20,7 @@ class Customer:
 
 		self.__Id = user_id
 		self.__name = name
-		self.__password = password
+		self.__password = password  # TODO
 		self.__balance = balance
 		self.__location = location
 		self.__riding = False
@@ -28,7 +28,7 @@ class Customer:
 
 	def get_id(self) -> int:
 		'''
-		Customer ID getter.
+		ID getter.
 
 		Returns
 		-------
@@ -141,7 +141,7 @@ class Customer:
 
 		Returns
 		-------
-		riding : `True` if the customer is riding; otherwise, `False`
+		riding : `True` if a customer is riding a bike; otherwise, `False`
 		'''
 
 		return self.__riding

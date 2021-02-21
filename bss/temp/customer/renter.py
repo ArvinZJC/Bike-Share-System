@@ -10,14 +10,14 @@ from bss.temp.customer.customer import Customer  # TODO
 from bss.data import db_path as db
 
 
-def check_bikes(location: list, bike_code = attrs.AVAILABLE_BIKE_CODE) -> list:
+def check_bikes(location = None, bike_code = attrs.AVAILABLE_BIKE_CODE) -> list:
 	'''
-	Check if there is any available/busy/defective bike in a specified location.
+	Check if there is any available/defective bike in a specified location, or check all available/busy/defective bikes.
 
 	Parameters
 	----------
-	location : a specified location; by default, available bikes
-	bike_code : a code indicating a type of bike to check
+	location : a specified location
+	bike_code : a code indicating a type of bike to check; by default, the available bike code
 
 	Returns
 	-------
@@ -28,17 +28,25 @@ def check_bikes(location: list, bike_code = attrs.AVAILABLE_BIKE_CODE) -> list:
 	c = conn.cursor()
 
 	if bike_code == attrs.AVAILABLE_BIKE_CODE:
-		c.execute(
-			'SELECT id from bike where location_row=:location_row and location_col=:location_col and defective<:threshold and is_being_used=:status',
-			{'location_row': location[0], 'location_col': location[1], 'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
-	elif bike_code == attrs.BUSY_BIKE_CODE:  # TODO: consider removing this part if it is not used by operators or managers
-		c.execute(
-			'SELECT id from bike where location_row=:location_row and location_col=:location_col and defective<:threshold and is_being_used=:status',
-			{'location_row': location[0], 'location_col': location[1], 'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.BUSY_BIKE_CODE})
+		if location is None:
+			c.execute('SELECT id from bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+		else:
+			c.execute(
+				'SELECT id from bike where location_row=:location_row and location_col=:location_col and defective<:threshold and is_being_used=:status',
+				{'location_row': location[0], 'location_col': location[1], 'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+	elif bike_code == attrs.BUSY_BIKE_CODE:
+		if location is None:
+			c.execute('SELECT id from bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.BUSY_BIKE_CODE})
+		else:
+			conn.close()
+			return []  # Return an empty list because for privacy reasons, a busy bike should not be seen on a map.
 	else:
-		c.execute(
-			'SELECT id from bike where location_row=:location_row and location_col=:location_col and defective>=:threshold',
-			{'location_row': location[0], 'location_col': location[1], 'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+		if location is None:
+			c.execute('SELECT id from bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+		else:
+			c.execute(
+				'SELECT id from bike where location_row=:location_row and location_col=:location_col and defective>=:threshold',
+				{'location_row': location[0], 'location_col': location[1], 'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
 
 	bikes = c.fetchall()
 	conn.close()
@@ -73,6 +81,8 @@ def get_closest_bike(location):
 			row = i
 			col = j
 
+	conn.close()
+
 	if row == location[0] and col == location[1]:
 		return check_bikes(location)
 	else:
@@ -93,7 +103,7 @@ def get_closest_bike(location):
 
 def renting(bike_id: int, location: list):
 	'''
-	Attempt to pick up a specified bike at a specified location.
+	Attempt to pick up/move a specified bike at a specified location.
 
 	Parameters
 	----------
@@ -115,8 +125,8 @@ def renting(bike_id: int, location: list):
 	if bike_details[0][2] == location[0] and bike_details[0][3] == location[1] and bike_details[0][4] == attrs.AVAILABLE_BIKE_CODE:
 		rented_bike = Bike(bike_id, bike_details[0][1], [bike_details[0][2], bike_details[0][3]], bike_details[0][4])
 		rented_bike.set_is_being_used()
-		conn.close()
 
+	conn.close()
 	return rented_bike
 
 

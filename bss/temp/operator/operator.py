@@ -2,28 +2,41 @@ import sqlite3
 import time
 
 from bss.temp.bike import Bike  # TODO
+from bss.temp.companys_pocket import CentralBank  # TODO
+from bss.conf import attrs
 from bss.data import db_path as db
 
 
 class OperatorWorker:
+	'''
+	The class for defining an operator.
+	'''
 
-	def __init__(self, operator_id, name, password,balance,skill_level):
+	def __init__(self, operator_id, name, password, balance, skill_level) -> None:
+		'''
+		The constructor of the class for defining an operator.
+
+		Parameters
+		----------
+		operator_id : the ID of an operator
+		name : an operator's name
+		password : an operator's password
+		balance : an operator's balance
+		skill_level : an operator's skill level
+		'''
+
 		self.__Id = operator_id
-		self.name = name
-		self.password = password
-		self.balance = balance
-		self.skill_level = skill_level
+		self.__name = name
+		self.__password = password  # TODO
+		self.__balance = balance
+		self.__skill_level = skill_level
+		self.__location = [0, 0]  # An operator's location is not recorded in the database. We assume that they are at the origin.
+		self.__riding = False
 		self.__db_path = db.get_db_path()
-
-	def print_nice(self):
-		print("Name: ",self.name),
-		print("Id: ",self.__Id),
-		print("Skill Level: ",self.skill_level)
-		print("Balance: ",self.balance)
 
 	def get_id(self) -> int:
 		'''
-		Operator ID getter.
+		ID getter.
 
 		Returns
 		-------
@@ -32,124 +45,174 @@ class OperatorWorker:
 
 		return self.__Id
 
-	def get_skill_level(self):
-		return self.skill_level
+	def get_name(self) -> str:
+		'''
+		Name getter.
 
-	def track_bikes(self):
+		Returns
+		-------
+		name : an operator's name
+		'''
+
+		return self.__name
+
+	def get_balance(self) -> float:
+		'''
+		Balance getter.
+
+		Returns
+		-------
+		balance : an operator's balance
+		'''
+
+		return self.__balance
+
+	def get_location(self) -> list:
+		'''
+		Location getter.
+
+		Returns
+		-------
+		location : an operator's location
+		'''
+
+		return self.__location
+
+	def set_location(self, location: list) -> None:
+		'''
+		Location setter.
+
+		Parameters
+		----------
+		location : a specified location
+		'''
+
+		self.__location = location
+
+	def get_skill_level(self) -> int:
+		'''
+		Skill level getter.
+
+		Returns
+		-------
+		skill_level : an operator's skill level
+		'''
+		return self.__skill_level
+
+	def is_using_bike(self, flag) -> None:
+		'''
+		Set a value to the flag indicating if an operator is moving a bike.
+
+		Parameters
+		----------
+		flag : a value indicating if an operator is moving a bike
+		'''
+
+		self.__riding = flag
+
+	def get_flag(self) -> bool:
+		'''
+		Riding status flag getter.
+
+		Returns
+		-------
+		riding : `True` if an operator is moving a bike; otherwise, `False`
+		'''
+
+		return self.__riding
+
+	def repair_bikes(self, bike_id: int):
+		'''
+		Overhaul a bike.
+
+		Parameters
+		----------
+		bike_id : the ID of a bike to overhaul
+
+		Returns
+		-------
+		to_repair : a `Bike` object
+		time_begin : a time string indicating the begin time
+		how_broken : a defective value
+		time_to_fix : a floating point value representing how long to overhaul a bike
+		'''
+
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("SELECT * FROM bike")
-
-		bikes = c.fetchall()
-
-		for i in bikes:
-			Bike(i[0],i[1],[i[2],i[3]],i[4]).print_details()
-
-		conn.close()
-
-		return bikes
-
-	def repair_bikes(self):
-		conn = sqlite3.connect(self.__db_path)
-		c = conn.cursor()
-		c.execute("SELECT * FROM bike where defective=1")
-
-		bikes = c.fetchall()
-		print("Choose which bike to fix from the following: ")
-		bike_ids = []
-		for i in bikes:
-			bike_ids.append(i[0])
-			
-		print(bike_ids)
-		while True:
-			to_fix = int(input("\n"))
-			if to_fix in bike_ids:
-				break
-			else:
-				print("Invalid id for bike.Try again.")
-
-		c.execute("SELECT * FROM bike where id=:Id",{'Id':to_fix})
+		c.execute("SELECT * FROM bike where id=:Id", {'Id': bike_id})
 		i = c.fetchone()
-		to_repair = Bike(i[0],i[1],[i[2],i[3]],i[4])
-		c.execute("SELECT defective_start,time_of_event from bike_status where id=:Id",{'Id':to_repair.get_id()})
+		to_repair = Bike(i[0], i[1], [i[2], i[3]], i[4])
+		c.execute("SELECT defective_start,time_of_event from bike_status where id=:Id", {'Id': bike_id})
 		rows = c.fetchall()
 		how_broken = rows[0][0]
-		timeBegin = rows[0][1]
+		time_begin = rows[0][1]
 		conn.commit()
-		print("Fixing.....")
-		timeToFix = (60/self.skill_level)*how_broken
-		time.sleep(timeToFix)
-		timeToFix = timeToFix*10*self.skill_level
+		time_to_fix = 60 * 10 * self.__skill_level * how_broken
 		conn.close()
-		to_repair.set_defective()
-		timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.time()))
+		return to_repair, time_begin, how_broken, time_to_fix
 
-		print(timeBegin)
-		print(time.time())
-		print(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")))
+	def record_repair(self, to_repair: Bike, time_begin: str, how_broken: float, time_to_fix: float):
+		'''
+		Record a repair.
 
-		if (time.time()+timeToFix)<time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")):
-			timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S"))+timeToFix))
+		Parameters
+		----------
+		to_repair : a `Bike` object representing the bike to overhaul
+		time_begin : a time string indicating the begin time
+		how_broken : a defective value
+		time_to_fix : a floating point value representing how long to overhaul a bike
+
+		Returns
+		-------
+		bonus : bonus received by an operator
+		time_of_fix : a time string indicating the end time
+		'''
+
+		to_repair.set_defective(to_repair.get_location(), attrs.BIKE_DAMAGE_MIN)
+		to_repair.set_is_being_used()
+		time_of_fix = time.strftime('%b %d %Y %H:%M:%S', time.gmtime(time.time()))
+
+		if (time.time() + time_to_fix) < time.mktime(time.strptime(time_begin, '%b %d %Y %H:%M:%S')):
+			time_of_fix = time.strftime('%b %d %Y %H:%M:%S', time.gmtime(time.mktime(time.strptime(time_begin, '%b %d %Y %H:%M:%S')) + time_to_fix))
 
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-
-		c.execute("INSERT INTO bike_status (id,time_of_event,defective_start,defective_end) VALUES ({},'{}',{},{})".format(to_repair.get_id(),
-																										timeOfFix,1,0)) # TODO: 1 should be how_broken i think
+		c.execute("INSERT INTO bike_status(id,time_of_event,defective_start,defective_end) VALUES({},'{}',{},{})".format(to_repair.get_id(), time_of_fix, how_broken, attrs.BIKE_DAMAGE_MIN))
 		conn.commit()
 		conn.close()
-		return [timeToFix/20,timeOfFix]
+		money = time_to_fix / 20
+		CentralBank().track_changes(-money, time_of_fix)
+		self.set_balance(money)
 
-	def move_bikes(self):
-		conn = sqlite3.connect(self.__db_path)
-		c = conn.cursor()
-		c.execute("SELECT id,location_row,location_col FROM bike")
+	def move_bikes(self, bike_id: int) -> None:
+		'''
+		Drop a bike after moving.
 
-		bikes = c.fetchall()
-
-		ids = []
-		locs = []
-
-		for i in bikes:
-			ids.append(i[0])
-			locs.append([i[1],i[2]])
-			print(i[0],'\t',i[1],",",i[2])
-
-		while True:
-			try:
-				to_move = int(input("Choose a bike (by id) to move: "))
-				if to_move not in ids:
-					raise SystemError
-				break
-			except:
-				print('Invalid. Try again. Choose from: \n',ids)
-
-		while True:
-			try:
-				location_row,location_col = [int(x) for x in input("Give row & col to move the bike: ").split()]
-				if (location_row>19 or location_row<0) or (location_col<0 or location_row>19):
-					raise SystemError
-				break
-			except:
-				print('Invalid location. Try again.')
+		Parameters
+		----------
+		bike_id : the ID of a bike
+		'''
 
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE bike set location_row =:location_row, location_col=:location_col where id=:Id",
-				  {'location_row': location_row, 'location_col': location_col, 'Id': to_move})
+		c.execute(
+			"UPDATE bike set location_row =:location_row, location_col=:location_col, is_being_used=:status where id=:Id",
+			{'location_row': self.__location[0], 'location_col': self.__location[1], 'status': attrs.AVAILABLE_BIKE_CODE, 'Id': bike_id})
 		conn.commit()
 		conn.close()
 
+	def set_balance(self, money) -> None:
+		'''
+		Add bonus to the wallet of an operator.
 
-	def set_balance(self,money):
-		self.balance += money
+		Parameters
+		----------
+		money : the amount of bonus
+		'''
+
+		self.__balance += money
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		c.execute("UPDATE operator set account=:sum where id=:Id",{'sum':self.balance,'Id':self.__Id})
+		c.execute("UPDATE operator set account=:sum where id=:Id", {'sum': self.__balance, 'Id': self.__Id})
 		conn.commit()
 		conn.close()
-
-
-
-
-	

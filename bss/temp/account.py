@@ -37,7 +37,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][6] == attrs.OFFLINE:
                 user = Customer(values[0][0], values[0][1], values[0][2], values[0][3], [values[0][4], values[0][5]])
-                c.execute('UPDATE customer SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
+                # TODO: c.execute('UPDATE customer SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.OPERATOR:
@@ -47,7 +47,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][5] == attrs.OFFLINE:
                 user = OperatorWorker(values[0][0], values[0][1], values[0][2], values[0][3], values[0][4])
-                c.execute('UPDATE operator SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
+                # TODO:c.execute('UPDATE operator SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.MANAGER:
@@ -57,7 +57,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][3] == attrs.OFFLINE:
                 user = Manager(values[0][0], values[0][1], values[0][2])
-                c.execute('UPDATE manager SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
+                # TODO: c.execute('UPDATE manager SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
 

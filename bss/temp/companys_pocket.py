@@ -17,12 +17,9 @@ class CentralBank:
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
 		c.execute('SELECT account FROM companyMoney')
-		self.money = c.fetchall()
-		self.money = self.money[0][0]
+		self.__money = c.fetchall()
+		self.__money = self.__money[0][0]
 		conn.close()
-
-	def get_money(self):
-		return self.money
 
 	def track_changes(self, amount, time) -> None:
 		'''
@@ -52,12 +49,7 @@ class CentralBank:
 
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		self.money += amount
-		c.execute('UPDATE companyMoney set account=:amount', {'amount': self.money})
+		self.__money += amount
+		c.execute('UPDATE companyMoney set account=:amount', {'amount': self.__money})
 		conn.commit()
 		conn.close()
-
-	def pay_operator(self,operator,money,time):
-		skill = operator.get_skill_level()
-		self.track_changes(-money,time)
-		operator.set_balance(money)

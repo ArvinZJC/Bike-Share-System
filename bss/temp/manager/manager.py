@@ -17,7 +17,7 @@ class Manager:
 
 	def get_id(self) -> int:
 		'''
-		Manager ID getter.
+		ID getter.
 
 		Returns
 		-------

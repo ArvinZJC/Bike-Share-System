@@ -12,16 +12,16 @@ class Mapping:
 	The class for defining the map array.
 	'''
 
-	def __init__(self, customer = None) -> None:
+	def __init__(self, user = None) -> None:
 		'''
 		The constructor of the class for defining the map array.
 
 		Parameters
 		----------
-		customer : the customer represented in the map array
+		user : a `Customer` or `OperatorWorker` object or `None`
 		'''
 
-		self.__customer = customer
+		self.__user = user
 		self.__map_array = self.download()
 
 	def download(self):
@@ -37,28 +37,47 @@ class Mapping:
 		conn = sqlite3.connect(db.get_db_path())
 		c = conn.cursor()
 
-		# Keep the query order to ensure any display priority.
-		# Set the defective code to the specified map element.
-		c.execute('SELECT location_row FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
-		rows = c.fetchall()
-		c.execute('SELECT location_col FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
-		cols = c.fetchall()
+		# Available bikes have more priority than defective bikes for a customer.
+		if isinstance(self.__user, Customer):
+			# Set the defective bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			cols = c.fetchall()
 
-		for i, j in zip(rows, cols):
-			map_array[i, j] = attrs.DEFECTIVE_BIKE_CODE
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.DEFECTIVE_BIKE_CODE
 
-		# Set the available code to the specified map element.
-		c.execute('SELECT location_row FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
-		rows = c.fetchall()
-		c.execute('SELECT location_col FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
-		cols = c.fetchall()
+			# Set the available bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			cols = c.fetchall()
 
-		for i, j in zip(rows, cols):
-			map_array[i, j] = attrs.AVAILABLE_BIKE_CODE
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.AVAILABLE_BIKE_CODE
+		else:
+			# Set the available bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			cols = c.fetchall()
+
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.AVAILABLE_BIKE_CODE
+
+			# Set the defective bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			cols = c.fetchall()
+
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.DEFECTIVE_BIKE_CODE
 
 		# Set the avatar code to the specified map element.
-		if self.__customer is not None and isinstance(self.__customer, Customer):
-			location = self.__customer.get_location()
+		if self.__user is not None:
+			location = self.__user.get_location()
 			map_array[location[0], location[1]] = attrs.AVATAR_CODE
 
 		conn.close()

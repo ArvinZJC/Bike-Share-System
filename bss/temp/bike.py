@@ -127,26 +127,31 @@ class Bike:
 
 	def get_location(self) -> list:
 		'''
+		Location getter.
 
 		Returns
 		-------
-
+		location : a specified location
 		'''
 
 		return self.__location
 
-	def set_location(self, location) -> None:
+	def set_location(self, location, is_operator = False) -> None:
 		'''
 		Move a bike to a location.
 
 		Parameters
 		----------
 		location : a specified location
+		is_operator : a flag indicating if a bike is moved by an operator
 		'''
 
 		self.__location = location
-		self.__defective += round(random.uniform(0.01, 0.05), 2)
-		self.__defective = attrs.BIKE_DAMAGE_MAX if self.__defective > attrs.BIKE_DAMAGE_MAX else self.__defective
+
+		if not is_operator:
+			self.__defective += round(random.uniform(0.01, 0.05), 2)
+			self.__defective = attrs.BIKE_DAMAGE_MAX if self.__defective > attrs.BIKE_DAMAGE_MAX else self.__defective
+
 		self.set_defective(location, self.__defective)
 
 	def get_id(self) -> int:
