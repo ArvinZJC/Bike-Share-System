@@ -72,7 +72,15 @@ class Bike:
 			conn.commit()
 			conn.close()
 
-	def get_is_being_used(self):  # TODO
+	def get_is_being_used(self) -> int:
+		'''
+		Bike using status getter.
+
+		Returns
+		-------
+		is_being_used : a status code
+		'''
+
 		return self.__is_being_used
 
 	def set_is_being_used(self) -> None:

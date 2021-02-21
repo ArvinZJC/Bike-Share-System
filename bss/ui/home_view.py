@@ -2,7 +2,6 @@ from tkinter import messagebox, Tk, ttk
 from tkinter.constants import E, N, RAISED, S, SOLID, W
 
 from PIL import Image, ImageTk
-import numpy as np
 
 from bss.temp import account  # TODO
 from bss.conf import attrs
@@ -140,7 +139,7 @@ class HomeView:
             ttk.Label(frame_dashboard, style=styles.PLACEHOLDER_LABEL).grid(row=frame_row_index)
             frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
-            # New row in the dashboard frame: the button for overhauling a bike. TODO
+            # New row in the dashboard frame: the button for overhauling a bike.
             frame_row_index += 1
             self.__button_overhaul_bike = ttk.Button(frame_dashboard, command = self.__overhaul_bike, text = 'Overhaul the bike')
             self.__button_overhaul_bike.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
@@ -253,14 +252,14 @@ class HomeView:
         Top up a customer account.
         '''
 
-        topup_result = FloatDialogue.askfloat('Top up', 'Enter the amount you want to top up (￡)\n(Please note that a maximum of 2 decimal places will be processed.)', minvalue = 0.01)
+        topup_result = FloatDialogue.askfloat('Top up', 'Enter the amount you want to top up (￡)\n(Please note that a maximum of 2 decimal places will be processed.)', minvalue = 0.01, parent = self.__parent)
 
         if topup_result is not None:
             amount_split = str(topup_result).split('.')
             amount = float(amount_split[0] + '.' + amount_split[1][:2])
             self.__user.update_balance(amount)
             self.__update_balance_text()
-            messagebox.showinfo(attrs.APP_NAME, 'Hurray! Your wallet has been topped up successfully.')
+            messagebox.showinfo(attrs.APP_NAME, 'Hurray! Your wallet has been topped up successfully.', parent = self.__parent)
 
     def __use_bike(self) -> None:
         '''
@@ -273,26 +272,28 @@ class HomeView:
                 # Drop a bike.
                 if self.__user.get_flag():
                     if self.__user.get_balance() < renter.calculate_charge(self.__rented_bike.get_extra_time()):
-                        messagebox.showerror(attrs.APP_NAME, "Oops! You haven't got enough money. Please top up your wallet first.")
+                        messagebox.showerror(attrs.APP_NAME, "Oops! You haven't got enough money. Please top up your wallet first.", parent = self.__parent)
                     else:
                         self.__button_use_bike['text'] = self.__PICKUP_BIKE_TEXT
-                        self.__user, self.__rented_bike, transaction_date = renter.drop_bike(self.__user, self.__rented_bike)
+                        self.__user, transaction_date = renter.drop_bike(self.__user, self.__rented_bike)
+
+                        if self.__rented_bike.is_defective():
+                            messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using! The bike you dropped will be unavailable and overhauled.\n\nDid the bike work fine?', parent = self.__parent)
+                            renter.report_break(self.__rented_bike, transaction_date)
+                        else:
+                            if not messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using!\n\nDid the bike work fine?', parent = self.__parent):
+                                renter.report_break(self.__rented_bike, transaction_date)
+
+                        self.__rented_bike.set_is_being_used()
                         location = self.__user.get_location()
                         label_map_element = self.__map_element_list[location[0]][location[1]][0]
                         tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
                         label_map_element.image = ImageTk.PhotoImage(self.__image_avatar_cell)
                         label_map_element['image'] = label_map_element.image
                         available_bike_count = len(renter.check_bikes(location))
-                        tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]) + '\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else '')
+                        tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]) + ('\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else ''))
                         self.__update_balance_text()
                         self.__update_ride_info()
-
-                        if self.__rented_bike.is_defective():
-                            messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using! The bike you dropped will be unavailable and overhauled.\n\nDid the bike work fine?')
-                            renter.report_break(self.__rented_bike, transaction_date)
-                        else:
-                            if not messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using!\n\nDid the bike work fine?'):
-                                renter.report_break(self.__rented_bike, transaction_date)
                 # Attempt to pick up a bike.
                 else:
                     bike_result = renter.get_closest_bike(self.__user.get_location())
@@ -305,7 +306,7 @@ class HomeView:
                             bike_choice = None
 
                             while bike_choice not in bike_id_list:
-                                bike_choice = IntegerDialogue.askinteger('Select a bike', 'Enter the ID of the bike you want to pick up\nIDs of any available bike: ' + ', '.join(str(bike_id) for bike_id in sorted(bike_id_list)))
+                                bike_choice = IntegerDialogue.askinteger('Select a bike', 'Enter the ID of the bike you want to pick up\nIDs of any available bike: ' + ', '.join(str(bike_id) for bike_id in sorted(bike_id_list)), parent = self.__parent)
 
                                 if bike_choice is None:
                                     break
@@ -315,11 +316,11 @@ class HomeView:
                         elif available_bike_count == 1:
                             self.__operate_bike(bike_id_list[0])
                         else:
-                            messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.')
+                            messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.', parent = self.__parent)
                     else:
-                        messagebox.showwarning(attrs.APP_NAME, bike_result)
+                        messagebox.showwarning(attrs.APP_NAME, bike_result, parent = self.__parent)
             else:
-                messagebox.showwarning(attrs.APP_NAME, 'Oops! Empty wallet. Please top up it.')
+                messagebox.showwarning(attrs.APP_NAME, 'Oops! Empty wallet. Please top up it.', parent = self.__parent)
         else:
             # Drop a bike.
             if self.__user.get_flag():
@@ -357,7 +358,7 @@ class HomeView:
                         dialogue_text += ('\nID(s) of any available bike: ' + ', '.join(str(bike_id) for bike_id in sorted(available_bike_id_list)))
 
                     while bike_choice not in defective_bike_id_list + available_bike_id_list:
-                        bike_choice = IntegerDialogue.askinteger('Select a bike', dialogue_text)
+                        bike_choice = IntegerDialogue.askinteger('Select a bike', dialogue_text, parent = self.__parent)
 
                         if bike_choice is None:
                             break
@@ -368,7 +369,7 @@ class HomeView:
                     bike_choice = available_bike_id_list[0] if defective_bike_count == 0 else defective_bike_id_list[0]
                     self.__operate_bike(bike_choice)
                 else:
-                    messagebox.showerror(attrs.APP_NAME, 'Oops! No defective or available bike here.')
+                    messagebox.showerror(attrs.APP_NAME, 'Oops! No defective or available bike here.', parent = self.__parent)
 
     def __operate_bike(self, bike_id: int) -> None:
         '''
@@ -383,7 +384,7 @@ class HomeView:
         self.__rented_bike = renter.renting(bike_id, location)
 
         if self.__rented_bike is None:
-            messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.')
+            messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.', parent = self.__parent)
         else:
             self.__button_use_bike['text'] = self.__DROP_BIKE_PAY_TEXT if isinstance(self.__user, Customer) else self.__DROP_BIKE_TEXT
             self.__user.is_using_bike(True)
@@ -407,30 +408,33 @@ class HomeView:
         Overhaul a specified bike.
         '''
 
-        defective_bike_results = renter.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE)
-        defective_bike_count = len(defective_bike_results)
-
-        if defective_bike_count >= 1:
-            defective_bike_id_list = [bike[0] for bike in defective_bike_results]
-            bike_choice = None
-
-            if defective_bike_count > 1:
-                while bike_choice not in defective_bike_id_list:
-                    bike_choice = IntegerDialogue.askinteger('Select a bike', 'Enter the ID of the bike you want to overhaul\nIDs of any defective bike: ' + ', '.join(str(bike_id) for bike_id in sorted(defective_bike_id_list)))
-
-                    if bike_choice is None:
-                        break
-            else:
-                bike_choice = defective_bike_id_list[0]
-
-            if bike_choice is not None:
-                to_repair, time_begin, how_broken, time_to_fix = self.__user.repair_bikes(bike_choice)
-                messagebox.showinfo(attrs.APP_NAME, 'Working hard...\n\nPretend that some time has passed away. XD\n\nAs you read this line, you are good to go. Well done!')
-                self.__user.record_repair(to_repair, time_begin, how_broken, time_to_fix)
-                self.__update_balance_text()
-                self.__update_ride_info()
+        if self.__user.get_flag():
+            messagebox.showerror(attrs.APP_NAME, 'Oops! You are moving a bike.\nPlease drop it and then pick up a bike to overhaul.')
         else:
-            messagebox.showerror(attrs.APP_NAME, 'Oops! No defective bike here.')
+            defective_bike_results = renter.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE)
+            defective_bike_count = len(defective_bike_results)
+
+            if defective_bike_count >= 1:
+                defective_bike_id_list = [bike[0] for bike in defective_bike_results]
+                bike_choice = None
+
+                if defective_bike_count > 1:
+                    while bike_choice not in defective_bike_id_list:
+                        bike_choice = IntegerDialogue.askinteger('Select a bike', 'Enter the ID of the bike you want to overhaul\nIDs of any defective bike: ' + ', '.join(str(bike_id) for bike_id in sorted(defective_bike_id_list)), parent = self.__parent)
+
+                        if bike_choice is None:
+                            break
+                else:
+                    bike_choice = defective_bike_id_list[0]
+
+                if bike_choice is not None:
+                    to_repair, time_begin, how_broken, time_to_fix = self.__user.repair_bikes(bike_choice)
+                    messagebox.showinfo(attrs.APP_NAME, 'Working hard...\n\nPretend that some time has passed away. XD\n\nAs you read this line, you are good to go. Well done!', parent = self.__parent)
+                    self.__user.record_repair(to_repair, time_begin, how_broken, time_to_fix)
+                    self.__update_balance_text()
+                    self.__update_ride_info()
+            else:
+                messagebox.showerror(attrs.APP_NAME, 'Oops! No defective bike here.', parent = self.__parent)
 
     def __update_ride_info(self) -> None:
         '''
@@ -474,9 +478,9 @@ class HomeView:
         '''
 
         if self.__user.get_flag():
-            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike and paying.')
+            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike and paying.', parent = self.__parent)
         else:
-            if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?'):
+            if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?', parent = self.__parent):
                 return
 
             account.log_out(self.__user)
@@ -488,75 +492,61 @@ class HomeView:
 
     def __refresh_map(self) -> None:
         '''
-        Refresh the map when necessary.
+        Refresh the map.
         '''
 
         new_map_array = self.__mapping.download()
 
-        # Apply changes if any.
-        if not np.array_equal(self.__map_array, new_map_array):
-            for row in range(attrs.MAP_LENGTH):
-                for col in range(attrs.MAP_LENGTH):
-                    tooltip_map_element = self.__map_element_list[row][col][1]
+        for row in range(attrs.MAP_LENGTH):
+            for col in range(attrs.MAP_LENGTH):
+                # Change the background image if there is an update.
+                if new_map_array[row, col] != self.__map_array[row, col]:
+                    label_map_element = self.__map_element_list[row][col][0]
 
-                    # Reset the possible tooltips containing the number of available bikes regardless of any existing change.
-                    if new_map_array[row, col] == self.__map_array[row][col]:
-                        if new_map_array[row, col] == attrs.AVATAR_CODE:
-                            available_bike_count = len(renter.check_bikes([row, col]))
-                            tooltip_text = 'Location: (%d, %d)' % (row, col)
-
-                            if isinstance(self.__user, OperatorWorker):
-                                defective_bike_count = len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
-
-                                if defective_bike_count > 0:
-                                    tooltip_text += '\nDefective bike(s): %d' % defective_bike_count
-
-                            if available_bike_count > 0:
-                                tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
-
-                            tooltip_map_element.set_text(tooltip_text)
-                        elif new_map_array[row, col] == attrs.AVAILABLE_BIKE_CODE:
-                            tooltip_map_element.set_text('Location: (%d, %d)\nAvailable bike(s): %d' % (row, col, len(renter.check_bikes([row, col]))))
-                    # Change the background image where necessary.
+                    if new_map_array[row, col] == attrs.AVATAR_CODE:
+                        label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider) if self.__user.get_flag() else ImageTk.PhotoImage(self.__image_avatar_cell)
+                    elif new_map_array[row, col] == attrs.AVAILABLE_BIKE_CODE:
+                        label_map_element.image = ImageTk.PhotoImage(self.__image_available_bike)
+                    elif new_map_array[row, col] == attrs.DEFECTIVE_BIKE_CODE:
+                        label_map_element.image = ImageTk.PhotoImage(self.__image_defective_bike)
                     else:
-                        label_map_element = self.__map_element_list[row][col][0]
-                        tooltip_text = 'Location: (%d, %d)' % (row, col)
+                        label_map_element.image = ImageTk.PhotoImage(self.__image_empty_cell)
 
-                        if new_map_array[row, col] == attrs.AVATAR_CODE:
-                            available_bike_count = len(renter.check_bikes([row, col]))
-                            label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider) if self.__user.get_flag() else ImageTk.PhotoImage(self.__image_avatar_cell)
+                    label_map_element['image'] = label_map_element.image
 
-                            if isinstance(self.__user, OperatorWorker):
-                                defective_bike_count = len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
+                # Refresh tooltips, whether any update happens or not.
+                tooltip_map_element = self.__map_element_list[row][col][1]
+                tooltip_text = 'Location: (%d, %d)' % (row, col)
 
-                                if defective_bike_count > 0:
-                                    tooltip_text += '\nDefective bike(s): %d' % defective_bike_count
+                if new_map_array[row, col] == attrs.AVATAR_CODE:
+                    available_bike_count = len(renter.check_bikes([row, col]))
+                    tooltip_text = 'Location: (%d, %d)' % (row, col)
 
-                            if available_bike_count > 0:
-                                tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
-                        elif self.__map_array[row, col] == attrs.AVAILABLE_BIKE_CODE:
-                            label_map_element.image = ImageTk.PhotoImage(self.__image_available_bike)
-                            tooltip_text += '\nAvailable bike(s): %d' % len(renter.check_bikes([row, col]))
-                        elif self.__map_array[row, col] == attrs.DEFECTIVE_BIKE_CODE:
-                            label_map_element.image = ImageTk.PhotoImage(self.__image_defective_bike)
+                    if isinstance(self.__user, OperatorWorker):
+                        defective_bike_count = len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
 
-                            if isinstance(self.__user, OperatorWorker):
-                                available_bike_count = len(renter.check_bikes([row, col]))
-                                tooltip_text += '\nDefective bike(s): %d' % len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
+                        if defective_bike_count > 0:
+                            tooltip_text += '\nDefective bike(s): %d' % defective_bike_count
 
-                                if available_bike_count > 0:
-                                    tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
-                        else:
-                            label_map_element.image = ImageTk.PhotoImage(self.__image_empty_cell)
+                    if available_bike_count > 0:
+                        tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
+                elif new_map_array[row, col] == attrs.AVAILABLE_BIKE_CODE:
+                    tooltip_text += '\nAvailable bike(s): %d' % len(renter.check_bikes([row, col]))
+                elif new_map_array[row, col] == attrs.DEFECTIVE_BIKE_CODE:
+                    if isinstance(self.__user, OperatorWorker):
+                        available_bike_count = len(renter.check_bikes([row, col]))
+                        tooltip_text += '\nDefective bike(s): %d' % len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
 
-                        label_map_element['image'] = label_map_element.image
-                        tooltip_map_element.set_text(tooltip_text)
+                        if available_bike_count > 0:
+                            tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
 
-                self.__mapping.set_map_array(new_map_array)
-                self.__map_array = new_map_array
+                tooltip_map_element.set_text(tooltip_text)
 
-            if isinstance(self.__user, OperatorWorker):
-                self.__update_ride_info()
+        self.__mapping.set_map_array(new_map_array)
+        self.__map_array = new_map_array
+
+        if isinstance(self.__user, OperatorWorker):
+            self.__update_ride_info()
 
         self.__parent.after(attrs.REFRESHING_INTERVAL, self.__refresh_map)  # It is needed here to ensure the map can be refreshed regularly.
 
@@ -669,6 +659,6 @@ if __name__ == '__main__':
     from bss.temp import account as account_test  # TODO
 
     home_window = Tk()
-    HomeView(home_window, account_test.logging(attrs.CUSTOMER, 'jichen', '12345'))
-    # HomeView(home_window, account_test.logging(attrs.OPERATOR, 'jiamin', '1234'))
+    # HomeView(home_window, account_test.logging(attrs.CUSTOMER, 'jichen', '12345'))
+    HomeView(home_window, account_test.logging(attrs.OPERATOR, 'jiamin', '1234'))
     home_window.mainloop()

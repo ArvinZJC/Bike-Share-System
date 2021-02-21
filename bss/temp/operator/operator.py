@@ -27,7 +27,7 @@ class OperatorWorker:
 
 		self.__Id = operator_id
 		self.__name = name
-		self.__password = password  # TODO
+		self.__password = password
 		self.__balance = balance
 		self.__skill_level = skill_level
 		self.__location = [0, 0]  # An operator's location is not recorded in the database. We assume that they are at the origin.
@@ -147,7 +147,7 @@ class OperatorWorker:
 		how_broken = rows[0][0]
 		time_begin = rows[0][1]
 		conn.commit()
-		time_to_fix = 60 * 10 * self.__skill_level * how_broken
+		time_to_fix = 60 * self.__skill_level * how_broken
 		conn.close()
 		return to_repair, time_begin, how_broken, time_to_fix
 
@@ -168,8 +168,10 @@ class OperatorWorker:
 		time_of_fix : a time string indicating the end time
 		'''
 
+		if to_repair.get_is_being_used() == attrs.BUSY_BIKE_CODE:
+			to_repair.set_is_being_used()
+
 		to_repair.set_defective(to_repair.get_location(), attrs.BIKE_DAMAGE_MIN)
-		to_repair.set_is_being_used()
 		time_of_fix = time.strftime('%b %d %Y %H:%M:%S', time.gmtime(time.time()))
 
 		if (time.time() + time_to_fix) < time.mktime(time.strptime(time_begin, '%b %d %Y %H:%M:%S')):

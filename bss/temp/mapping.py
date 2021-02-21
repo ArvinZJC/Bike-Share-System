@@ -12,13 +12,13 @@ class Mapping:
 	The class for defining the map array.
 	'''
 
-	def __init__(self, user = None) -> None:
+	def __init__(self, user) -> None:
 		'''
 		The constructor of the class for defining the map array.
 
 		Parameters
 		----------
-		user : a `Customer` or `OperatorWorker` object or `None`
+		user : a `Customer` or `OperatorWorker` object
 		'''
 
 		self.__user = user
@@ -76,9 +76,8 @@ class Mapping:
 				map_array[i, j] = attrs.DEFECTIVE_BIKE_CODE
 
 		# Set the avatar code to the specified map element.
-		if self.__user is not None:
-			location = self.__user.get_location()
-			map_array[location[0], location[1]] = attrs.AVATAR_CODE
+		location = self.__user.get_location()
+		map_array[location[0], location[1]] = attrs.AVATAR_CODE
 
 		conn.close()
 		return map_array

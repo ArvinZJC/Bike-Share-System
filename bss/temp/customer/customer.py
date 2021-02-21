@@ -20,7 +20,7 @@ class Customer:
 
 		self.__Id = user_id
 		self.__name = name
-		self.__password = password  # TODO
+		self.__password = password
 		self.__balance = balance
 		self.__location = location
 		self.__riding = False

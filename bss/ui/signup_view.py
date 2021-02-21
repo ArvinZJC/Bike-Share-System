@@ -1,10 +1,10 @@
 '''
 Description: the definition of a sign-up view
-Version: 1.2.0.20210220
+Version: 1.2.1.20210221
 Author: Arvin Zhao
 Date: 2021-01-30 18:31:28
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-20 18:31:39
+LastEditTime: 2021-02-21 18:31:39
 '''
 
 from tkinter import messagebox, StringVar, ttk, Tk
@@ -83,9 +83,9 @@ class SignupView:
         # New row: the username entry.
         row_index += 1
         self.__variable_username = StringVar()
-        entry_username = ttk.Entry(self.__parent, font = font_dict['content_font'], textvariable = self.__variable_username)
-        entry_username.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_index, sticky = (E, W))
-        entry_username.focus()
+        self.__entry_username = ttk.Entry(self.__parent, font = font_dict['content_font'], textvariable = self.__variable_username)
+        self.__entry_username.grid(columnspan = column_num, padx = ui_attrs.PADDING_X, row = row_index, sticky = (E, W))
+        self.__entry_username.focus()
         self.__parent.rowconfigure(row_index, weight = 0)
 
         # New row: a frame for the password label area.
@@ -142,7 +142,7 @@ class SignupView:
         self.__parent.rowconfigure(row_index, weight = 1)
 
         # Bind events.
-        entry_username.bind('<Return>', self.__sign_up)
+        self.__entry_username.bind('<Return>', self.__sign_up)
         self.__entry_password.bind('<Return>', self.__sign_up)
         button_signup.bind('<Return>', self.__sign_up)
 
@@ -175,17 +175,15 @@ class SignupView:
             status_code = account.register_customer(username, self.__variable_password.get())
 
             if status_code == attrs.PASS:
-                messagebox.showinfo(attrs.APP_NAME, 'Hurray! ' + attrs.CUSTOMER + ' "' + username + '" has been registered successfully.')
+                messagebox.showinfo(attrs.APP_NAME, 'Hurray! ' + attrs.CUSTOMER + ' "' + username + '" has been registered successfully.', parent = self.__parent)
                 self.__parent.destroy()
                 self.__parent = None
             elif status_code == attrs.FAIL:
-                if messagebox.showerror(attrs.APP_NAME, 'Invalid username or password. Please see the hints by hovering over the question mark icon.') == messagebox.OK:
-                    self.__parent.focus()
+                if messagebox.showerror(attrs.APP_NAME, 'Oops! Invalid username or password.\nPlease see the hints by hovering over the question mark icon.', parent = self.__parent) == messagebox.OK:
+                    self.__entry_username.focus()
             else:
-                if messagebox.showerror(attrs.APP_NAME, 'The username already exists.') == messagebox.OK:
-                    self.__parent.focus()
-        else:
-            pass  # TODO: manager
+                if messagebox.showerror(attrs.APP_NAME, 'Oops! The username already exists.', parent = self.__parent) == messagebox.OK:
+                    self.__entry_username.focus()
 
 
 # Test purposes only.

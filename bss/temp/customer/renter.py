@@ -90,12 +90,12 @@ def get_closest_bike(location):
 
 		if row < location[0]:
 			s += 'Go ' + str(location[0] - row) + ' UP. '
-		else:
+		elif row > location[0]:
 			s += 'Go ' + str(row - location[0]) + ' DOWN. '
 
 		if col < location[1]:
 			s += 'Go ' + str(location[1] - col) + ' LEFT.'
-		else:
+		elif col > location[1]:
 			s += 'Go ' + str(col - location[1]) + ' RIGHT.'
 
 		return s
@@ -117,7 +117,7 @@ def renting(bike_id: int, location: list):
 
 	conn = sqlite3.connect(db.get_db_path())
 	c = conn.cursor()
-	c.execute("SELECT * FROM bike where id=:Id", {'Id': bike_id})
+	c.execute('SELECT * FROM bike where id=:Id', {'Id': bike_id})
 	bike_details = c.fetchall()
 	rented_bike = None
 
@@ -158,7 +158,6 @@ def drop_bike(customer: Customer, rented_bike: Bike):
 	Returns
 	-------
 	customer : a `Customer` object
-	rented_bike : a `Bike` object
 	transaction_date : the date of a transaction
 	'''
 
@@ -172,9 +171,8 @@ def drop_bike(customer: Customer, rented_bike: Bike):
 	c.execute("INSERT INTO movement(bike_id,user_id,distance,duration,startTime) VALUES({},{},{},'{}','{}')".format(rented_bike.get_id(), customer.get_id(), rented_bike.get_distance(), duration, transaction_date))
 	conn.commit()
 	conn.close()
-	rented_bike.set_is_being_used()
 	CentralBank().track_changes(amount, transaction_date)
-	return customer, rented_bike, transaction_date
+	return customer, transaction_date
 
 
 def report_break(bike: Bike, report_time: str) -> None:

@@ -1,10 +1,10 @@
 '''
 Description: the definition of a login view
-Version: 1.2.0.20210220
+Version: 1.2.1.20210221
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-20 18:23:21
+LastEditTime: 2021-02-21 18:23:21
 '''
 
 from tkinter import font, messagebox, StringVar, Tk, Toplevel, ttk
@@ -39,7 +39,6 @@ class LoginView:
         '''
 
         self.__parent = parent
-        self.__signup_window = None  # Initialise the sign-up window here to avoid opening duplicated windows.
         screen_width = self.__parent.winfo_screenwidth()
         screen_height = self.__parent.winfo_screenheight()
         parent_width = 300
@@ -215,9 +214,9 @@ class LoginView:
         user = account.logging(self.__combobox_role.get(), self.__variable_username.get(), self.__variable_password.get())
 
         if user is None:
-            messagebox.showerror(attrs.APP_NAME, 'Wrong username or password. Please try again!')
+            messagebox.showerror(attrs.APP_NAME, 'Oops! Wrong username or password.\nPlease try again!', parent = self.__parent)
         elif user == attrs.ALREADY_ONLINE:
-            messagebox.showerror(attrs.APP_NAME, 'You have already logged in somewhere else.')
+            messagebox.showerror(attrs.APP_NAME, 'Oops! You have already logged in somewhere else.', parent = self.__parent)
         else:
             self.__combobox_role.current(0)
             self.__select_role(None)
@@ -227,10 +226,12 @@ class LoginView:
 
             if isinstance(user, Manager):
                 manager_window = Toplevel(self.__parent)
+                manager_window.focus_force()
                 ManagerView(manager_window, user, self.__parent)
                 manager_window.mainloop()
             else:
                 home_window = Toplevel(self.__parent)
+                home_window.focus_force()
                 HomeView(home_window, user, self.__parent)
                 home_window.mainloop()
 
@@ -291,20 +292,22 @@ class LoginView:
             self.__parent.focus()
 
             if self.__is_over_label_signup:
-                if self.__signup_window is None:
-                    self.__signup_window = Toplevel(self.__parent)
-                    self.__signup_window.protocol('WM_DELETE_WINDOW', self.__reset_signup_window)
-                    SignupView(self.__signup_window, attrs.CUSTOMER, 'Sign up')
-                else:
-                    self.__signup_window.focus()
+                self.__signup_window = Toplevel(self.__parent)
+                self.__signup_window.protocol('WM_DELETE_WINDOW', self.__regain_focus)
+                self.__signup_window.grab_set()
+                SignupView(self.__signup_window, attrs.CUSTOMER, 'Sign up')
+                self.__signup_window.mainloop()
 
-    def __reset_signup_window(self) -> None:
+    def __regain_focus(self) -> None:
         '''
-        Reset the sign-up window.
+        Regain focus on a specified widget after closing the sign-up view.
         '''
 
-        self.__signup_window.destroy()
+        if self.__signup_window is not None:
+            self.__signup_window.destroy()
+
         self.__signup_window = None
+        self.__entry_username.focus()
 
 
 # Test purposes only.

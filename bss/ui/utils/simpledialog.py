@@ -1,10 +1,10 @@
 '''
 Description: the definition of customised Tkinter simple dialogues
-Version: 1.0.1.20210220
+Version: 1.0.2.20210221
 Author: Arvin Zhao
 Date: 2021-02-19 10:20:30
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-20 10:57:50
+LastEditTime: 2021-02-21 10:57:50
 '''
 
 from tkinter import simpledialog
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     test_window.geometry('%dx%d+%d+%d' % (parent_length, parent_length, (screen_width - parent_length) / 2, (screen_height - parent_length) / 2))  # Centre the parent window.
     test_window.title('Test')
     test_window.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
-    print(FloatDialogue.askfloat('Float dialogue test', 'Enter anything for testing:'))
-    print(IntegerDialogue.askinteger('Integer dialogue test', 'Enter anything for testing:'))
-    print(StringDialogue.askstring('String dialogue test', 'Enter anything for testing:'))
+    print(FloatDialogue.askfloat('Float dialogue test', 'Enter anything for testing:', parent = test_window))
+    print(IntegerDialogue.askinteger('Integer dialogue test', 'Enter anything for testing:', parent = test_window))
+    print(StringDialogue.askstring('String dialogue test', 'Enter anything for testing:', parent = test_window))
     test_window.mainloop()
