@@ -75,7 +75,7 @@ def main():
 								user_id INTEGER NOT NULL,
 								distance REAL,
 								duration TEXT,
-								startTime TEXT,
+								endTime TEXT,
 								FOREIGN KEY(bike_id) REFERENCES bike(id),
 								FOREIGN KEY(user_id) REFERENCES customer(id)
 								);"""                            

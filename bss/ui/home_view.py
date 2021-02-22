@@ -3,11 +3,11 @@ from tkinter.constants import E, N, RAISED, S, SOLID, W
 
 from PIL import Image, ImageTk
 
-from bss.temp import account, rental  # TODO
+from bss import rental, account, account as account_test
 from bss.conf import attrs
-from bss.temp.customer import Customer  # TODO
-from bss.temp.mapping import Mapping  # TODO
-from bss.temp.operator import OperatorWorker  # TODO
+from bss.customer import Customer
+from bss.mapping import Mapping
+from bss.operator import OperatorWorker
 from bss.ui.about_view import AboutView
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.tracking_view import TrackingView
@@ -630,7 +630,7 @@ class HomeView:
 
     def __move(self, event) -> None:
         '''
-        Move the avatar of a customer, or move a bike if the user is an operator.TODO
+        Move the avatar or a bike.
 
         Parameters
         ----------
@@ -714,8 +714,6 @@ class HomeView:
 # Test purposes only.
 if __name__ == '__main__':
     from tkinter import Tk
-
-    from bss.temp import account as account_test  # TODO
 
     home_window = Tk()
     # HomeView(home_window, account_test.logging(attrs.CUSTOMER, 'jichen', '12345'))

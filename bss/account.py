@@ -21,9 +21,9 @@ def logging(role: str, name: str, password: str):
     '''
 
     # Put module references here to attempt to avoid a circular import.
-    from bss.temp.customer import Customer  # TODO
-    from bss.temp.manager import Manager  # TODO
-    from bss.temp.operator import OperatorWorker  # TODO
+    from bss.customer import Customer  # TODO
+    from bss.manager import Manager  # TODO
+    from bss.operator import OperatorWorker  # TODO
 
     conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
@@ -77,9 +77,9 @@ def log_out(user) -> None:
     '''
 
     # Put module references here to attempt to avoid a circular import.
-    from bss.temp.customer import Customer  # TODO
-    from bss.temp.manager import Manager  # TODO
-    from bss.temp.operator import OperatorWorker  # TODO
+    from bss.customer import Customer  # TODO
+    from bss.manager import Manager  # TODO
+    from bss.operator import OperatorWorker  # TODO
 
     conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
@@ -136,9 +136,9 @@ def register_customer(name: str, password: str) -> int:
 
 # Test purposes only.
 if __name__ == '__main__':
-    user = logging(attrs.CUSTOMER, 'jichen', '12345')
-    print(user is None)  # Expect: False
-    log_out(user)
+    user_test = logging(attrs.CUSTOMER, 'jichen', '12345')
+    print(user_test is None)  # Expect: False
+    log_out(user_test)
     print(logging(attrs.MANAGER, '???????', 'hello_world') is None)  # Expect: True
     print(register_customer('ji_chen', 'hello12345'))  # Expect: 0
     print(register_customer('jichen', '123456'))  # Expect: 0

@@ -1,6 +1,6 @@
 '''
 Description: an attribute sheet to make it convenient to manage code attributes
-Version: 1.0.10.20210222
+Version: 1.0.11.20210222
 Author: Arvin Zhao
 Date: 2021-02-01 17:00:57
 Last Editors: Arvin Zhao
@@ -20,7 +20,7 @@ AVAILABLE_BIKE_FILENAME = 'available_bike.png'
 BIKE_WITH_RIDER_FILENAME = 'bike_with_rider.png'
 CLOSED_EYE_FILENAME = 'closed_eye.png'
 CUSTOMER_AVATAR_FILENAME = 'customer.png'
-DB_FILENAME = 'TEAM_PJT.db'
+DB_FILENAME = 'BACKUP.db'  # 'TEAM_PJT.db'
 DEFECTIVE_BIKE_FILENAME = 'defective_bike.png'
 HINT_FILENAME = 'hint.png'
 MANAGER_AVATAR_FILENAME = 'manager.png'

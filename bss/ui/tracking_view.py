@@ -10,7 +10,7 @@ LastEditTime: 2021-02-22 05:06:45
 from tkinter import ttk
 from tkinter.constants import BOTH, BOTTOM, E, END, HORIZONTAL, RIGHT, VERTICAL, X, Y
 
-from bss.temp import rental  # TODO
+from bss import rental
 from bss.conf import attrs
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.utils import img_path as img

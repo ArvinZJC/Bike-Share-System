@@ -73,36 +73,6 @@ class IntegerDialogue(simpledialog._QueryInteger):
         return d.result
 
 
-# noinspection PyProtectedMember
-class StringDialogue(simpledialog._QueryString):  # TODO: remove this if it is not used
-    '''
-    The class for creating a customised Tkinter simple string dialogue.
-    '''
-
-    def body(self, master):
-        super().body(master)
-        self.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
-
-    @staticmethod
-    def askstring(title: str, prompt: str, **kw) -> str:
-        '''
-        Show a customised Tkinter simple string dialogue.
-
-        Parameters
-        ----------
-        title : the dialogue's title
-        prompt : the prompt on the dialogue
-        kw : some properties controlling the dialogue's behaviours
-
-        Returns
-        -------
-        result : a string value or `None`
-        '''
-
-        d = StringDialogue(title, prompt, **kw)
-        return d.result
-
-
 # Test purposes only.
 if __name__ == '__main__':
     from tkinter import Tk
@@ -116,5 +86,4 @@ if __name__ == '__main__':
     test_window.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
     print(FloatDialogue.askfloat('Float dialogue test', 'Enter anything for testing:', parent = test_window))
     print(IntegerDialogue.askinteger('Integer dialogue test', 'Enter anything for testing:', parent = test_window))
-    print(StringDialogue.askstring('String dialogue test', 'Enter anything for testing:', parent = test_window))
     test_window.mainloop()

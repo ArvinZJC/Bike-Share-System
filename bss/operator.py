@@ -1,8 +1,8 @@
 import sqlite3
 import time
 
-from bss.temp.bike import Bike  # TODO
-from bss.temp.companys_pocket import CentralBank  # TODO
+from bss.bike import Bike
+from bss.companys_pocket import CentralBank
 from bss.conf import attrs
 from bss.data import db_path as db
 
@@ -97,6 +97,7 @@ class OperatorWorker:
 		-------
 		skill_level : an operator's skill level
 		'''
+
 		return self.__skill_level
 
 	def is_using_bike(self, flag) -> None:

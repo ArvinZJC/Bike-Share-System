@@ -12,7 +12,7 @@ from tkinter.constants import E, END, LEFT, RIGHT, W, X
 
 from PIL import Image, ImageTk
 
-from bss.temp import account  # TODO
+from bss import account
 from bss.conf import attrs
 from bss.manager.manager import Manager
 from bss.ui.conf import attrs as ui_attrs, styles

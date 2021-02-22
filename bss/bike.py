@@ -1,113 +1,174 @@
 import sqlite3
 import random
 
-from conf import attrs
+from bss.conf import attrs
+from bss.data import db_path as db
 
 
 class Bike:
+	'''
+	The class for defining a bike.
+	'''
 
-	def __init__(self, Id, defective, location,is_being_used):
-		self.Id = Id
-		self.location = location
-		self.defective = defective
-		self.__db_path = 'data/' + attrs.DB_FILENAME
-		self.is_being_used = is_being_used
+	def __init__(self, bike_id, defective, location, is_being_used) -> None:
+		'''
+		The constructor of the class for defining a bike.
 
-	def print_nice(self):
-		print("Bike Id: ",self.Id),
-		print("%% defective: ",self.defective)
-		
+		Parameters
+		----------
+		bike_id : the ID of a bike
+		defective : a value representing the bike status
+		location : a specified location
+		is_being_used : a flag indicating if a bike is available
+		'''
 
-	def print_details(self):
-		print("Bike Id: ",self.Id),
-		print("%% defective: ",self.defective),
-		print("Location: ",self.location)
+		self.__Id = bike_id
+		self.__location = location
+		self.__defective = defective
+		self.__db_path = db.get_db_path()
+		self.__is_being_used = is_being_used
+		self.__distance = 0
+		self.__extra_time = 0
 
-	def get_defective(self):
-		return self.defective
+	def get_defective(self) -> float:
+		'''
+		Defective level getter.
 
-	def is_defective(self):
-		return self.defective>0.9
+		Returns
+		-------
+		defective : a defective level of a bike
+		'''
 
-	def set_defective(self):
+		return self.__defective
+
+	def is_defective(self) -> bool:
+		'''
+		Check if a bike is defective or needs overhauling.
+
+		Returns
+		-------
+		is_defective : `True` if a bike is defective; otherwise, `False`
+		'''
+
+		return self.__defective >= attrs.DEFECTIVE_BIKE_THRESHOLD
+
+	def set_defective(self, location: list, defective: float) -> None:
+		'''
+		Defective level setter.
+
+		Parameters
+		----------
+		location : the location of a bike
+		defective : a defective level of a bike
+		'''
+
+		if attrs.BIKE_DAMAGE_MIN <= defective <= attrs.BIKE_DAMAGE_MAX:
+			self.__defective = defective
+			conn = sqlite3.connect(self.__db_path)
+			c = conn.cursor()
+			c.execute(
+				"UPDATE bike set location_row =:location_row, location_col=:location_col, defective=:value where id=:Id",
+				{'location_row': location[0], 'location_col': location[1], 'value': self.__defective, 'Id': self.__Id})
+			conn.commit()
+			conn.close()
+
+	def get_is_being_used(self) -> int:
+		'''
+		Bike using status getter.
+
+		Returns
+		-------
+		is_being_used : a status code
+		'''
+
+		return self.__is_being_used
+
+	def set_is_being_used(self) -> None:
+		'''
+		Set the using status of a bike.
+		'''
+
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
-		if self.defective==1:
-			self.defective = 0
-			c.execute("UPDATE bike set defective=0 where id=:Id",{'Id':self.get_id()})
-		
-		else:
-			self.defective = 1
-			c.execute("UPDATE bike set defective=1 where id=:Id",{'Id':self.get_id()})
-
+		self.__is_being_used = attrs.AVAILABLE_BIKE_CODE if self.__is_being_used == attrs.BUSY_BIKE_CODE else attrs.BUSY_BIKE_CODE
+		self.__distance = 0
+		self.__extra_time = 0
+		c.execute("UPDATE bike set is_being_used=:status where id=:Id", {'status': self.__is_being_used, 'Id': self.__Id})
 		conn.commit()
 		conn.close()
 
-	def get_is_being_used(self):
-		return self.is_being_used
-		
-		
-	def set_is_being_used(self):
-		conn = sqlite3.connect(self.__db_path)
-		c = conn.cursor()
-		if self.is_being_used==1:
-			self.is_being_used=0
-			c.execute("UPDATE bike set is_being_used=0 where id=:Id",{'Id':self.get_id()})
-		
-		else:
-			self.is_being_used = 1
-			c.execute("UPDATE bike set is_being_used=1 where id=:Id",{'Id':self.get_id()})
+	def get_distance(self) -> int:
+		'''
+		Distance getter.
 
-		conn.commit()
-		conn.close()
+		Returns
+		-------
+		distance : the riding distance
+		'''
 
+		return self.__distance
 
+	def add_distance(self) -> None:
+		'''
+		Add 1 to the riding distance.
+		'''
 
+		self.__distance += 1
 
-	def get_location(self):
-		return self.location
+	def get_extra_time(self) -> float:
+		'''
+		Extra time getter.
 
-	def set_location(self, location,operator=1):
-		self.location = location
-		self.defective+=round(random.uniform(0.01,0.05),2)
-		conn = sqlite3.connect(self.__db_path)
-		c = conn.cursor()
-		c.execute("UPDATE bike set location_row =:location_row, location_col=:location_col,defective=:value where id=:Id",
-				  {'location_row': location[0], 'location_col': location[1],'value':self.defective, 'Id': self.Id})
-		conn.commit()
-		conn.close()
+		Returns
+		-------
+		extra_time : the extra time
+		'''
 
-	def get_id(self):
-		return self.Id
+		return self.__extra_time
 
-	def move(self, direction, map):
-		location = self.get_location()
+	def add_extra_time(self) -> None:
+		'''
+		Add a random value to the extra time.
+		'''
 
-		og_val = map.get_square_val(location)
-		if direction == 'up':
-			if location[0]>0:
-				map.set_state(location, og_val - 1)
-				location[0] -= 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)
+		self.__extra_time += random.randint(3, 5) * random.randint(50, 60) * max(0.5, (1 - self.get_defective()))
 
-		elif direction == 'down':
-			if location[0]<19:
-				map.set_state(location, og_val - 1)
-				location[0] += 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)
+	def get_location(self) -> list:
+		'''
+		Location getter.
 
-		elif direction == 'left':
-			if location[1]>0:
-				map.set_state(location, og_val - 1)
-				location[1] -= 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)
+		Returns
+		-------
+		location : a specified location
+		'''
 
-		else:
-			if location[1]<19:
-				map.set_state(location, og_val - 1)
-				location[1] += 1
-				self.set_location(location)
-				map.set_state(location, map.get_square_val(location) + 1)
+		return self.__location
+
+	def set_location(self, location, is_operator = False) -> None:
+		'''
+		Move a bike to a location.
+
+		Parameters
+		----------
+		location : a specified location
+		is_operator : a flag indicating if a bike is moved by an operator
+		'''
+
+		self.__location = location
+
+		if not is_operator:
+			self.__defective += round(random.uniform(0.01, 0.05), 2)
+			self.__defective = attrs.BIKE_DAMAGE_MAX if self.__defective > attrs.BIKE_DAMAGE_MAX else self.__defective
+
+		self.set_defective(location, self.__defective)
+
+	def get_id(self) -> int:
+		'''
+		Get the ID of a bike.
+
+		Returns
+		-------
+		Id : the ID of a bike
+		'''
+
+		return self.__Id
