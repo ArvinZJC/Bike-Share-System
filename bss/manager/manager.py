@@ -55,7 +55,7 @@ class Manager:
 			plt.title("Growth over time")
 			plt.ylabel("Money in company's account")
 			plt.xlabel("Dates")
-			ax.set_xticklabels(transactions['timeOfEvent'][::80],rotation='vertical')
+			ax.set_xticklabels(transactions['timeOfEvent'][::80],rotation=45)
 			plt.show()
 
 		if choice == 2:
