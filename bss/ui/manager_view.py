@@ -9,7 +9,11 @@ from bss.temp.manager import Manager  # TODO
 from bss.ui.about_view import AboutView
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.utils import img_path as img
+
 from bss.ui.utils.tooltip import Tooltip
+from bss.data import db_path as db
+
+
 
 
 class ManagerView:
@@ -17,7 +21,7 @@ class ManagerView:
     The class for creating a manager view.
     '''
 
-    def __init__(self, parent, user, toplevel = None) -> None:
+    def __init__(self, parent, user, toplevel=None) -> None:
         '''
         The constructor of the class for creating a manager view.
         Only managers can have access to this view.
@@ -36,6 +40,7 @@ class ManagerView:
         screen_height = self.__parent.winfo_screenheight()
         self.__parent_width = 900
         self.__parent_height = 600
+        self.__db_path = db.get_db_path()
 
         self.__parent.geometry(
             '%dx%d+%d+%d' % (self.__parent_width, self.__parent_height, (screen_width - self.__parent_width) / 2,
@@ -50,6 +55,7 @@ class ManagerView:
         styles.apply_style()
 
         # New row: a dashboard frame.
+
         column_index = 0  # Make it convenient to index the column of the grid.
         frame_column_num = 2
         frame_dashboard = ttk.Frame(self.__parent, relief=RAISED)
@@ -96,10 +102,15 @@ class ManagerView:
         ttk.Label(frame_dashboard, style=styles.PLACEHOLDER_LABEL).grid(row=frame_row_index)
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
+
+
         # New row in the dashboard frame: the growth over time image.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text='Growth over time Image').grid(columnspan=frame_column_num, padx=ui_attrs.PADDING_X,
-                                                        row=frame_row_index, sticky=(E, W))
+
+        ttk.Button(frame_dashboard, command=self.__user.image1(), text='Growth of company over time').grid(
+            columnspan=frame_column_num,
+            padx=ui_attrs.PADDING_X,
+            row=frame_row_index, sticky=(E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
         # New row in the dashboard frame: placeholder.
@@ -107,10 +118,12 @@ class ManagerView:
         ttk.Label(frame_dashboard, style=styles.PLACEHOLDER_LABEL).grid(row=frame_row_index)
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
-        # New row in the dashboard frame: Distance Travelled Image.
+        # New row in the dashboard frame: User Behaviour Statistics v1.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text='Distance Travelled Image').grid(columnspan=frame_column_num, padx=ui_attrs.PADDING_X,
-                                                                  row=frame_row_index, sticky=(E, W))
+        ttk.Button(frame_dashboard, command=self.__user.image2(), text='User Behaviour Statistics v1').grid(
+            columnspan=frame_column_num,
+            padx=ui_attrs.PADDING_X,
+            row=frame_row_index, sticky=(E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
         # New row in the dashboard frame: placeholder.
@@ -120,8 +133,10 @@ class ManagerView:
 
         # New row in the dashboard frame: Duration of Trips Image.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text='Duration of Trips Image').grid(columnspan=frame_column_num, padx=ui_attrs.PADDING_X,
-                                                                  row=frame_row_index, sticky=(E, W))
+        ttk.Button(frame_dashboard, command=self.__user.image3(), text='User Behaviour Statistics v2').grid(
+            columnspan=frame_column_num,
+            padx=ui_attrs.PADDING_X,
+            row=frame_row_index, sticky=(E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
         # New row in the dashboard frame: placeholder.
@@ -131,8 +146,10 @@ class ManagerView:
 
         # New row in the dashboard frame: Cost of Trips Image.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text='Cost of Trips Image').grid(columnspan=frame_column_num, padx=ui_attrs.PADDING_X,
-                                                                  row=frame_row_index, sticky=(E, W))
+        ttk.Button(frame_dashboard, command=self.__user.image4(), text='Bike Statistics').grid(columnspan=frame_column_num,
+                                                                                            padx=ui_attrs.PADDING_X,
+                                                                                            row=frame_row_index,
+                                                                                            sticky=(E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
         # New row in the dashboard frame: placeholder.
@@ -142,9 +159,10 @@ class ManagerView:
 
         # New row in the dashboard frame: Breaking point of Bikes Image.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text='Breaking point of Bikes Image').grid(columnspan=frame_column_num,
-                                                                     padx=ui_attrs.PADDING_X,
-                                                                     row=frame_row_index, sticky=(E, W))
+        ttk.Button(frame_dashboard, command=self.__user.image5(), text='Daily Usage Frequency Analysis').grid(
+            columnspan=frame_column_num,
+            padx=ui_attrs.PADDING_X,
+            row=frame_row_index, sticky=(E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
         # New row in the dashboard frame: placeholder.
@@ -154,22 +172,11 @@ class ManagerView:
 
         # New row in the dashboard frame: Number of Movements VS Times of Day Image.
         frame_row_index += 1
-        ttk.Button(frame_dashboard, text='Number of Movements VS Times of Day Image').grid(columnspan=frame_column_num,
-                                                                               padx=ui_attrs.PADDING_X,
-                                                                               row=frame_row_index, sticky=(E, W))
-        frame_dashboard.rowconfigure(frame_row_index, weight=0)
-
-        # New row in the dashboard frame: placeholder.
-        frame_row_index += 1
-        ttk.Label(frame_dashboard, style=styles.PLACEHOLDER_LABEL).grid(row=frame_row_index)
-        frame_dashboard.rowconfigure(frame_row_index, weight=0)
-
-        # New row in the dashboard frame: Response Time Image.
-        frame_row_index += 1
-        ttk.Button(frame_dashboard, text='Response Time Image').grid(columnspan=frame_column_num,
-                                                                                           padx=ui_attrs.PADDING_X,
-                                                                                           row=frame_row_index,
-                                                                                           sticky=(E, W))
+        ttk.Button(frame_dashboard, command=self.__user.image6(), text='Response Time from Workers').grid(
+            columnspan=frame_column_num,
+            padx=ui_attrs.PADDING_X,
+            row=frame_row_index,
+            sticky=(E, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
         # New row in the dashboard frame: placeholder.
@@ -180,9 +187,9 @@ class ManagerView:
         # New row in the dashboard frame: the log-out button
         frame_row_index += 1
         frame_column_index = 0
-        ttk.Button(frame_dashboard, command = self.__log_out, text='Log out').grid(column=frame_column_index,
-                                                                                    padx=ui_attrs.PADDING_X,
-                                                                                    row=frame_row_index, sticky=(S, W))
+        ttk.Button(frame_dashboard, command=self.__log_out, text='Log out').grid(column=frame_column_index,
+                                                                                 padx=ui_attrs.PADDING_X,
+                                                                                 row=frame_row_index, sticky=(S, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=1)
 
         # Same row, new column in the dashboard frame: the about-app button.
@@ -194,40 +201,30 @@ class ManagerView:
         button_about.grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, S))
         Tooltip(button_about, 'About ' + attrs.APP_NAME)
 
-        # New row in the dashboard frame: placeholder.
-        frame_row_index += 1
-        ttk.Label(frame_dashboard, style=styles.PLACEHOLDER_LABEL).grid(row=frame_row_index, pady=ui_attrs.PADDING_Y)
-        frame_dashboard.rowconfigure(frame_row_index, weight=0)
-
-        # Same row, new column: a frame for the map area.
-        column_index += 1
-        frame_map_area = ttk.Frame(self.__parent, relief=RAISED)
-        frame_map_area.grid(column=column_index, row=0, sticky=(E, N, S, W))
-
-        # In the frame for the map area: a map frame.
-        frame_map = ttk.Frame(frame_map_area)
-        frame_map.pack(expand=1)
-
-        # Map labels in the map frame.
-        self.__map_label_list = []
-        self.__image_empty_cell = Image.new('1', (ui_attrs.MAP_CELL_LENGTH, ui_attrs.MAP_CELL_LENGTH),
-                                            color=colours.EMPTY_CELL_BACKGROUND)
-
-        for row in range(attrs.MAP_LENGTH):
-            map_label_row_list = []
-
-            for col in range(attrs.MAP_LENGTH):
-                label_map_cell = ttk.Label(frame_map, relief=SOLID)
-                label_map_cell.grid(row=row, column=col)
-                label_map_cell.image = ImageTk.PhotoImage(self.__image_empty_cell)
-                label_map_cell['image'] = label_map_cell.image  # Keep a reference to prevent GC.
-                map_label_row_list.append(label_map_cell)
-
-            self.__map_label_list.append(map_label_row_list)
-
         # Bind events.
         self.__parent.protocol('WM_DELETE_WINDOW', lambda: self.__log_out(False))
         self.__parent.bind('<Configure>', self.__resize_frames)
+
+    def __resize_frames(self, event) -> None:
+        '''
+        Auto-resize the two frames.
+
+        Parameters
+        ----------
+        event : the event bound to the widget calling this function
+        '''
+
+        parent_width_new = self.__parent.winfo_width()
+        parent_height_new = self.__parent.winfo_height()
+
+        # Try to ensure the square map can take up as much space as possible.
+        if parent_width_new - parent_height_new > self.__parent_width - self.__parent_height:
+            self.__parent.columnconfigure(0, minsize=parent_width_new - parent_height_new, weight=1)
+            self.__parent.columnconfigure(1, minsize=parent_height_new, weight=1)
+        else:
+            self.__parent.columnconfigure(0, minsize=self.__parent_width - self.__parent_height, weight=1)
+            self.__parent.columnconfigure(1, minsize=self.__parent_height, weight=1)
+
 
     def __goto_about(self) -> None:
         '''
@@ -244,7 +241,6 @@ class ManagerView:
     def __log_out(self, is_logout_button = True) -> None:
         '''
         Log out the account.
-
         Parameters
         ----------
         is_logout_button : a flag indicating if a user tries to log out himself/herself by clicking the log-out button
@@ -259,27 +255,6 @@ class ManagerView:
 
         if self.__toplevel is not None:
             self.__toplevel.deiconify()
-
-    # noinspection PyUnusedLocal
-    def __resize_frames(self, event) -> None:
-        '''
-        Auto-resize the two frames.
-
-        Parameters
-        ----------
-        event : the event bound to the widget calling this function
-        '''
-
-        parent_width_new = self.__parent.winfo_width()
-        parent_height_new = self.__parent.winfo_height()
-
-        # Try to ensure the square map can take up as much space as possible.
-        if parent_width_new - parent_height_new > self.__parent_width - self.__parent_height:
-            self.__parent.columnconfigure(0, minsize = parent_width_new - parent_height_new, weight = 1)
-            self.__parent.columnconfigure(1, minsize = parent_height_new, weight = 1)
-        else:
-            self.__parent.columnconfigure(0, minsize = self.__parent_width - self.__parent_height, weight = 1)
-            self.__parent.columnconfigure(1, minsize = self.__parent_height, weight = 1)
 
 
 if __name__ == '__main__':

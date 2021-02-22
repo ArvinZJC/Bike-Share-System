@@ -1,5 +1,5 @@
 import sqlite3
-from conf import attrs
+from bss.conf import attrs
 db_name = attrs.DB_FILENAME 
 conn = sqlite3.connect(db_name)
 c = conn.cursor()

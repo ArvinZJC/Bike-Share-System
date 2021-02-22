@@ -1,5 +1,6 @@
 import sqlite3
-from conf import attrs
+from bss.conf import attrs
+
 def connection_check(db_name):
 	# Checking for connection and create a database file named "TEAM_PJT.db" if not exists.
 	conn = None

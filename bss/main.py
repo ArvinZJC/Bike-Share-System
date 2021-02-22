@@ -5,9 +5,9 @@ from bike import *
 from customer import *
 from login import *
 from mapping import *
-from controllerCustomer import *
-from controllerOperator import *
-from controllerManager import *
+from bss.customer.controllerCustomer import *
+from bss.operator.controllerOperator import *
+from bss.manager.controllerManager import *
 
 our_map = Mapping()
 #state = our_map.get_state()
