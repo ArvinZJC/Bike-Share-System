@@ -1,13 +1,13 @@
 '''
 Description: the definition of a login view
-Version: 1.2.1.20210221
+Version: 1.2.2.20210222
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-21 18:23:21
+LastEditTime: 2021-02-22 18:23:21
 '''
 
-from tkinter import font, messagebox, StringVar, Tk, Toplevel, ttk
+from tkinter import font, messagebox, StringVar, Toplevel, ttk
 from tkinter.constants import E, END, LEFT, RIGHT, W, X
 
 from PIL import Image, ImageTk
@@ -65,7 +65,7 @@ class LoginView:
         label_banner = ttk.Label(self.__parent)
         label_banner.grid(columnspan = column_num, row = row_index)
         image_banner = Image.open(img.get_img_path(attrs.APP_BANNER_FILENAME))
-        image_banner = image_banner.resize((parent_width, ui_attrs.BANNER_HEIGHT), Image.ANTIALIAS)
+        image_banner = image_banner.resize((ui_attrs.BANNER_WIDTH, ui_attrs.BANNER_HEIGHT), Image.ANTIALIAS)
         label_banner.image = ImageTk.PhotoImage(image_banner)
         label_banner['image'] = label_banner.image  # Keep a reference to prevent GC.
         self.__parent.rowconfigure(row_index, weight = 1)
@@ -111,13 +111,13 @@ class LoginView:
         self.__entry_password.pack(expand = True, fill = X, side = LEFT)
 
         # Same row in the frame: the button with an eye image for controlling the visibility of password
-        image_opening_eye = Image.open(img.get_img_path(attrs.OPENING_EYE_FILENAME))
-        image_opening_eye = image_opening_eye.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
-        self.__photo_image_opening_eye = ImageTk.PhotoImage(image_opening_eye)  # Keep a reference in self to prevent GC.
-        image_closed_eye = Image.open(img.get_img_path(attrs.CLOSED_EYE_FILENAME))
-        image_closed_eye = image_closed_eye.resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
-        self.__photo_image_closed_eye = ImageTk.PhotoImage(image_closed_eye)  # Keep a reference in self to prevent GC.
-        self.__button_password_eye = ttk.Button(frame_password, command = self.__set_password_visibility, image = self.__photo_image_closed_eye, style = styles.IMG_BUTTON)
+        image_opening_eye = Image.open(img.get_img_path(attrs.OPENING_EYE_FILENAME)).resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
+        self.__photo_image_opening_eye = ImageTk.PhotoImage(image_opening_eye)
+        image_closed_eye = Image.open(img.get_img_path(attrs.CLOSED_EYE_FILENAME)).resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
+        self.__photo_image_closed_eye = ImageTk.PhotoImage(image_closed_eye)
+        self.__button_password_eye = ttk.Button(frame_password, command = self.__set_password_visibility, style = styles.IMG_BUTTON)
+        self.__button_password_eye.image = self.__photo_image_closed_eye
+        self.__button_password_eye['image'] = self.__button_password_eye.image  # Keep a reference in self to prevent GC.
         self.__button_password_eye.pack(side = RIGHT)
         self.__text_show_password = 'Click to show the password.'
         self.__text_hide_password = 'Click to hide the password.'
@@ -193,11 +193,13 @@ class LoginView:
 
         if self.__entry_password['show'] == '*':
             self.__entry_password['show'] = ''
-            self.__button_password_eye['image'] = self.__photo_image_opening_eye
+            self.__button_password_eye.image = self.__photo_image_opening_eye
+            self.__button_password_eye['image'] = self.__button_password_eye.image
             self.__tooltip_password_eye.set_text(self.__text_hide_password)
         else:
             self.__entry_password['show'] = '*'
-            self.__button_password_eye['image'] = self.__photo_image_closed_eye
+            self.__button_password_eye.image = self.__photo_image_closed_eye
+            self.__button_password_eye['image'] = self.__button_password_eye.image
             self.__tooltip_password_eye.set_text(self.__text_show_password)
 
     # noinspection PyUnusedLocal
@@ -312,6 +314,8 @@ class LoginView:
 
 # Test purposes only.
 if __name__ == '__main__':
+    from tkinter import Tk
+
     login_window = Tk()
     LoginView(login_window)
     login_window.mainloop()

@@ -1,10 +1,10 @@
 '''
 Description: an attribute sheet to make it convenient to manage code attributes
-Version: 1.0.9.20210220
+Version: 1.0.10.20210222
 Author: Arvin Zhao
 Date: 2021-02-01 17:00:57
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-20 17:01:54
+LastEditTime: 2021-02-22 17:01:54
 '''
 
 # Login status.
@@ -13,6 +13,7 @@ OFFLINE = 0
 ONLINE = 1
 
 # Filenames.
+ABOUT_FILENAME = 'about.png'
 APP_BANNER_FILENAME = 'banner.png'
 APP_ICON_FILENAME = 'icon.ico'
 AVAILABLE_BIKE_FILENAME = 'available_bike.png'
@@ -51,6 +52,7 @@ DEFECTIVE_STATUS = 'CRUMMY'
 
 # Project configuration.
 APP_NAME = 'BikeSims'
+APP_VERSION = '2.0.0'
 CUSTOMER = 'Customer'
 DATA_BASENAME = 'data'
 MANAGER = 'Manager'

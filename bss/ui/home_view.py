@@ -1,4 +1,4 @@
-from tkinter import messagebox, Tk, ttk
+from tkinter import messagebox, Toplevel, ttk
 from tkinter.constants import E, N, RAISED, S, SOLID, W
 
 from PIL import Image, ImageTk
@@ -9,6 +9,7 @@ from bss.temp.customer import renter  # TODO
 from bss.temp.customer.customer import Customer  # TODO
 from bss.temp.mapping import Mapping  # TODO
 from bss.temp.operator.operator import OperatorWorker  # TODO
+from bss.ui.about_view import AboutView
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.utils import img_path as img
 from bss.ui.utils.simpledialog import FloatDialogue, IntegerDialogue
@@ -59,20 +60,20 @@ class HomeView:
         # New row: a dashboard frame.
         column_index = 0  # Make it convenient to index the column of the grid.
         frame_column_num = 2
-        frame_dashboard = ttk.Frame(self.__parent, relief = RAISED)
-        frame_dashboard.grid(row = 0, sticky = (E, N, S, W))
-        frame_dashboard.columnconfigure(0, weight = 1)
+        self.__frame_dashboard = ttk.Frame(self.__parent, relief = RAISED)
+        self.__frame_dashboard.grid(row = 0, sticky = (E, N, S, W))
+        self.__frame_dashboard.columnconfigure(0, weight = 1)
 
         # New row in the dashboard frame: placeholder.
         frame_row_index = 0  # Make it convenient to index the row of the grid in the dashboard frame.
-        ttk.Label(frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(columnspan = frame_column_num, row = frame_row_index)
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        ttk.Label(self.__frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(columnspan = frame_column_num, row = frame_row_index)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: the avatar image label.
         frame_row_index += 1
-        label_avatar = ttk.Label(frame_dashboard)
+        label_avatar = ttk.Label(self.__frame_dashboard)
         label_avatar.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = frame_row_index)
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         if isinstance(self.__user, Customer):
             image_avatar = Image.open(img.get_img_path(attrs.CUSTOMER_AVATAR_FILENAME))
@@ -85,87 +86,92 @@ class HomeView:
 
         # New row in the dashboard frame: the username label.
         frame_row_index += 1
-        ttk.Label(frame_dashboard, style = styles.PRIMARY_LABEL, text = self.__user.get_name()).grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index)
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        ttk.Label(self.__frame_dashboard, style = styles.PRIMARY_LABEL, text = self.__user.get_name()).grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         if isinstance(self.__user, OperatorWorker):
             # New row in the dashboard frame: the skill level label.
             frame_row_index += 1
-            ttk.Label(frame_dashboard, style = styles.EXPLANATION_LABEL, text = 'Skill level: ' + str(self.__user.get_skill_level())).grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index)
-            frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+            ttk.Label(self.__frame_dashboard, style = styles.EXPLANATION_LABEL, text = 'Skill level: ' + str(self.__user.get_skill_level())).grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index)
+            self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: the balance label.
         frame_row_index += 1
-        self.__label_balance = ttk.Label(frame_dashboard, style = styles.EXPLANATION_LABEL)
+        self.__label_balance = ttk.Label(self.__frame_dashboard, style = styles.EXPLANATION_LABEL)
         self.__label_balance.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index)
         self.__update_balance_text()
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         if isinstance(self.__user, Customer):
             # New row in the dashboard frame: placeholder.
             frame_row_index += 1
-            ttk.Label(frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
-            frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+            ttk.Label(self.__frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
+            self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
             # New row in the dashboard frame: the top-up button.
             frame_row_index += 1
-            ttk.Button(frame_dashboard, command = self.__topup, text = 'Top up').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
-            frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+            ttk.Button(self.__frame_dashboard, command = self.__topup, text = 'Top up').grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
+            self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: placeholder.
         frame_row_index += 1
-        ttk.Label(frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        ttk.Label(self.__frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: a separator.
         frame_row_index += 1
-        ttk.Separator(frame_dashboard).grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_Y, row = frame_row_index, sticky = (E, W))
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        ttk.Separator(self.__frame_dashboard).grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_Y, row = frame_row_index, sticky = (E, W))
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: placeholder.
         frame_row_index += 1
-        ttk.Label(frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        ttk.Label(self.__frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: the button for picking up/moving/dropping a bike.
         frame_row_index += 1
-        self.__button_use_bike = ttk.Button(frame_dashboard, command = self.__use_bike, text = self.__PICKUP_BIKE_TEXT if isinstance(self.__user, Customer) else self.__MOVE_BIKE_TEXT)
+        self.__button_use_bike = ttk.Button(self.__frame_dashboard, command = self.__use_bike, text = self.__PICKUP_BIKE_TEXT if isinstance(self.__user, Customer) else self.__MOVE_BIKE_TEXT)
         self.__button_use_bike.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         if isinstance(self.__user, OperatorWorker):
             # New row in the dashboard frame: placeholder.
             frame_row_index += 1
-            ttk.Label(frame_dashboard, style=styles.PLACEHOLDER_LABEL).grid(row=frame_row_index)
-            frame_dashboard.rowconfigure(frame_row_index, weight=0)
+            ttk.Label(self.__frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
+            self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
             # New row in the dashboard frame: the button for overhauling a bike.
             frame_row_index += 1
-            self.__button_overhaul_bike = ttk.Button(frame_dashboard, command = self.__overhaul_bike, text = 'Overhaul the bike')
+            self.__button_overhaul_bike = ttk.Button(self.__frame_dashboard, command = self.__overhaul_bike, text = 'Overhaul the bike')
             self.__button_overhaul_bike.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
-            frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+            self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: the info label.
         frame_row_index += 1
-        self.__label_info = ttk.Label(frame_dashboard, style = styles.CONTENT_LABEL)
+        self.__label_info = ttk.Label(self.__frame_dashboard, style = styles.CONTENT_LABEL)
         self.__label_info.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = frame_row_index)
         self.__update_ride_info()
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # New row in the dashboard frame: the log-out button.
         frame_row_index += 1
         frame_column_index = 0
-        ttk.Button(frame_dashboard, command = self.__log_out, text = 'Log out').grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (S, W))
-        frame_dashboard.rowconfigure(frame_row_index, weight = 1)
+        ttk.Button(self.__frame_dashboard, command = self.__log_out, text = 'Log out').grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (S, W))
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 1)
 
-        # Same row, new column in the dashboard frame: the settings button. TODO
+        # Same row, new column in the dashboard frame: the about-app button.
         frame_column_index += 1
-        ttk.Button(frame_dashboard, text = 'Settings').grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, S))
+        button_about = ttk.Button(self.__frame_dashboard, command = self.__goto_about)
+        image_about = Image.open(img.get_img_path(attrs.ABOUT_FILENAME)).resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
+        button_about.image = ImageTk.PhotoImage(image_about)
+        button_about['image'] = button_about.image  # Keep a reference to prevent GC.
+        button_about.grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, S))
+        Tooltip(button_about, 'About ' + attrs.APP_NAME)
 
         # New row in the dashboard frame: placeholder.
         frame_row_index += 1
-        ttk.Label(frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index, pady = ui_attrs.PADDING_Y)
-        frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+        ttk.Label(self.__frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index, pady = ui_attrs.PADDING_Y)
+        self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
         # Same row, new column: a frame for the map area.
         column_index += 1
@@ -223,7 +229,7 @@ class HomeView:
                 else:
                     label_map_cell.image = ImageTk.PhotoImage(self.__image_empty_cell)
 
-                label_map_cell['image'] = label_map_cell.image  # Keep a reference to prevent GC.
+                label_map_cell['image'] = label_map_cell.image
                 tooltip_map_cell = Tooltip(label_map_cell, tooltip_text)
                 map_cell_list.append(tooltip_map_cell)
                 map_element_row_list.append(map_cell_list)
@@ -239,6 +245,18 @@ class HomeView:
         self.__parent.bind('<Down>', self.__move)
 
         self.__parent.after(attrs.REFRESHING_INTERVAL, self.__refresh_map)  # Refresh the map regularly.
+
+    def __goto_about(self) -> None:
+        '''
+        Go to the about-app view.
+        '''
+
+        self.__parent.focus()
+        about_window = Toplevel(self.__parent)
+        about_window.focus()
+        about_window.grab_set()
+        AboutView(about_window, attrs.CUSTOMER if isinstance(self.__user, Customer) else attrs.OPERATOR)
+        about_window.mainloop()
 
     def __update_balance_text(self) -> None:
         '''
@@ -571,6 +589,8 @@ class HomeView:
             self.__parent.columnconfigure(0, minsize = self.__parent_width - self.__parent_height, weight = 1)
             self.__parent.columnconfigure(1, minsize = self.__parent_height, weight = 1)
 
+        self.__label_info['wraplength'] = self.__frame_dashboard.winfo_width() - ui_attrs.PADDING_X * 2
+
     def __move(self, event) -> None:
         '''
         Move the avatar of a customer, or move a bike if the user is an operator.TODO
@@ -656,6 +676,8 @@ class HomeView:
 
 # Test purposes only.
 if __name__ == '__main__':
+    from tkinter import Tk
+
     from bss.temp import account as account_test  # TODO
 
     home_window = Tk()
