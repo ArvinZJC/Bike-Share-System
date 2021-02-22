@@ -75,7 +75,7 @@ def customer_pilot(customer,our_map):
 				dateOfTransaction = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.time()))
 				conn = sqlite3.connect(db_path)
 				c = conn.cursor()
-				c.execute("INSERT INTO movement (bike_id,user_id,distance,duration,startTime) VALUES ({},{},{},'{}','{}')".format(rented_bike.get_id(),
+				c.execute("INSERT INTO movement (bike_id,user_id,distance,duration,endTime) VALUES ({},{},{},'{}','{}')".format(rented_bike.get_id(),
 											customer.Id,distance,duration,dateOfTransaction))
 				conn.commit()
 				conn.close()
