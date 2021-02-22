@@ -128,7 +128,7 @@ dmypy.json
 .idea/*
 
 # SQLite3 database
-*.dbddd
+*.db
 
 # MacOS: general
 .DS_Store

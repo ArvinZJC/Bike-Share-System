@@ -21,9 +21,9 @@ def logging(role: str, name: str, password: str):
     '''
 
     # Put module references here to attempt to avoid a circular import.
-    from bss.customer import Customer  # TODO
-    from bss.manager import Manager  # TODO
-    from bss.operator import OperatorWorker  # TODO
+    from bss.customer import Customer
+    from bss.manager import Manager
+    from bss.operator import OperatorWorker
 
     conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
@@ -77,9 +77,9 @@ def log_out(user) -> None:
     '''
 
     # Put module references here to attempt to avoid a circular import.
-    from bss.customer import Customer  # TODO
-    from bss.manager import Manager  # TODO
-    from bss.operator import OperatorWorker  # TODO
+    from bss.customer import Customer
+    from bss.manager import Manager
+    from bss.operator import OperatorWorker
 
     conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
