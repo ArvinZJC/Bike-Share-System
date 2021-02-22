@@ -1,26 +1,16 @@
-# TODO: still under construction; do not run this file!
-from setuptools import setup, find_packages
+try:
+    import matplotlib
+    import numpy
+    import pandas
+    import PIL
+except ImportError:
+    print('Oops! Any necessary third-party package is missing.')
+    print('Setup would help you to install any missing package.')
+    print('NOTE: if the setup fails to do that, you may need to install the packages manually by running the command `pip3 install -r requirements.txt` under the directory same as that of the setup.\n')
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
 
-setup(
-    name = 'BikeSims',
-    version = '2.0.0',
-    author = 'test1',
-    description = 'test',
-    license = 'GPLv3',
-    keywords = 'test',
-    url = 'https://github.com/ArvinZJC/Bike-Share-System',  # TODO: change to GitLab
-    packages = find_packages(),
-    include_package_data = True,
-    # TODO: data_files = ,
-    # TODO: platforms = 'any',
-    install_requires = [
-        'matplotlib==3.3.4',
-        'numpy==1.20.1',
-        'pandas==1.2.2',
-        'Pillow==8.1.0'
-    ],
-    entry_points={'console_scripts': [
-        'bss_run = bss.main:main'
-    ]},
-    zip_safe = False
-)
+from bss import bss_run
+
+bss_run.main()
