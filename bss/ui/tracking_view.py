@@ -9,6 +9,10 @@ LastEditTime: 2021-02-22 05:06:45
 
 from tkinter import ttk
 from tkinter.constants import BOTH, BOTTOM, E, END, HORIZONTAL, RIGHT, VERTICAL, X, Y
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
 from bss import rental
 from bss.conf import attrs
