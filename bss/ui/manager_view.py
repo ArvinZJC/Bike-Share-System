@@ -1,4 +1,4 @@
-from tkinter import messagebox, Tk, ttk
+from tkinter import messagebox, Toplevel, ttk
 from tkinter.constants import E, N, RAISED, S, SOLID, W
 
 from PIL import Image, ImageTk
@@ -6,8 +6,10 @@ from PIL import Image, ImageTk
 from bss.temp import account  # TODO
 from bss.conf import attrs
 from bss.temp.manager.manager import Manager  # TODO
+from bss.ui.about_view import AboutView
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.utils import img_path as img
+from bss.ui.utils.tooltip import Tooltip
 
 
 class ManagerView:
@@ -67,10 +69,7 @@ class ManagerView:
                           row=frame_row_index)
         frame_dashboard.rowconfigure(frame_row_index, weight=0)
 
-        if isinstance(user, Manager):
-            image_avatar = Image.open(img.get_img_path(attrs.MANAGER_AVATAR_FILENAME))
-
-        image_avatar = image_avatar.resize((ui_attrs.AVATAR_LENGTH, ui_attrs.AVATAR_LENGTH), Image.ANTIALIAS)
+        image_avatar = Image.open(img.get_img_path(attrs.MANAGER_AVATAR_FILENAME)).resize((ui_attrs.AVATAR_LENGTH, ui_attrs.AVATAR_LENGTH), Image.ANTIALIAS)
         label_avatar.image = ImageTk.PhotoImage(image_avatar)
         label_avatar['image'] = label_avatar.image  # Keep a reference to prevent GC.
 
@@ -186,11 +185,14 @@ class ManagerView:
                                                                                     row=frame_row_index, sticky=(S, W))
         frame_dashboard.rowconfigure(frame_row_index, weight=1)
 
-        # Same row, new column in the dashboard frame: TODO: the settings area
+        # Same row, new column in the dashboard frame: the about-app button.
         frame_column_index += 1
-        ttk.Label(frame_dashboard, style=styles.CONTENT_LABEL, text='Settings').grid(column=frame_column_index,
-                                                                                     padx=ui_attrs.PADDING_X,
-                                                                                     row=frame_row_index, sticky=(E, S))
+        button_about = ttk.Button(frame_dashboard, command = self.__goto_about)
+        image_about = Image.open(img.get_img_path(attrs.ABOUT_FILENAME)).resize((ui_attrs.PRIMARY_FONT_SIZE, ui_attrs.PRIMARY_FONT_SIZE), Image.ANTIALIAS)
+        button_about.image = ImageTk.PhotoImage(image_about)
+        button_about['image'] = button_about.image  # Keep a reference to prevent GC.
+        button_about.grid(column = frame_column_index, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, S))
+        Tooltip(button_about, 'About ' + attrs.APP_NAME)
 
         # New row in the dashboard frame: placeholder.
         frame_row_index += 1
@@ -227,6 +229,18 @@ class ManagerView:
         self.__parent.protocol('WM_DELETE_WINDOW', lambda: self.__log_out(False))
         self.__parent.bind('<Configure>', self.__resize_frames)
 
+    def __goto_about(self) -> None:
+        '''
+        Go to the about-app view.
+        '''
+
+        self.__parent.focus()
+        about_window = Toplevel(self.__parent)
+        about_window.focus()
+        about_window.grab_set()
+        AboutView(about_window, attrs.MANAGER)
+        about_window.mainloop()
+
     def __log_out(self, is_logout_button = True) -> None:
         '''
         Log out the account.
@@ -236,18 +250,15 @@ class ManagerView:
         is_logout_button : a flag indicating if a user tries to log out himself/herself by clicking the log-out button
         '''
 
-        if self.__user.get_flag():
-            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike and paying.')
-        else:
-            if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?'):
-                return
+        if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?'):
+            return
 
-            account.log_out(self.__user)
-            self.__parent.destroy()
-            self.__parent = None
+        account.log_out(self.__user)
+        self.__parent.destroy()
+        self.__parent = None
 
-            if self.__toplevel is not None:
-                self.__toplevel.deiconify()
+        if self.__toplevel is not None:
+            self.__toplevel.deiconify()
 
     # noinspection PyUnusedLocal
     def __resize_frames(self, event) -> None:
@@ -272,6 +283,8 @@ class ManagerView:
 
 
 if __name__ == '__main__':
+    from tkinter import Tk
+
     manager_window = Tk()
     ManagerView(manager_window, Manager(3, 'xiaoran', '666666'))
     manager_window.mainloop()

@@ -136,7 +136,9 @@ def register_customer(name: str, password: str) -> int:
 
 # Test purposes only.
 if __name__ == '__main__':
-    print(logging(attrs.CUSTOMER, 'jichen ', '12345') is None)  # Expect: True
+    user = logging(attrs.CUSTOMER, 'jichen', '12345')
+    print(user is None)  # Expect: False
+    log_out(user)
     print(logging(attrs.MANAGER, '???????', 'hello_world') is None)  # Expect: True
     print(register_customer('ji_chen', 'hello12345'))  # Expect: 0
     print(register_customer('jichen', '123456'))  # Expect: 0

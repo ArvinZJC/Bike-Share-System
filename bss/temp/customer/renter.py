@@ -6,7 +6,6 @@ import numpy as np
 from bss.temp.bike import Bike  # TODO
 from bss.temp.companys_pocket import CentralBank  # TODO
 from bss.conf import attrs
-from bss.temp.customer.customer import Customer  # TODO
 from bss.data import db_path as db
 
 
@@ -146,7 +145,7 @@ def calculate_charge(ride_time) -> float:
 	return round(float(ride_time) / 60, 2) * 0.5
 
 
-def drop_bike(customer: Customer, rented_bike: Bike):
+def drop_bike(customer, rented_bike: Bike):
 	'''
 	Do something after the customer selects dropping a bike.
 
