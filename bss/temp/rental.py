@@ -9,6 +9,23 @@ from bss.conf import attrs
 from bss.data import db_path as db
 
 
+def track_bikes() -> list:
+	'''
+	Get all bike data.
+
+	Returns
+	-------
+	bikes : a list of bike data
+	'''
+
+	conn = sqlite3.connect(db.get_db_path())
+	c = conn.cursor()
+	c.execute('SELECT * FROM bike')
+	bikes = c.fetchall()
+	conn.close()
+	return bikes
+
+
 def check_bikes(location = None, bike_code = attrs.AVAILABLE_BIKE_CODE) -> list:
 	'''
 	Check if there is any available/defective bike in a specified location, or check all available/busy/defective bikes.

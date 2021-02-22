@@ -3,14 +3,14 @@ from tkinter.constants import E, N, RAISED, S, SOLID, W
 
 from PIL import Image, ImageTk
 
-from bss.temp import account  # TODO
+from bss.temp import account, rental  # TODO
 from bss.conf import attrs
-from bss.temp.customer import renter  # TODO
-from bss.temp.customer.customer import Customer  # TODO
+from bss.temp.customer import Customer  # TODO
 from bss.temp.mapping import Mapping  # TODO
-from bss.temp.operator.operator import OperatorWorker  # TODO
+from bss.temp.operator import OperatorWorker  # TODO
 from bss.ui.about_view import AboutView
 from bss.ui.conf import attrs as ui_attrs, colours, styles
+from bss.ui.tracking_view import TrackingView
 from bss.ui.utils import img_path as img
 from bss.ui.utils.simpledialog import FloatDialogue, IntegerDialogue
 from bss.ui.utils.tooltip import Tooltip
@@ -47,6 +47,7 @@ class HomeView:
         self.__parent_width = 900
         self.__parent_height = 600
         self.__rented_bike = None
+        self.__tracking_window = None
 
         self.__parent.geometry('%dx%d+%d+%d' % (self.__parent_width, self.__parent_height, (screen_width - self.__parent_width) / 2, (screen_height - self.__parent_height) / 2))  # Centre the parent window.
         self.__parent.title('Home')
@@ -146,6 +147,17 @@ class HomeView:
             self.__button_overhaul_bike.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
             self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
 
+            # New row in the dashboard frame: placeholder.
+            frame_row_index += 1
+            ttk.Label(self.__frame_dashboard, style = styles.PLACEHOLDER_LABEL).grid(row = frame_row_index)
+            self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+
+            # New row in the dashboard frame: the button for tracking all bikes.
+            frame_row_index += 1
+            self.__button_overhaul_bike = ttk.Button(self.__frame_dashboard, command = self.__goto_tracking, text = 'Track all bikes')
+            self.__button_overhaul_bike.grid(columnspan = frame_column_num, padx = ui_attrs.PADDING_X, row = frame_row_index, sticky = (E, W))
+            self.__frame_dashboard.rowconfigure(frame_row_index, weight = 0)
+
         # New row in the dashboard frame: the info label.
         frame_row_index += 1
         self.__label_info = ttk.Label(self.__frame_dashboard, style = styles.CONTENT_LABEL)
@@ -203,11 +215,11 @@ class HomeView:
                 tooltip_text = 'Location: (%d, %d)' % (row, col)
 
                 if self.__map_array[row, col] == attrs.AVATAR_CODE:
-                    available_bike_count = len(renter.check_bikes([row, col]))
+                    available_bike_count = len(rental.check_bikes([row, col]))
                     label_map_cell.image = ImageTk.PhotoImage(self.__image_avatar_cell)
 
                     if isinstance(self.__user, OperatorWorker):
-                        defective_bike_count = len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
+                        defective_bike_count = len(rental.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
 
                         if defective_bike_count > 0:
                             tooltip_text += '\nDefective bike(s): %d' % defective_bike_count
@@ -216,13 +228,14 @@ class HomeView:
                         tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
                 elif self.__map_array[row, col] == attrs.AVAILABLE_BIKE_CODE:
                     label_map_cell.image = ImageTk.PhotoImage(self.__image_available_bike)
-                    tooltip_text += '\nAvailable bike(s): %d' % len(renter.check_bikes([row, col]))
+                    tooltip_text += '\nAvailable bike(s): %d' % len(rental.check_bikes([row, col]))
                 elif self.__map_array[row, col] == attrs.DEFECTIVE_BIKE_CODE:
                     label_map_cell.image = ImageTk.PhotoImage(self.__image_defective_bike)
 
                     if isinstance(self.__user, OperatorWorker):
-                        available_bike_count = len(renter.check_bikes([row, col]))
-                        tooltip_text += '\nDefective bike(s): %d' % len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
+                        available_bike_count = len(rental.check_bikes([row, col]))
+                        tooltip_text += '\nDefective bike(s): %d' % len(
+                            rental.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
 
                         if available_bike_count > 0:
                             tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
@@ -245,6 +258,28 @@ class HomeView:
         self.__parent.bind('<Down>', self.__move)
 
         self.__parent.after(attrs.REFRESHING_INTERVAL, self.__refresh_map)  # Refresh the map regularly.
+
+    def __goto_tracking(self) -> None:
+        '''
+        Go to the bike tracking view.
+        '''
+
+        if self.__tracking_window is None:
+            self.__tracking_window = Toplevel(self.__parent)
+            self.__tracking_window.protocol('WM_DELETE_WINDOW', self.__reset_tracking)
+            self.__tracking_window.focus()
+            TrackingView(self.__tracking_window)
+            self.__tracking_window.mainloop()
+        else:
+            self.__tracking_window.focus()
+
+    def __reset_tracking(self) -> None:
+        '''
+        Reset the bike tracking view.
+        '''
+
+        self.__tracking_window.destroy()
+        self.__tracking_window = None
 
     def __goto_about(self) -> None:
         '''
@@ -289,18 +324,18 @@ class HomeView:
             if self.__user.get_balance() > 0:
                 # Drop a bike.
                 if self.__user.get_flag():
-                    if self.__user.get_balance() < renter.calculate_charge(self.__rented_bike.get_extra_time()):
+                    if self.__user.get_balance() < rental.calculate_charge(self.__rented_bike.get_extra_time()):
                         messagebox.showerror(attrs.APP_NAME, "Oops! You haven't got enough money. Please top up your wallet first.", parent = self.__parent)
                     else:
                         self.__button_use_bike['text'] = self.__PICKUP_BIKE_TEXT
-                        self.__user, transaction_date = renter.drop_bike(self.__user, self.__rented_bike)
+                        self.__user, transaction_date = rental.drop_bike(self.__user, self.__rented_bike)
 
                         if self.__rented_bike.is_defective():
                             messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using! The bike you dropped will be unavailable and overhauled.\n\nDid the bike work fine?', parent = self.__parent)
-                            renter.report_break(self.__rented_bike, transaction_date)
+                            rental.report_break(self.__rented_bike, transaction_date)
                         else:
                             if not messagebox.askyesno(attrs.APP_NAME, 'Thanks for your using!\n\nDid the bike work fine?', parent = self.__parent):
-                                renter.report_break(self.__rented_bike, transaction_date)
+                                rental.report_break(self.__rented_bike, transaction_date)
 
                         self.__rented_bike.set_is_being_used()
                         location = self.__user.get_location()
@@ -308,13 +343,13 @@ class HomeView:
                         tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
                         label_map_element.image = ImageTk.PhotoImage(self.__image_avatar_cell)
                         label_map_element['image'] = label_map_element.image
-                        available_bike_count = len(renter.check_bikes(location))
+                        available_bike_count = len(rental.check_bikes(location))
                         tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]) + ('\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else ''))
                         self.__update_balance_text()
                         self.__update_ride_info()
                 # Attempt to pick up a bike.
                 else:
-                    bike_result = renter.get_closest_bike(self.__user.get_location())
+                    bike_result = rental.get_closest_bike(self.__user.get_location())
 
                     if isinstance(bike_result, list):
                         bike_id_list = [bike[0] for bike in bike_result]
@@ -350,16 +385,16 @@ class HomeView:
                 tooltip_map_element = self.__map_element_list[location[0]][location[1]][1]
                 label_map_element.image = ImageTk.PhotoImage(self.__image_avatar_cell)
                 label_map_element['image'] = label_map_element.image
-                defective_bike_count = len(renter.check_bikes(location, attrs.DEFECTIVE_BIKE_CODE))
-                available_bike_count = len(renter.check_bikes(location))
+                defective_bike_count = len(rental.check_bikes(location, attrs.DEFECTIVE_BIKE_CODE))
+                available_bike_count = len(rental.check_bikes(location))
                 tooltip_text_supplement = ('\nDefective bike(s): %d' % defective_bike_count if defective_bike_count > 0 else '') \
                     + ('\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else '')
                 tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]) + tooltip_text_supplement)
                 self.__update_ride_info()
             # Attempt to move a bike.
             else:
-                defective_bike_results = renter.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE)
-                available_bike_results = renter.check_bikes(self.__user.get_location())
+                defective_bike_results = rental.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE)
+                available_bike_results = rental.check_bikes(self.__user.get_location())
                 defective_bike_id_list = [bike[0] for bike in defective_bike_results]
                 available_bike_id_list = [bike[0] for bike in available_bike_results]
                 defective_bike_count = len(defective_bike_id_list)
@@ -399,7 +434,7 @@ class HomeView:
         '''
 
         location = self.__user.get_location()
-        self.__rented_bike = renter.renting(bike_id, location)
+        self.__rented_bike = rental.renting(bike_id, location)
 
         if self.__rented_bike is None:
             messagebox.showerror(attrs.APP_NAME, 'Oops! Your preferred bike may have been taken by someone else.', parent = self.__parent)
@@ -411,10 +446,10 @@ class HomeView:
             label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider)
             label_map_element['image'] = label_map_element.image
             defective_bike_count = 0
-            available_bike_count = len(renter.check_bikes(self.__user.get_location()))
+            available_bike_count = len(rental.check_bikes(self.__user.get_location()))
 
             if isinstance(self.__user, OperatorWorker):
-                defective_bike_count = len(renter.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE))
+                defective_bike_count = len(rental.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE))
 
             tooltip_text_supplement = ('\nDefective bike(s): %d' % defective_bike_count if isinstance(self.__user, OperatorWorker) and defective_bike_count > 0 else '') \
                 + ('\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else '')
@@ -429,7 +464,7 @@ class HomeView:
         if self.__user.get_flag():
             messagebox.showerror(attrs.APP_NAME, 'Oops! You are moving a bike.\nPlease drop it and then pick up a bike to overhaul.')
         else:
-            defective_bike_results = renter.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE)
+            defective_bike_results = rental.check_bikes(self.__user.get_location(), attrs.DEFECTIVE_BIKE_CODE)
             defective_bike_count = len(defective_bike_results)
 
             if defective_bike_count >= 1:
@@ -462,7 +497,7 @@ class HomeView:
         if isinstance(self.__user, Customer):
             if self.__user.get_flag():
                 defective = self.__rented_bike.get_defective()
-                bike_status_info = '\n\nBike status (est.): '
+                bike_status_info = '\n\nBike conditions (est.): '
 
                 if defective < attrs.FINE_BIKE_THRESHOLD:
                     bike_status_info += attrs.FINE_STATUS
@@ -476,15 +511,16 @@ class HomeView:
                     + '\n\nBike ID: ' + str(self.__rented_bike.get_id()) \
                     + bike_status_info \
                     + '\n\nDistance: ' + str(self.__rented_bike.get_distance()) \
-                    + '\n\nCharge: ￡' + '%.2f' % renter.calculate_charge(self.__rented_bike.get_extra_time())
+                    + '\n\nCharge: ￡' + '%.2f' % rental.calculate_charge(self.__rented_bike.get_extra_time())
             else:
                 self.__label_info['text'] = self.__HINT_INFO
         else:
             self.__label_info['text'] = \
                 self.__HINT_INFO \
-                + '\n\nAll defective bike(s): ' + str(len(renter.check_bikes(bike_code = attrs.DEFECTIVE_BIKE_CODE))) \
-                + '\n\nAll busy non-defective bike(s): ' + str(len(renter.check_bikes(bike_code = attrs.BUSY_BIKE_CODE))) \
-                + '\n\nAll available bike(s): ' + str(len(renter.check_bikes()))
+                + '\n\nAll defective bike(s): ' + str(len(rental.check_bikes(bike_code = attrs.DEFECTIVE_BIKE_CODE))) \
+                + '\n\nAll busy non-defective bike(s): ' + str(len(
+                    rental.check_bikes(bike_code = attrs.BUSY_BIKE_CODE))) \
+                + '\n\nAll available bike(s): ' + str(len(rental.check_bikes()))
 
     def __log_out(self, is_logout_button = True) -> None:
         '''
@@ -537,11 +573,11 @@ class HomeView:
                 tooltip_text = 'Location: (%d, %d)' % (row, col)
 
                 if new_map_array[row, col] == attrs.AVATAR_CODE:
-                    available_bike_count = len(renter.check_bikes([row, col]))
+                    available_bike_count = len(rental.check_bikes([row, col]))
                     tooltip_text = 'Location: (%d, %d)' % (row, col)
 
                     if isinstance(self.__user, OperatorWorker):
-                        defective_bike_count = len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
+                        defective_bike_count = len(rental.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
 
                         if defective_bike_count > 0:
                             tooltip_text += '\nDefective bike(s): %d' % defective_bike_count
@@ -549,11 +585,12 @@ class HomeView:
                     if available_bike_count > 0:
                         tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
                 elif new_map_array[row, col] == attrs.AVAILABLE_BIKE_CODE:
-                    tooltip_text += '\nAvailable bike(s): %d' % len(renter.check_bikes([row, col]))
+                    tooltip_text += '\nAvailable bike(s): %d' % len(rental.check_bikes([row, col]))
                 elif new_map_array[row, col] == attrs.DEFECTIVE_BIKE_CODE:
                     if isinstance(self.__user, OperatorWorker):
-                        available_bike_count = len(renter.check_bikes([row, col]))
-                        tooltip_text += '\nDefective bike(s): %d' % len(renter.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
+                        available_bike_count = len(rental.check_bikes([row, col]))
+                        tooltip_text += '\nDefective bike(s): %d' % len(
+                            rental.check_bikes([row, col], attrs.DEFECTIVE_BIKE_CODE))
 
                         if available_bike_count > 0:
                             tooltip_text += '\nAvailable bike(s): %d' % available_bike_count
@@ -620,15 +657,15 @@ class HomeView:
                 new_location[0] += 1
 
             if self.__user.get_flag():
-                self.__rented_bike.set_location(new_location)
+                self.__rented_bike.set_location(new_location, False if isinstance(self.__user, Customer) else True)
 
                 if isinstance(self.__user, Customer):
                     self.__rented_bike.add_distance()
                     self.__rented_bike.add_extra_time()
                     self.__update_ride_info()
 
-            defective_bike_results = renter.check_bikes(location, attrs.DEFECTIVE_BIKE_CODE)
-            available_bike_results = renter.check_bikes(location)
+            defective_bike_results = rental.check_bikes(location, attrs.DEFECTIVE_BIKE_CODE)
+            available_bike_results = rental.check_bikes(location)
             defective_bike_count = len(defective_bike_results)
             available_bike_count = len(available_bike_results)
             tooltip_text = 'Location: (%d, %d)' % (location[0], location[1])
@@ -667,8 +704,8 @@ class HomeView:
             tooltip_map_element = self.__map_element_list[new_location[0]][new_location[1]][1]
             label_map_element.image = ImageTk.PhotoImage(self.__image_bike_with_rider) if self.__user.get_flag() else ImageTk.PhotoImage(self.__image_avatar_cell)
             label_map_element['image'] = label_map_element.image
-            defective_bike_count = len(renter.check_bikes(new_location, attrs.DEFECTIVE_BIKE_CODE))
-            available_bike_count = len(renter.check_bikes(new_location))
+            defective_bike_count = len(rental.check_bikes(new_location, attrs.DEFECTIVE_BIKE_CODE))
+            available_bike_count = len(rental.check_bikes(new_location))
             tooltip_text_supplement = ('\nDefective bike(s): %d' % defective_bike_count if isinstance(self.__user, OperatorWorker) and defective_bike_count > 0 else '') \
                 + ('\nAvailable bike(s): %d' % available_bike_count if available_bike_count > 0 else '')
             tooltip_map_element.set_text('Location: (%d, %d)' % (location[0], location[1]) + tooltip_text_supplement)

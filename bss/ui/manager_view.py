@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 
 from bss.temp import account  # TODO
 from bss.conf import attrs
-from bss.temp.manager.manager import Manager  # TODO
+from bss.temp.manager import Manager  # TODO
 from bss.ui.about_view import AboutView
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.utils import img_path as img

@@ -3,7 +3,7 @@ import sqlite3
 import numpy as np
 
 from bss.conf import attrs
-from bss.temp.customer.customer import Customer  # TODO
+from bss.temp.customer import Customer  # TODO
 from bss.data import db_path as db
 
 

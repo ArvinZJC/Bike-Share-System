@@ -95,7 +95,7 @@ class AboutView:
             busy_bike_explanation = 'To protect privacy, busy bikes are not visualised on a map.'
 
             if role == attrs.OPERATOR:
-                busy_bike_explanation += ' However, as an operator, you can view their locations in a tracking report.'
+                busy_bike_explanation += ' However, as an operator, you can view their locations in a bike tracking report.'
 
             ttk.Label(parent, justify = CENTER, style = styles.CONTENT_LABEL, text = busy_bike_explanation, wraplength = parent_width - ui_attrs.PADDING_X * 2).grid(columnspan = column_num, padx = ui_attrs.PADDING_X, pady = ui_attrs.PADDING_Y, row = row_index)
             parent.rowconfigure(row_index, weight = 0)
@@ -116,6 +116,7 @@ class AboutView:
         ttk.Label(frame_version_copyright, style = styles.PLACEHOLDER_LABEL).pack()
 
 
+# Test purposes only.
 if __name__ == '__main__':
     from tkinter import Tk
 

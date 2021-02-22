@@ -1,6 +1,6 @@
 import sqlite3
 
-from bss.temp.customer import renter
+from bss.temp import rental
 from bss.data import db_path as db
 
 
@@ -61,7 +61,7 @@ class Customer:
 		amount : the amount of money for the ride
 		'''
 
-		amount = renter.calculate_charge(time)
+		amount = rental.calculate_charge(time)
 		self.__balance -= amount
 		conn = sqlite3.connect(self.__db_path)
 		c = conn.cursor()
