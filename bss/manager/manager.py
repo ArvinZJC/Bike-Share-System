@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sqlite3
 from datetime import datetime
-from bss.data.db_path import get_db_path
+import os
 
 
 class Manager:
@@ -11,6 +11,9 @@ class Manager:
 		self.Id = Id
 		self.name = name
 		self.password = password
+
+	def get_id(self):
+		return self.Id
 
 	def menu_options(self):
 		print("Choosing one of the following options.")
@@ -33,8 +36,9 @@ class Manager:
 		return choice
 
 	def viz(self,choice):
+		print(os.getcwd())
 
-		conn = sqlite3.connect(get_db_path())
+		conn=sqlite3.connect(os.getcwd()+'\\data\\BACKUP.db')
 		c = conn.cursor()
 
 		if choice == 1:
@@ -48,7 +52,7 @@ class Manager:
 
 			plt.figure(figsize=(14,8))
 			plt.plot(transactions_plot.index[::len(transactions_plot)//15],transactions_plot[::len(transactions_plot)//15],
-			        'r-o',markeredgecolor='k',label='Growth over time')
+					'r-o',markeredgecolor='k',label='Growth over time')
 			plt.grid()
 			plt.legend(loc='best')
 			plt.title("Growth over time")
@@ -111,7 +115,7 @@ class Manager:
 			plt.subplots(1,3,figsize=(20,8))
 
 			plt.subplot(1,3,1)
-			plt.hist(transactions,bins=10,color='b')
+			plt.hist(transactions,bins=15,color='b')
 			plt.xlabel('Distance in Miles')
 			plt.title('Distance Travelled Per Trip')
 			plt.ylabel('Number of trips')
@@ -136,7 +140,7 @@ class Manager:
 			plt.grid(axis='both',linewidth=1)
 
 			plt.subplot(1,3,3)
-			plt.hist(charges,bins=10,color='y')
+			plt.hist(charges,bins=15,color='y')
 			plt.xlabel('Money')
 			plt.title('Cost Per Trip')
 			plt.ylabel('Number of trips')
@@ -199,8 +203,8 @@ class Manager:
 			end_time = pd.read_sql('Select id,time_of_event from bike_status where defective_start=1',conn)	
 			start_time['end']=0
 			for i in start_time['id'].unique():
-			    start_time['end'][start_time['id']==i]=list(end_time['time_of_event'][end_time['id']==i])
-			    
+				start_time['end'][start_time['id']==i]=list(end_time['time_of_event'][end_time['id']==i])
+				
 			broke_time = [datetime.strptime(i,"%b %d %Y %H:%M:%S") for i in start_time['time_of_event']]
 			fixed_time = [datetime.strptime(i,"%b %d %Y %H:%M:%S") for i in start_time['end']]
 			response_time = [j-i for i,j in zip(broke_time,fixed_time)]
@@ -209,9 +213,9 @@ class Manager:
 			indexes =  [i[0] for i in response_time.index.values]
 			response_time = list(response_time)
 			for i in range(24):
-			    if i not in indexes:
-			        indexes.append(i)
-			        response_time.append(0)
+				if i not in indexes:
+					indexes.append(i)
+					response_time.append(0)
 
 			response_time = pd.DataFrame(response_time,index=indexes)
 			response_time = response_time.sort_index()[0].values

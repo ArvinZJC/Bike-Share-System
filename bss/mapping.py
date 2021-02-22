@@ -3,19 +3,19 @@ import sqlite3
 
 import numpy as np
 
-from bss.data.db_path import get_db_path
+from conf import attrs
 
 
 class Mapping:
 
 	def __init__(self):
 		self.map_array = np.zeros((20, 20))
-		conn = sqlite3.connect(get_db_path())
+		conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 		c = conn.cursor()
 
-		c.execute("SELECT location_row FROM bike where defective<1")
+		c.execute("SELECT location_row FROM bike where defective<0.9")
 		rows = c.fetchall()
-		c.execute("SELECT location_col FROM bike where defective<1")
+		c.execute("SELECT location_col FROM bike where defective<0.9")
 		cols = c.fetchall()
 		for i, j in zip(rows, cols):
 			self.map_array[i, j] += 1
@@ -31,12 +31,12 @@ class Mapping:
 
 	def get_state(self):
 		self.map_array = np.zeros((20, 20))
-		conn = sqlite3.connect(get_db_path())
+		conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
 		c = conn.cursor()
 
-		c.execute("SELECT location_row FROM bike where defective<1")
+		c.execute("SELECT location_row FROM bike where defective<0.9")
 		rows = c.fetchall()
-		c.execute("SELECT location_col FROM bike where defective<1")
+		c.execute("SELECT location_col FROM bike where defective<0.9")
 		cols = c.fetchall()
 		for i, j in zip(rows, cols):
 			self.map_array[i, j] += 1

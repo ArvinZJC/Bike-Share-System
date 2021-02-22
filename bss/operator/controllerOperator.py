@@ -1,12 +1,11 @@
 import random
 from bike import *
-from customer import *
 from login import *
 from mapping import *
-from renter import *
-from operators import *
+from operator import *
 from companysPocket import *
 import time
+import os
 
 def operator_pilot(operatorWorker):
 	centralPocket = CentralBank()
@@ -20,6 +19,11 @@ def operator_pilot(operatorWorker):
 			continue
 
 		if menu_choice==4:
+			conn = sqlite3.connect(os.getcwd()+'\\data\\' + attrs.DB_FILENAME)
+			c = conn.cursor()
+			c.execute("UPDATE operator SET is_online = 0 where id =:val",{'val':operatorWorker.get_id()})
+			conn.commit()
+			conn.close()
 			break
 		elif menu_choice==1:
 			operatorWorker.track_bikes()

@@ -1,16 +1,7 @@
-'''
-Description: a definition of operators
-Author: Antony
-Last Editors: Arvin Zhao
-LastEditTime: 2021-02-04 09:57:33
-'''
-
 import sqlite3
+from bike import *
 import time
-
-from bss.bike import Bike
-from bss.data.db_path import get_db_path
-
+import os
 
 class OperatorWorker:
 
@@ -20,7 +11,7 @@ class OperatorWorker:
 		self.password = password
 		self.balance = balance
 		self.skill_level = skill_level
-		self.__db_path = get_db_path()
+		self.__db_path = os.getcwd()+'\\data\\' + attrs.DB_FILENAME
 
 	def print_nice(self):
 		print("Name: ",self.name),
@@ -30,6 +21,9 @@ class OperatorWorker:
 
 	def get_skill_level(self):
 		return self.skill_level
+
+	def get_id(self):
+		return self.Id
 
 	def track_bikes(self):
 		conn = sqlite3.connect(self.__db_path)
@@ -79,10 +73,6 @@ class OperatorWorker:
 		conn.close()
 		to_repair.set_defective()
 		timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.time()))
-
-		print(timeBegin)
-		print(time.time())
-		print(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")))
 
 		if (time.time()+timeToFix)<time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S")):
 			timeOfFix = time.strftime("%b %d %Y %H:%M:%S",time.gmtime(time.mktime(time.strptime(timeBegin,"%b %d %Y %H:%M:%S"))+timeToFix))

@@ -1,6 +1,9 @@
 import sqlite3
-from conf import attrs
-db_name = attrs.DB_FILENAME 
+
+from bss.conf import attrs
+
+
+db_name = attrs.DB_FILENAME
 
 try:
 	conn = sqlite3.connect(db_name)
