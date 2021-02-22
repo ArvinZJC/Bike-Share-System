@@ -1,5 +1,9 @@
 from tkinter import messagebox, Toplevel, ttk
 from tkinter.constants import E, N, RAISED, S, SOLID, W
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
 from PIL import Image, ImageTk
 

@@ -1,6 +1,10 @@
 from tkinter import ttk
 from tkinter.constants import CENTER, E, S, W
 import time
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
 from PIL import Image, ImageTk
 
