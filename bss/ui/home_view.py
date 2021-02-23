@@ -58,7 +58,6 @@ class HomeView:
         self.__parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         self.__parent.minsize(self.__parent_width, self.__parent_height)
         self.__parent.maxsize(int(self.__parent_width * 1.5), int(self.__parent_height * 1.5))
-
         self.__parent.rowconfigure(0, weight = 1)
         styles.apply_style()
 

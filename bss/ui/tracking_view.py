@@ -1,10 +1,10 @@
 '''
 Description: the definition of a bike tracking view
-Version: 1.0.0.20210222
+Version: 1.0.1.20210223
 Author: Arvin Zhao
 Date: 2021-02-22 05:06:32
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-22 05:06:45
+LastEditTime: 2021-02-23 05:06:45
 '''
 
 from tkinter import ttk
@@ -50,7 +50,6 @@ class TrackingView:
         self.__parent.title('Bike tracking report')
         self.__parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         self.__parent.minsize(parent_width, parent_height)
-
         styles.apply_style()
         self.__bike_data = rental.track_bikes()
 

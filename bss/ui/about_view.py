@@ -45,7 +45,6 @@ class AboutView:
         parent.title('About ' + attrs.APP_NAME)
         parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         parent.resizable(False, False)
-
         styles.apply_style()
 
         # New row: the logo image label.
