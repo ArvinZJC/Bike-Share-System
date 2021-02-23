@@ -19,7 +19,7 @@ The system is not packaged as an executable file, and the command prompt is need
 
 We have tested that BikeSims can be error-free if the above requirements are satisfied.
 
-Additionally, most functionality can work properly on other platforms like MacOS, since we mainly use [`tkinter`](https://docs.python.org/3/library/tkinter.html) and [`ttk`](https://docs.python.org/3/library/tkinter.ttk.html) of Python. However, we have not specially optimised the performance on these platforms because it is not our top priority.
+Additionally, most functionality can work properly on other platforms like MacOS, since we mainly use [`ttk`](https://docs.python.org/3/library/tkinter.ttk.html) of Python. However, we have not specially optimised the performance on these platforms because it is not our top priority.
 
 ## Lab 1_2d's Group Members
 
