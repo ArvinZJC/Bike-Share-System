@@ -535,7 +535,7 @@ class HomeView:
         '''
 
         if self.__user.get_flag():
-            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike and paying.', parent = self.__parent)
+            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike' + (' and paying.' if isinstance(self.__user, Customer) else '.'), parent = self.__parent)
         else:
             if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?', parent = self.__parent):
                 return
