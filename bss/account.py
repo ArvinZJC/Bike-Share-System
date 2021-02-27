@@ -21,9 +21,9 @@ def logging(role: str, name: str, password: str):
     '''
 
     # Put module references here to attempt to avoid a circular import.
-    from bss.temp.customer import Customer  # TODO
-    from bss.temp.manager import Manager  # TODO
-    from bss.temp.operator import OperatorWorker  # TODO
+    from bss.customer import Customer
+    from bss.manager import Manager
+    from bss.operator import OperatorWorker
 
     conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
@@ -37,7 +37,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][6] == attrs.OFFLINE:
                 user = Customer(values[0][0], values[0][1], values[0][2], values[0][3], [values[0][4], values[0][5]])
-                # TODO: c.execute('UPDATE customer SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
+                c.execute('UPDATE customer SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.OPERATOR:
@@ -47,7 +47,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][5] == attrs.OFFLINE:
                 user = OperatorWorker(values[0][0], values[0][1], values[0][2], values[0][3], values[0][4])
-                # TODO:c.execute('UPDATE operator SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
+                c.execute('UPDATE operator SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
     elif role == attrs.MANAGER:
@@ -57,7 +57,7 @@ def logging(role: str, name: str, password: str):
         if len(values) > 0:
             if values[0][3] == attrs.OFFLINE:
                 user = Manager(values[0][0], values[0][1], values[0][2])
-                # TODO: c.execute('UPDATE manager SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
+                c.execute('UPDATE manager SET is_online =:status where id =:val', {'status': attrs.ONLINE, 'val': values[0][0]})
             else:
                 return attrs.ALREADY_ONLINE
 
@@ -77,9 +77,9 @@ def log_out(user) -> None:
     '''
 
     # Put module references here to attempt to avoid a circular import.
-    from bss.temp.customer import Customer  # TODO
-    from bss.temp.manager import Manager  # TODO
-    from bss.temp.operator import OperatorWorker  # TODO
+    from bss.customer import Customer
+    from bss.manager import Manager
+    from bss.operator import OperatorWorker
 
     conn = sqlite3.connect(db.get_db_path())
     c = conn.cursor()
@@ -136,9 +136,9 @@ def register_customer(name: str, password: str) -> int:
 
 # Test purposes only.
 if __name__ == '__main__':
-    user = logging(attrs.CUSTOMER, 'jichen', '12345')
-    print(user is None)  # Expect: False
-    log_out(user)
+    user_test = logging(attrs.CUSTOMER, 'jichen', '12345')
+    print(user_test is None)  # Expect: False
+    log_out(user_test)
     print(logging(attrs.MANAGER, '???????', 'hello_world') is None)  # Expect: True
     print(register_customer('ji_chen', 'hello12345'))  # Expect: 0
     print(register_customer('jichen', '123456'))  # Expect: 0

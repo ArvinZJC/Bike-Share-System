@@ -1,6 +1,6 @@
 '''
 Description: the definition of a login view
-Version: 1.2.2.20210222
+Version: 1.2.3.20210222
 Author: Arvin Zhao
 Date: 2021-01-24 15:03:00
 Last Editors: Arvin Zhao
@@ -9,12 +9,16 @@ LastEditTime: 2021-02-22 18:23:21
 
 from tkinter import font, messagebox, StringVar, Toplevel, ttk
 from tkinter.constants import E, END, LEFT, RIGHT, W, X
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
 from PIL import Image, ImageTk
 
-from bss.temp import account  # TODO
+from bss import account
 from bss.conf import attrs
-from bss.manager.manager import Manager
+from bss.manager import Manager
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.home_view import HomeView
 from bss.ui.manager_view import ManagerView

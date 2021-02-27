@@ -1,9 +1,14 @@
 import sqlite3
-from conf import attrs
-db_name = attrs.DB_FILENAME 
-conn = sqlite3.connect(db_name)
-c = conn.cursor()
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
+import db_path as db
+
+
+conn = sqlite3.connect(db.get_db_path())
+c = conn.cursor()
 
 print("Customer table")
 print("========================")

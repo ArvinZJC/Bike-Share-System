@@ -1,74 +1,124 @@
-import sys
 import sqlite3
 
 import numpy as np
 
-from conf import attrs
+from bss.conf import attrs
+from bss.customer import Customer
+from bss.data import db_path as db
 
 
 class Mapping:
+	'''
+	The class for defining the map array.
+	'''
 
-	def __init__(self):
-		self.map_array = np.zeros((20, 20))
-		conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
+	def __init__(self, user) -> None:
+		'''
+		The constructor of the class for defining the map array.
+
+		Parameters
+		----------
+		user : a `Customer` or `OperatorWorker` object
+		'''
+
+		self.__user = user
+		self.__map_array = self.download()
+
+	def download(self):
+		'''
+		Retrieve the data source to create a map array.
+
+		Returns
+		-------
+		map_array : a new map array
+		'''
+
+		map_array = np.full((attrs.MAP_LENGTH, attrs.MAP_LENGTH), attrs.EMPTY_CELL_CODE)
+		conn = sqlite3.connect(db.get_db_path())
 		c = conn.cursor()
 
-		c.execute("SELECT location_row FROM bike where defective<0.9")
-		rows = c.fetchall()
-		c.execute("SELECT location_col FROM bike where defective<0.9")
-		cols = c.fetchall()
-		for i, j in zip(rows, cols):
-			self.map_array[i, j] += 1
+		# Available bikes have more priority than defective bikes for a customer.
+		if isinstance(self.__user, Customer):
+			# Set the defective bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			cols = c.fetchall()
 
-		c.execute("SELECT location_row FROM customer")
-		rows = c.fetchall()
-		c.execute("SELECT location_col FROM customer")
-		cols = c.fetchall()
-		for i, j in zip(rows, cols):
-			self.map_array[i, j] += 100
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.DEFECTIVE_BIKE_CODE
+
+			# Set the available bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			cols = c.fetchall()
+
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.AVAILABLE_BIKE_CODE
+		else:
+			# Set the available bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective<:threshold and is_being_used=:status', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD, 'status': attrs.AVAILABLE_BIKE_CODE})
+			cols = c.fetchall()
+
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.AVAILABLE_BIKE_CODE
+
+			# Set the defective bike code to the specified map element.
+			c.execute('SELECT location_row FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			rows = c.fetchall()
+			c.execute('SELECT location_col FROM bike where defective>=:threshold', {'threshold': attrs.DEFECTIVE_BIKE_THRESHOLD})
+			cols = c.fetchall()
+
+			for i, j in zip(rows, cols):
+				map_array[i, j] = attrs.DEFECTIVE_BIKE_CODE
+
+		# Set the avatar code to the specified map element.
+		location = self.__user.get_location()
+		map_array[location[0], location[1]] = attrs.AVATAR_CODE
 
 		conn.close()
+		return map_array
 
 	def get_state(self):
-		self.map_array = np.zeros((20, 20))
-		conn = sqlite3.connect('data/' + attrs.DB_FILENAME)
-		c = conn.cursor()
+		'''
+		Map array getter.
 
-		c.execute("SELECT location_row FROM bike where defective<0.9")
-		rows = c.fetchall()
-		c.execute("SELECT location_col FROM bike where defective<0.9")
-		cols = c.fetchall()
-		for i, j in zip(rows, cols):
-			self.map_array[i, j] += 1
+		Returns
+		-------
+		map_array : a map array
+		'''
 
-		c.execute("SELECT location_row FROM customer")
-		rows = c.fetchall()
-		c.execute("SELECT location_col FROM customer")
-		cols = c.fetchall()
-		for i, j in zip(rows, cols):
-			self.map_array[i, j] += 100
+		return self.__map_array
 
-		conn.close()
-		return self.map_array
+	def set_map_array(self, map_array) -> None:
+		'''
+		Map array setter.
+		Parameters
+		----------
+		map_array : a map array
+		'''
 
-	def get_square_val(self, location):
-		return self.map_array[location[0], location[1]]
+		self.__map_array = map_array
 
-	def set_state(self, location, value):
-		map_array = self.get_state()
-		try:
-			map_array[location[0], location[1]] = value
-		except Exception as e:
-			sys.exit(sys.exc_info()[0])
+	def set_state(self, location, value) -> bool:
+		'''
+		Set a specified code to the specified element of the map array.
 
-		self.map_array = map_array
+		Parameters
+		----------
+		location : the location of the specified element
+		value : a specified code
 
-	def print_nice(self):
-		for i in range(20):
-			for j in range(20):
-				#print("row:", i," col: ",j),
-				print(self.get_square_val([i, j]), end="\t"),
-			print("\n")
+		Returns
+		-------
+		succeed : `True` if the change is applied; otherwise, `False`
+		'''
 
-
-
+		if 0 <= location[0] < attrs.MAP_LENGTH and 0 <= location[1] < attrs.MAP_LENGTH:
+			self.__map_array[location[0], location[1]] = value
+			return True
+		else:
+			return False

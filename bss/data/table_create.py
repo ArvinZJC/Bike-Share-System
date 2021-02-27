@@ -1,5 +1,12 @@
 import sqlite3
-from conf import attrs
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
+
+import db_path as db
+
+
 def connection_check(db_name):
 	# Checking for connection and create a database file named "TEAM_PJT.db" if not exists.
 	conn = None
@@ -22,7 +29,7 @@ def create_table(conn, sqldb_table):
 
 def main():
 
-	db_name = attrs.DB_FILENAME  # version update
+	db_name = db.get_db_path()  # version update
 
 	bike_table = """CREATE TABLE IF NOT EXISTS bike(
 								id INTEGER PRIMARY KEY,
@@ -72,7 +79,7 @@ def main():
 								user_id INTEGER NOT NULL,
 								distance REAL,
 								duration TEXT,
-								startTime TEXT,
+								endTime TEXT,
 								FOREIGN KEY(bike_id) REFERENCES bike(id),
 								FOREIGN KEY(user_id) REFERENCES customer(id)
 								);"""                            
@@ -95,11 +102,12 @@ def main():
 		create_table(conn, manager_table)
 		create_table(conn, operator_table)
 		create_table(conn, movement_table)
-		create_table(conn,company_table)
-		create_table(conn,transactions)
+		create_table(conn, company_table)
+		create_table(conn, transactions)
 		conn.close()
 	else:
 		print("ERROR. Unable to create database connection.")
+
 
 if __name__ == '__main__':
 	main()

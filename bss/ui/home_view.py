@@ -1,13 +1,17 @@
 from tkinter import messagebox, Toplevel, ttk
 from tkinter.constants import E, N, RAISED, S, SOLID, W
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
 from PIL import Image, ImageTk
 
-from bss.temp import account, rental  # TODO
+from bss import rental, account, account as account_test
 from bss.conf import attrs
-from bss.temp.customer import Customer  # TODO
-from bss.temp.mapping import Mapping  # TODO
-from bss.temp.operator import OperatorWorker  # TODO
+from bss.customer import Customer
+from bss.mapping import Mapping
+from bss.operator import OperatorWorker
 from bss.ui.about_view import AboutView
 from bss.ui.conf import attrs as ui_attrs, colours, styles
 from bss.ui.tracking_view import TrackingView
@@ -54,7 +58,6 @@ class HomeView:
         self.__parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         self.__parent.minsize(self.__parent_width, self.__parent_height)
         self.__parent.maxsize(int(self.__parent_width * 1.5), int(self.__parent_height * 1.5))
-
         self.__parent.rowconfigure(0, weight = 1)
         styles.apply_style()
 
@@ -532,7 +535,7 @@ class HomeView:
         '''
 
         if self.__user.get_flag():
-            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike and paying.', parent = self.__parent)
+            messagebox.showerror(attrs.APP_NAME, 'You cannot be logged out until dropping the bike' + (' and paying.' if isinstance(self.__user, Customer) else '.'), parent = self.__parent)
         else:
             if not is_logout_button and not messagebox.askyesno(attrs.APP_NAME, 'Are you sure you want to log out?', parent = self.__parent):
                 return
@@ -630,7 +633,7 @@ class HomeView:
 
     def __move(self, event) -> None:
         '''
-        Move the avatar of a customer, or move a bike if the user is an operator.TODO
+        Move the avatar or a bike.
 
         Parameters
         ----------
@@ -714,8 +717,6 @@ class HomeView:
 # Test purposes only.
 if __name__ == '__main__':
     from tkinter import Tk
-
-    from bss.temp import account as account_test  # TODO
 
     home_window = Tk()
     # HomeView(home_window, account_test.logging(attrs.CUSTOMER, 'jichen', '12345'))

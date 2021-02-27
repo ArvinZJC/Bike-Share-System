@@ -1,6 +1,10 @@
 from tkinter import ttk
 from tkinter.constants import CENTER, E, S, W
 import time
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
 from PIL import Image, ImageTk
 
@@ -41,7 +45,6 @@ class AboutView:
         parent.title('About ' + attrs.APP_NAME)
         parent.iconbitmap(img.get_img_path(attrs.APP_ICON_FILENAME))
         parent.resizable(False, False)
-
         styles.apply_style()
 
         # New row: the logo image label.

@@ -1,6 +1,6 @@
 '''
 Description: the definition of a sign-up view
-Version: 1.2.2.20210222
+Version: 1.2.3.20210222
 Author: Arvin Zhao
 Date: 2021-01-30 18:31:28
 Last Editors: Arvin Zhao
@@ -9,10 +9,14 @@ LastEditTime: 2021-02-22 18:31:39
 
 from tkinter import messagebox, StringVar, ttk
 from tkinter.constants import E, LEFT, RIGHT, W, X
+import os
+import sys
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(BASE_DIR)
 
 from PIL import Image, ImageTk
 
-from bss.temp import account  # TODO
+from bss import account
 from bss.conf import attrs
 from bss.ui.conf import attrs as ui_attrs, styles
 from bss.ui.utils import img_path as img

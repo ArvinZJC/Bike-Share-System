@@ -3,8 +3,8 @@ import time
 
 import numpy as np
 
-from bss.temp.bike import Bike  # TODO
-from bss.temp.companys_pocket import CentralBank  # TODO
+from bss.bike import Bike
+from bss.companys_pocket import CentralBank
 from bss.conf import attrs
 from bss.data import db_path as db
 
@@ -184,7 +184,7 @@ def drop_bike(customer, rented_bike: Bike):
 	transaction_date = time.strftime('%b %d %Y %H:%M:%S', time.gmtime(time.time()))
 	conn = sqlite3.connect(db.get_db_path())
 	c = conn.cursor()
-	c.execute("INSERT INTO movement(bike_id,user_id,distance,duration,startTime) VALUES({},{},{},'{}','{}')".format(rented_bike.get_id(), customer.get_id(), rented_bike.get_distance(), duration, transaction_date))
+	c.execute("INSERT INTO movement(bike_id,user_id,distance,duration,endTime) VALUES({},{},{},'{}','{}')".format(rented_bike.get_id(), customer.get_id(), rented_bike.get_distance(), duration, transaction_date))
 	conn.commit()
 	conn.close()
 	CentralBank().track_changes(amount, transaction_date)

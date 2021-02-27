@@ -1,10 +1,10 @@
 '''
 Description: an attribute sheet to make it convenient to manage code attributes
-Version: 1.0.10.20210222
+Version: 1.0.13.20210223
 Author: Arvin Zhao
 Date: 2021-02-01 17:00:57
 Last Editors: Arvin Zhao
-LastEditTime: 2021-02-22 17:01:54
+LastEditTime: 2021-02-23 17:01:54
 '''
 
 # Login status.
@@ -20,7 +20,7 @@ AVAILABLE_BIKE_FILENAME = 'available_bike.png'
 BIKE_WITH_RIDER_FILENAME = 'bike_with_rider.png'
 CLOSED_EYE_FILENAME = 'closed_eye.png'
 CUSTOMER_AVATAR_FILENAME = 'customer.png'
-DB_FILENAME = 'TEAM_PJT.db'
+DB_FILENAME = 'BACKUP.db'
 DEFECTIVE_BIKE_FILENAME = 'defective_bike.png'
 HINT_FILENAME = 'hint.png'
 MANAGER_AVATAR_FILENAME = 'manager.png'
@@ -59,6 +59,7 @@ MANAGER = 'Manager'
 OPERATOR = 'Operator'
 PASSWORD_LENGTH_MAX = 18
 PASSWORD_LENGTH_MIN = 6
+PROJECT_BASENAME = 'Bike-Share-System'
 ROLE_LIST = [CUSTOMER, MANAGER, OPERATOR]
 ROOT_BASENAME = 'bss'
 UI_BASENAME = 'ui'

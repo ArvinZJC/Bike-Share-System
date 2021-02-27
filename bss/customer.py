@@ -1,6 +1,6 @@
 import sqlite3
 
-from bss.temp import rental
+from bss import rental
 from bss.data import db_path as db
 
 
