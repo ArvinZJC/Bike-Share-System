@@ -9,8 +9,18 @@ The bike-sharing system named **BikeSims** is built by the members of the group 
 The system is not packaged as an executable file, and the command prompt is needed to run it. Taken the Windows platform as an example, the steps of the recommended way are listed as follows.
 
 1. In the command prompt, navigate to the project directory whose name should contain `Bike-Share-System` (e.g., `C:\Bike-Share-System-main`).
-2. Run the command `python setup.py`. It will check and install any missing third-party package. If everything is fine, it will import the entry to the system and execute it. You may refer to the text file [`requirements.txt`](./requirements.txt) for the list of the required packages.
-3. It should be good to go if you see a login view.
+2. Run the command `python setup.py` in the command prompt. The script file will check and install any missing third-party package. If everything is fine, it will import the entry to the system and execute it. You may refer to the text file [`requirements.txt`](./requirements.txt) for the list of the required packages.
+3. It should be good to go if you see a login view. The existing account details are listed in the following table. Please remember to **select a correct role** when you log in. You can also sign up a new account as a **customer**. Any newly registered customer account's username and password must satisfy the specified rules. Please refer to the user manual for further guides on how to use BikeSims.
+
+    | Role | Username | Password |
+    | :--: | :--: | :--: |
+    | Customer | tony | 1234 |
+    | Customer | jichen | 12345 |
+    | Customer | shihao | 123456 |
+    | Customer | yuan | 1234567 |
+    | Operator | jiamin | 1234 |
+    | Operator | nan | 12345 |
+    | Manager | xiaoran | 1234 |
 
 ## System Requirements
 
