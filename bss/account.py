@@ -119,19 +119,20 @@ def register_customer(name: str, password: str) -> int:
     else:
         conn = sqlite3.connect(db.get_db_path())
         c = conn.cursor()
+        c.execute('SELECT * FROM customer WHERE name=:username', {'username': name})
+
+        if len(c.fetchall()) != 0:
+            return attrs.ERROR  # The username already exists.
+
         row = random.randint(0, attrs.MAP_LENGTH - 1)
         col = random.randint(0, attrs.MAP_LENGTH - 1)
         sql = "select max(id) from customer"
         c.execute(sql)
         cid = c.fetchall()[0][0] + 1
-
-        try:
-            c.execute("INSERT INTO customer(id,name,password,wallet,location_row,location_col,is_online) VALUES({},'{}','{}',{},{},{},{})".format(cid, name, password, 0.0, row, col, attrs.OFFLINE))
-            conn.commit()
-            conn.close()
-            return attrs.PASS  # Sign up a user successfully.
-        except sqlite3.IntegrityError:
-            return attrs.ERROR  # The username already exists.
+        c.execute("INSERT INTO customer(id,name,password,wallet,location_row,location_col,is_online) VALUES({},'{}','{}',{},{},{},{})".format(cid, name, password, 0.0, row, col, attrs.OFFLINE))
+        conn.commit()
+        conn.close()
+        return attrs.PASS  # Sign up a user successfully.
 
 
 # Test purposes only.
